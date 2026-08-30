@@ -1,0 +1,472 @@
+{
+  "translation": {
+    "nav": {
+      "home": "الرئيسية",
+      "menu": "القائمة",
+      "profile": "الملف الشخصي",
+      "reminders": "تذكيرات المهام",
+      "calendar": "التقويم",
+      "overall": "نظرة عامة"
+    },
+    "overall": {
+      "title": "نظرة عامة على التحدي",
+      "overallRate": "المعدل العام",
+      "day": "يوم",
+      "bestStreaks": "أفضل سلسلة",
+      "perfectDays": "الأيام المكتملة",
+      "habitsDone": "المهام المنجزة",
+      "dailyAverage": "المعدل اليومي",
+      "habitTracker": "متتبع المهام",
+      "bestDay": "أفضل يوم"
+    },
+    "mood": {
+      "question": "كيف تشعر الآن؟",
+      "excellent": "ممتاز",
+      "great": "رائع",
+      "good": "جيد",
+      "neutral": "عادي",
+      "poor": "سيء",
+      "bad": "حزين",
+      "awful": "سيء جداً",
+      "addReason": "أضف سبباً",
+      "save": "حفظ",
+      "saved": "تم حفظ الحالة!",
+      "savedDescription": "تم تسجيل حالتك المزاجية."
+    },
+    "createTask": {
+      "title": "مهمة جديدة",
+      "popular": "الأكثر شيوعاً",
+      "popularDesc": "المهام الأكثر شيوعاً",
+      "customHabit": "مهمة محددة",
+      "createCustom": "إنشاء مهمة محددة",
+      "habitName": "اسم المهمة",
+      "create": "إنشاء",
+      "added": "تمت الإضافة!",
+      "habitAddedDesc": "تمت إضافة المهمة إلى مهامك اليومية",
+      "customHabitAdded": "تم إنشاء مهمتك المحددة",
+      "alreadyExists": "موجودة مسبقاً",
+      "habitAlreadyAdded": "هذه المهمة موجودة في قائمتك",
+      "habits": {
+        "walk": "المشي",
+        "sleep": "النوم",
+        "drinkWater": "شرب الماء",
+        "meditation": "التأمل",
+        "run": "الجري",
+        "stand": "الوقوف",
+        "cycling": "ركوب الدراجة",
+        "workout": "التمرين",
+        "burnCalories": "حرق السعرات",
+        "readBooks": "قراءة الكتب",
+        "lessCaffeine": "تقليل الكافيين",
+        "yoga": "اليوغا",
+        "stretch": "التمدد",
+        "noSmoking": "عدم التدخين",
+        "eatHealthy": "الأكل الصحي"
+      }
+    },
+    "challenge": {
+      "title": "Hard Challenge",
+      "stageName": "🌱 مرحلة البداية القوية",
+      "stage2Name": "💪 مرحلة التحدي والصمود",
+      "stage3Name": "🏆 مرحلة الأبطال والإتقان",
+      "daysRemaining": "{{count}} يوم من الفرص المتبقية",
+      "day": "🔥 اليوم {{current}}",
+      "totalDays": "{{total}} يوم من رحلة التميز",
+      "completeDay": "✨ أكمل اليوم بنجاح",
+      "allTasksRequired": "أنت على بُعد خطوات من إنجاز اليوم! أكمل جميع المهام لتحقيق النصر",
+      "dayCompleted": "مبارك! 🎉 أنجزت اليوم {{day}} بتميز!",
+      "motivational1": "استمر في التألق! 💪",
+      "motivational2": "أنت لا تُوقف! 🚀",
+      "motivational3": "خطوة أقرب للعظمة! ⭐",
+      "motivational4": "الأبطال يُصنعون يومياً! 🏆",
+      "motivational5": "انضباطك ملهم! 🔥",
+      "congratulations": "ماشاء الله! 🌟 أكملت {{stage}} في {{days}} يوم! أنت أسطورة حقيقية!",
+      "stageCompleted": "إنجاز رائع! 🎊 أتممت المرحلة {{stage}} بنجاح! استعد للمرحلة التالية...",
+      "allStagesCompleted": "سبحان الله! 👑 أنت بطل حقيقي! أكملت جميع المراحل بتفوق!",
+      "resetTitle": "⚠️ تم إعادة التحدي",
+      "resetDescription": "لم تكمل مهام الأيام السابقة، تم إرجاعك لليوم الأول. ابدأ من جديد بعزيمة أقوى!"
+    },
+    "notifications": {
+      "endOfDayTitle": "⚠️ تنبيه - باقي ساعتين!",
+      "endOfDayBody": "لم تكمل مهامك اليوم بعد! أكمل المهام قبل نهاية اليوم لتجنب إعادة التحدي من البداية.",
+      "urgentTitle1": "🚨 تحذير عاجل!",
+      "urgentBody1": "باقي ساعة واحدة فقط! أسرع وأكمل مهامك قبل فوات الأوان!",
+      "urgentTitle2": "⏰ الوقت ينفد!",
+      "urgentBody2": "باقي 30 دقيقة فقط! لا تخسر تقدمك، أكمل المهام الآن!",
+      "urgentTitle3": "🔥 آخر فرصة!",
+      "urgentBody3": "باقي 15 دقيقة! هذه فرصتك الأخيرة لإنقاذ يومك!"
+    },
+    "tasks": {
+      "quran": {
+        "title": "القرآن الكريم",
+        "description": "اتصل بكلام الله وارتقِ بروحك بقراءة وردك اليومي من القرآن"
+      },
+      "sport": {
+        "title": "تمرين صباحي 45 دقيقة",
+        "description": "قوِّ جسدك وعزّز طاقتك بتمرينك اليومي المنشط"
+      },
+      "sleep": {
+        "title": "نوم من 6-8 ساعات",
+        "description": "اشحن طاقتك واستعد لتحديات الغد بنوم كافي"
+      },
+      "water": {
+        "title": "شرب 3 لتر ماء",
+        "description": "حافظ على صحتك ونشاطك بشرب كمية كافية من الماء"
+      },
+      "reading": {
+        "title": "تطوير الذات",
+        "description": "وسّع مداركك وأثرِ عقلك بقراءة أو تعلم شيء جديد"
+      },
+      "noSugar": {
+        "title": "بدون أكل سريع",
+        "description": "تحكّم في رغباتك وابتعد عن الأكل السريع والوجبات الجاهزة"
+      },
+      "noWoman": {
+        "title": "غض البصر",
+        "description": "احفظ بصرك وطهّر قلبك بغض البصر عن المحرمات"
+      },
+      "coldShower": {
+        "title": "الدش البارد",
+        "description": "قوِّ إرادتك واختبر صلابتك بدش بارد منعش"
+      },
+      "dailyTask": {
+        "title": "✅ المهمة اليومية",
+        "description": "حقق هدفك اليومي وأنجز مهمتك المحددة بتميز"
+      },
+      "communityService": {
+        "title": "🤝 خدمة المجتمع",
+        "description": "كن سبباً في السعادة وساعد الآخرين أو اخدم مجتمعك"
+      },
+      "talkToStranger": {
+        "title": "💬 حوار هادف",
+        "description": "اكسر حاجز الخوف وأجرِ محادثة ملهمة مع شخص جديد"
+      },
+      "makeDawa": {
+        "title": "🕌 الدعوة إلى الله",
+        "description": "كن نوراً للآخرين وشارك الخير والتعاليم الإسلامية"
+      }
+    },
+    "index": {
+      "note": "ملاحظة (اختياري)",
+      "notePlaceholder": "أضف ملاحظة عن تقدمك...",
+      "setReminder": "تعيين تذكير",
+      "selectTime": "اختر الوقت المناسب للتذكير بهذه المهمة",
+      "time": "الوقت",
+      "saveReminder": "حفظ التذكير",
+      "saved": "تم الحفظ",
+      "reminderSet": "تم تعيين التذكير بنجاح",
+      "uploaded": "تم الرفع",
+      "error": "خطأ",
+      "failedToSaveReminder": "فشل في حفظ التذكير"
+    },
+    "rules": {
+      "title": "قواعد التحدي",
+      "subtitle": "اتبع هذه القواعد بدقة لمدة 75 يوماً"
+    },
+    "leaderboard": {
+      "title": "لوحة الصدارة",
+      "rank": "المرتبة",
+      "username": "اسم المستخدم",
+      "streak": "السلسلة الحالية",
+      "bestStreak": "أفضل سلسلة",
+      "currentDay": "اليوم الحالي",
+      "backToChallenge": "العودة للتحدي",
+      "weeklyPoints": "النقاط الأسبوعية",
+      "totalPoints": "إجمالي النقاط",
+      "weeklyChampion": "بطل الأسبوع",
+      "points": "نقطة",
+      "you": "أنت",
+      "howToEarn": "كيف تكسب النقاط؟",
+      "completeTask": "أكمل مهمة = نقطة واحدة",
+      "championReward": "صاحب أعلى نقاط في الأسبوع يحصل على إطار البطل ليوم كامل!",
+      "weeklyReset": "تُصفّر النقاط الأسبوعية كل أسبوع"
+    },
+    "auth": {
+      "login": "تسجيل الدخول",
+      "signup": "إنشاء حساب",
+      "email": "البريد الإلكتروني",
+      "password": "كلمة المرور",
+      "username": "اسم المستخدم",
+      "alreadyHaveAccount": "لديك حساب بالفعل؟",
+      "dontHaveAccount": "ليس لديك حساب؟",
+      "logout": "تسجيل الخروج",
+      "welcomeBack": "مرحباً بعودتك",
+      "joinChallenge": "انضم للتحدي",
+      "signupDescription": "ابدأ رحلة التحول لمدة 75 يوماً اليوم",
+      "loginDescription": "تابع تقدمك"
+    },
+    "settings": {
+      "title": "الإعدادات",
+      "language": "اللغة",
+      "changeLanguage": "تغيير اللغة",
+      "appearance": "المظهر",
+      "appearanceDesc": "خصص شكل التطبيق على جهازك",
+      "theme": "الوضع",
+      "themeDesc": "اختر الوضع المفضل لديك",
+      "light": "فاتح",
+      "dark": "داكن",
+      "system": "النظام",
+      "languageDesc": "اختر لغتك المفضلة",
+      "selectLanguage": "اختر اللغة",
+      "languageHint": "سيتم عرض التطبيق باللغة التي تختارها",
+      "notifications": "الإشعارات",
+      "notificationsDesc": "إدارة تفضيلات الإشعارات",
+      "dailyReminder": "تذكير يومي",
+      "dailyReminderDesc": "احصل على تذكير لإكمال مهامك اليومية",
+      "weeklyProgress": "التقدم الأسبوعي",
+      "weeklyProgressDesc": "احصل على ملخصات أسبوعية لتقدمك",
+      "achievements": "الإنجازات",
+      "achievementsDesc": "احصل على إشعار عند فتح إنجازات جديدة",
+      "saved": "تم حفظ الإعدادات",
+      "notificationUpdated": "تم تحديث تفضيلات الإشعارات",
+      "languageUpdated": "تم تحديث تفضيلات اللغة",
+      "themeUpdated": "تم تحديث تفضيلات المظهر",
+      "taskReminders": "تذكيرات المهام",
+      "taskRemindersDesc": "اضبط أوقات التذكير لكل مهمة يومية",
+      "accountSecurity": "أمان الحساب",
+      "accountSecurityDesc": "إدارة كلمة المرور وأمان الحساب",
+      "changePassword": "تغيير كلمة المرور",
+      "dangerZone": "منطقة الخطر",
+      "dangerZoneDesc": "إجراءات لا يمكن التراجع عنها"
+    },
+    "admin": {
+      "title": "لوحة تحكم المسؤول",
+      "accessDenied": "الوصول مرفوض",
+      "adminOnly": "هذه الصفحة متاحة فقط للمسؤولين",
+      "manageChallenges": "التحديات",
+      "challengesDescription": "عرض وإدارة تحديات جميع المستخدمين",
+      "currentDay": "اليوم الحالي",
+      "status": "الحالة",
+      "actions": "الإجراءات",
+      "delete": "حذف",
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "confirmDelete": "هل أنت متأكد؟",
+      "confirmDeleteDescription": "لا يمكن التراجع عن هذا الإجراء. سيتم حذف تقدم التحدي بشكل دائم.",
+      "cancel": "إلغاء",
+      "confirm": "حذف",
+      "deleteSuccess": "نجح",
+      "challengeDeleted": "تم حذف التحدي",
+      "deleteError": "خطأ في حذف التحدي",
+      "loadError": "خطأ في تحميل التحديات",
+      "manageUsers": "المستخدمين",
+      "usersDescription": "عرض وإدارة أدوار المستخدمين والصلاحيات",
+      "username": "اسم المستخدم",
+      "email": "البريد الإلكتروني",
+      "role": "الدور",
+      "joinedDate": "تاريخ الانضمام",
+      "roleUpdated": "تم تحديث الدور",
+      "roleUpdateSuccess": "تم تحديث دور المستخدم بنجاح",
+      "roleUpdateError": "خطأ في تحديث دور المستخدم",
+      "refresh": "تحديث",
+      "refreshed": "تم التحديث",
+      "dataRefreshed": "تم تحديث جميع البيانات بنجاح",
+      "rolesDistribution": "توزيع الأدوار",
+      "rolesDistributionDesc": "توزيع المستخدمين حسب أدوارهم في التطبيق",
+      "roles": {
+        "user": "مستخدم",
+        "moderator": "كشاف",
+        "admin": "مسؤول"
+      },
+      "tabs": {
+        "overview": "نظرة عامة",
+        "database": "قاعدة البيانات"
+      },
+      "database": {
+        "title": "قاعدة البيانات",
+        "description": "معلومات تفصيلية عن جداول قاعدة البيانات",
+        "totalRecords": "إجمالي السجلات",
+        "records": "سجل"
+      },
+      "stats": {
+        "totalUsers": "إجمالي المستخدمين",
+        "activeUsers": "المستخدمين النشطين",
+        "completionRate": "معدل الإكمال",
+        "averageDays": "متوسط الأيام",
+        "bestStreak": "أفضل سلسلة",
+        "admins": "المسؤولين",
+        "moderators": "الكشافين",
+        "regularUsers": "المستخدمين العاديين",
+        "registered": "مستخدمين مسجلين",
+        "currentlyActive": "نشطين حالياً",
+        "completed75Days": "أكملوا جميع المراحل",
+        "longestStreak": "أطول سلسلة",
+        "avgDaysCompleted": "متوسط الأيام المكتملة"
+      }
+    },
+    "onboarding": {
+      "slide1": {
+        "title": "مرحباً بك في Challenge 21",
+        "subtitle": "رحلتك تبدأ هنا",
+        "content": "مرحباً بك في Challenge 21 - رفيقك الشخصي لبناء نسخة أفضل منك. يسعدنا انضمامك إلينا!"
+      },
+      "slide2": {
+        "title": "ابدأ بناء روتينك",
+        "subtitle": "يوم بيوم",
+        "content": "أنشئ عادات يومية قوية تستمر معك. تتبع تقدمك، ابقَ ملتزماً، وشاهد نفسك تتحول يوماً بعد يوم."
+      },
+      "slide3": {
+        "title": "اجعل كل يوم يحسب",
+        "subtitle": "كل مهمة مهمة",
+        "content": "أكمل مهامك اليومية لكسب النقاط، حافظ على سلسلتك، وافتح الإنجازات. الأفعال الصغيرة المتسقة تؤدي إلى نتائج كبيرة."
+      },
+      "slide4": {
+        "title": "ابقَ متحمساً",
+        "subtitle": "لست وحدك",
+        "content": "انضم إلى مجتمع من الأشخاص المتشابهين في التفكير يعملون جميعاً نحو أن يصبحوا أفضل نسخة من أنفسهم. تنافس، ألهم، وتطور معاً."
+      },
+      "slide5": {
+        "title": "خصص رحلتك",
+        "subtitle": "اجعلها ملكك",
+        "content": "اختر كيف تريد أن يبدو تطبيقك. اختر الوضع الذي يناسبك وابدأ تحولك!"
+      },
+      "next": "التالي",
+      "skip": "تخطي",
+      "start": "لنبدأ!",
+      "lightMode": "فاتح",
+      "darkMode": "داكن"
+    },
+    "profile": {
+      "title": "الملف الشخصي",
+      "admin": "مسؤول",
+      "memberSince": "عضو منذ",
+      "journeyStats": "إحصائيات الرحلة الكاملة",
+      "overallProgress": "التقدم الإجمالي",
+      "daysCompleted": "يوم مكتمل",
+      "daysRemaining": "يوم متبقي",
+      "stage": "المرحلة",
+      "completed": "✓ مكتملة",
+      "inProgress": "قيد التنفيذ",
+      "upcoming": "قادمة",
+      "currentStageProgress": "تقدم المرحلة الحالية",
+      "currentDay": "اليوم الحالي",
+      "currentStreak": "السلسلة الحالية",
+      "streak": "السلسلة",
+      "completedDays": "مكتمل",
+      "bestStreak": "أفضل سلسلة",
+      "joinDate": "تاريخ الانضمام",
+      "startDate": "تاريخ البدء",
+      "status": "الحالة",
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "daysRemainingInStage": "يوم متبقي في هذه المرحلة",
+      "completedStage1": "أتممت المرحلة الأولى!",
+      "completedStage1And2": "أتممت المرحلتين الأولى والثانية!",
+      "daysOfDiscipline": "{{days}} يوم من التحدي والانضباط",
+      "consecutiveDays": "أيام متتالية",
+      "personalBest": "أفضل إنجاز شخصي",
+      "totalDays": "إجمالي الأيام المكتملة",
+      "challengeStatus": "حالة التحدي",
+      "progressTitle": "تقدم التحدي",
+      "completion": "نسبة الإنجاز",
+      "expectedEnd": "التاريخ المتوقع للإكمال",
+      "loadError": "خطأ في تحميل الملف الشخصي",
+      "noData": "لا توجد بيانات للملف الشخصي",
+      "editProfile": "تعديل الملف الشخصي",
+      "editDescription": "تحديث معلومات ملفك الشخصي",
+      "username": "اسم المستخدم",
+      "usernamePlaceholder": "أدخل اسم المستخدم",
+      "cancel": "إلغاء",
+      "save": "حفظ",
+      "saving": "جاري الحفظ...",
+      "updateSuccess": "تم تحديث الملف الشخصي",
+      "updateSuccessDesc": "تم تحديث ملفك الشخصي بنجاح",
+      "updateError": "خطأ في تحديث الملف الشخصي",
+      "avatarUpdated": "تم تحديث الصورة",
+      "avatarSuccess": "تم تحديث صورة ملفك الشخصي",
+      "avatarError": "خطأ في رفع الصورة"
+    },
+    "reminders": {
+      "title": "تذكيرات المهام",
+      "description": "إدارة تذكيرات مهامك اليومية",
+      "taskName": "المهمة",
+      "reminderTime": "وقت التذكير",
+      "status": "الحالة",
+      "enabled": "مفعّل",
+      "disabled": "معطّل",
+      "actions": "الإجراءات",
+      "edit": "تعديل",
+      "delete": "حذف",
+      "noReminders": "لا توجد تذكيرات بعد",
+      "addFirst": "أضف أول تذكير للبدء"
+    },
+    "paths": {
+      "title": "اختر مسارك",
+      "subtitle": "اختر تحدياً لبدء رحلتك",
+      "days": "يوم",
+      "completed": "مكتمل",
+      "recommended": "موصى به",
+      "active": "نشط",
+      "acceptChallengeTitle": "قبول التحدي",
+      "acceptChallengeDescription": "هل أنت مستعد لقبول تحدي {{path}}؟ بمجرد البدء، يجب عليك إكمال جميع المهام يومياً!",
+      "cancel": "إلغاء",
+      "acceptChallenge": "قبول التحدي",
+      "challengeStarted": "بدأ التحدي!",
+      "goodLuck": "بالتوفيق في رحلتك!",
+      "alreadyActive": "لديك تحدي نشط",
+      "completeFirst": "أكمل تحديك الحالي أولاً",
+      "muslimHard": {
+        "title": "21 HARD",
+        "description": "ابنِ عادات قوية مع 8 مهام يومية لمدة 21 يوماً. أساس تحولك."
+      },
+      "discipline": {
+        "title": "45 يوم انضباط",
+        "description": "ارتقِ مع 11 مهمة يومية لمدة 45 يوماً. لمن أتقن الأساسيات."
+      },
+      "transformation": {
+        "title": "75 يوم تحول",
+        "description": "التحدي الأقصى مع 12 مهمة يومية لمدة 75 يوماً. كن أفضل نسخة من نفسك."
+      },
+      "health": {
+        "title": "مسار الصحة",
+        "description": "ركز على الصحة البدنية: التمارين والتغذية والنوم لمدة 30 يوماً."
+      },
+      "fitness": {
+        "title": "مسار اللياقة",
+        "description": "برنامج لياقة مكثف مع تمارين يومية ومتابعة التغذية."
+      },
+      "learning": {
+        "title": "مسار التعلم",
+        "description": "وسّع معرفتك بمهام القراءة والتعلم اليومية."
+      }
+    },
+    "calendar": {
+      "title": "التقويم الشهري",
+      "currentStreak": "السلسلة الحالية",
+      "bestStreak": "أفضل سلسلة",
+      "points": "النقاط",
+      "completed": "مكتمل",
+      "missed": "فائت",
+      "today": "اليوم",
+      "day": "اليوم",
+      "dayCompletedMessage": "أحسنت! أكملت جميع المهام في هذا اليوم.",
+      "dayMissedMessage": "لم تكمل المهام في هذا اليوم.",
+      "dayPendingMessage": "هذا اليوم لم يكتمل بعد."
+    },
+    "wheelOfLife": {
+      "title": "عجلة الحياة",
+      "days": "يوم"
+    },
+    "customTask": {
+      "addButton": "إضافة مهمة مخصصة",
+      "title": "إضافة مهمة جديدة",
+      "description": "أنشئ مهمة مخصصة لتحديك",
+      "taskName": "اسم المهمة",
+      "taskNamePlaceholder": "أدخل اسم المهمة",
+      "taskDescription": "الوصف (اختياري)",
+      "taskDescriptionPlaceholder": "أدخل وصف المهمة",
+      "category": "الفئة",
+      "selectCategory": "اختر فئة",
+      "add": "إضافة المهمة",
+      "added": "تمت الإضافة",
+      "addedDescription": "تمت إضافة مهمتك المخصصة بنجاح",
+      "titleRequired": "الرجاء إدخال اسم المهمة"
+    },
+    "pathTasks": {
+      "dailyTasks": "المهام اليومية",
+      "tasksCount": "مهمة",
+      "startPath": "ابدأ هذا المسار",
+      "goToChallenge": "اذهب للتحدي"
+    }
+  }
+}

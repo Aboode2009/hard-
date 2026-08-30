@@ -1,0 +1,465 @@
+{
+  "translation": {
+    "nav": {
+      "home": "Inicio",
+      "menu": "Menú",
+      "profile": "Perfil",
+      "reminders": "Recordatorios",
+      "calendar": "Calendario",
+      "overall": "General"
+    },
+    "overall": {
+      "title": "Resumen del Desafío",
+      "overallRate": "Tasa General",
+      "day": "Día",
+      "bestStreaks": "Mejores Rachas",
+      "perfectDays": "Días Perfectos",
+      "habitsDone": "Tareas Completadas",
+      "dailyAverage": "Promedio Diario",
+      "habitTracker": "Seguidor de Tareas",
+      "bestDay": "Mejor Día"
+    },
+    "mood": {
+      "question": "¿Cómo te sientes ahora?",
+      "excellent": "Excelente",
+      "great": "Genial",
+      "good": "Bien",
+      "neutral": "Neutral",
+      "poor": "Mal",
+      "bad": "Triste",
+      "awful": "Terrible",
+      "addReason": "Agregar razón",
+      "save": "Guardar",
+      "saved": "¡Estado de ánimo guardado!",
+      "savedDescription": "Tu estado de ánimo ha sido registrado."
+    },
+    "createTask": {
+      "title": "Nueva Tarea",
+      "popular": "Populares",
+      "popularDesc": "Las tareas más populares",
+      "customHabit": "Tarea Personalizada",
+      "createCustom": "Crear Tarea Personalizada",
+      "habitName": "Nombre de la tarea",
+      "create": "Crear",
+      "added": "¡Tarea Añadida!",
+      "habitAddedDesc": "La tarea ha sido añadida a tus tareas diarias",
+      "customHabitAdded": "Tu tarea personalizada ha sido creada",
+      "alreadyExists": "Ya existe",
+      "habitAlreadyAdded": "Esta tarea ya está en tu lista",
+      "habits": {
+        "walk": "Caminar",
+        "sleep": "Dormir",
+        "drinkWater": "Beber Agua",
+        "meditation": "Meditación",
+        "run": "Correr",
+        "stand": "Estar de Pie",
+        "cycling": "Ciclismo",
+        "workout": "Ejercicio",
+        "burnCalories": "Quemar Calorías",
+        "readBooks": "Leer Libros",
+        "lessCaffeine": "Menos Cafeína",
+        "yoga": "Yoga",
+        "stretch": "Estiramientos",
+        "noSmoking": "No Fumar",
+        "eatHealthy": "Comer Saludable"
+      }
+    },
+    "challenge": {
+      "title": "Desafío Duro",
+      "stageName": "🌱 Etapa de Fundación",
+      "stage2Name": "💪 Etapa Guerrero",
+      "stage3Name": "🏆 Etapa Campeón",
+      "daysRemaining": "{{count}} oportunidades por delante",
+      "day": "🔥 Día {{current}}",
+      "totalDays": "{{total}} días de excelencia",
+      "completeDay": "✨ Completar Día Exitosamente",
+      "allTasksRequired": "¡Estás a pasos de la victoria! Completa todas las tareas para lograr el éxito de hoy",
+      "dayCompleted": "¡Increíble! 🎉 ¡Completaste el Día {{day}}!",
+      "motivational1": "¡Mantén este impulso! 💪",
+      "motivational2": "¡Eres imparable! 🚀",
+      "motivational3": "¡Un paso más cerca de la grandeza! ⭐",
+      "motivational4": "¡Los campeones se hacen a diario! 🏆",
+      "motivational5": "¡Tu disciplina es inspiradora! 🔥",
+      "congratulations": "¡MashaAllah! 🌟 ¡Completaste {{stage}} en {{days}} días! ¡Eres un verdadero campeón!",
+      "stageCompleted": "¡Logro excepcional! 🎊 ¡Etapa {{stage}} completada! Prepárate para el siguiente nivel...",
+      "allStagesCompleted": "¡SubhanAllah! 👑 ¡Eres una verdadera leyenda! ¡Completaste todas las etapas con excelencia!",
+      "resetTitle": "⚠️ Desafío Reiniciado",
+      "resetDescription": "No completaste las tareas de los días anteriores. Has sido devuelto al Día 1. ¡Comienza de nuevo con más determinación!"
+    },
+    "notifications": {
+      "endOfDayTitle": "⚠️ Advertencia - ¡Quedan 2 horas!",
+      "endOfDayBody": "¡Aún no has completado las tareas de hoy! Complétalas antes de medianoche para evitar reiniciar el desafío.",
+      "urgentTitle1": "🚨 ¡Advertencia Urgente!",
+      "urgentBody1": "¡Solo queda 1 hora! ¡Date prisa y completa tus tareas antes de que sea demasiado tarde!",
+      "urgentTitle2": "⏰ ¡El tiempo se agota!",
+      "urgentBody2": "¡Solo quedan 30 minutos! ¡No pierdas tu progreso, completa las tareas ahora!",
+      "urgentTitle3": "🔥 ¡Última oportunidad!",
+      "urgentBody3": "¡Quedan 15 minutos! ¡Esta es tu última oportunidad para salvar tu día!"
+    },
+    "tasks": {
+      "quran": {
+        "title": "Sagrado Corán",
+        "description": "Conecta con las palabras de Allah y eleva tu alma con lectura diaria del Corán"
+      },
+      "sport": {
+        "title": "Excelencia Física",
+        "description": "Fortalece tu cuerpo y aumenta tu energía con un entrenamiento poderoso"
+      },
+      "sleep": {
+        "title": "Descanso de Calidad",
+        "description": "Recarga tu energía y prepárate para los desafíos de mañana con 7-8 horas de sueño"
+      },
+      "water": {
+        "title": "Hidratación Vital",
+        "description": "Mantén tu salud y vitalidad bebiendo mucha agua"
+      },
+      "reading": {
+        "title": "Lectura Profunda",
+        "description": "Expande tus horizontes y enriquece tu mente leyendo un libro físico"
+      },
+      "noSugar": {
+        "title": "Sin Azúcar",
+        "description": "Domina tus antojos y mantente alejado del azúcar y los dulces hoy"
+      },
+      "noWoman": {
+        "title": "Baja la Mirada",
+        "description": "Protege tu vista y purifica tu corazón bajando la mirada"
+      },
+      "coldShower": {
+        "title": "Ducha Fría",
+        "description": "Fortalece tu voluntad y pon a prueba tu resistencia con una ducha fría refrescante"
+      },
+      "dailyTask": {
+        "title": "✅ Misión Diaria",
+        "description": "Logra tu objetivo diario y completa tu tarea elegida con excelencia"
+      },
+      "communityService": {
+        "title": "🤝 Impacto Comunitario",
+        "description": "Sé una fuente de felicidad ayudando a otros y sirviendo a tu comunidad"
+      },
+      "talkToStranger": {
+        "title": "💬 Conexión Significativa",
+        "description": "Rompe la barrera del miedo y ten una conversación inspiradora con alguien nuevo"
+      },
+      "makeDawa": {
+        "title": "🕌 Misión de Dawah",
+        "description": "Sé una luz para otros y comparte la belleza de las enseñanzas islámicas"
+      }
+    },
+    "index": {
+      "note": "Nota (opcional)",
+      "notePlaceholder": "Añade una nota sobre tu progreso...",
+      "setReminder": "Establecer Recordatorio",
+      "selectTime": "Selecciona el momento adecuado para este recordatorio de tarea",
+      "time": "Hora",
+      "saveReminder": "Guardar Recordatorio",
+      "saved": "Guardado",
+      "reminderSet": "Recordatorio establecido exitosamente",
+      "uploaded": "Subido",
+      "error": "Error",
+      "failedToSaveReminder": "Error al guardar recordatorio"
+    },
+    "rules": {
+      "title": "Reglas del Desafío",
+      "subtitle": "Sigue estas reglas estrictamente durante 75 días"
+    },
+    "leaderboard": {
+      "title": "Tabla de Clasificación",
+      "rank": "Rango",
+      "username": "Usuario",
+      "streak": "Racha",
+      "bestStreak": "Mejor Racha",
+      "currentDay": "Día Actual",
+      "backToChallenge": "Volver al Desafío",
+      "weeklyPoints": "Puntos Semanales",
+      "totalPoints": "Puntos Totales",
+      "weeklyChampion": "Campeón Semanal",
+      "points": "puntos",
+      "you": "Tú",
+      "howToEarn": "¿Cómo ganar puntos?",
+      "completeTask": "Completar tarea = 1 punto",
+      "championReward": "¡Más puntos semanales = Marco de campeón por un día!",
+      "weeklyReset": "Los puntos semanales se reinician cada semana"
+    },
+    "auth": {
+      "login": "Iniciar Sesión",
+      "signup": "Registrarse",
+      "email": "Correo Electrónico",
+      "password": "Contraseña",
+      "username": "Nombre de Usuario",
+      "alreadyHaveAccount": "¿Ya tienes una cuenta?",
+      "dontHaveAccount": "¿No tienes una cuenta?",
+      "logout": "Cerrar Sesión",
+      "welcomeBack": "Bienvenido de Nuevo",
+      "joinChallenge": "Únete al Desafío",
+      "signupDescription": "Comienza tu viaje de transformación de 75 días hoy",
+      "loginDescription": "Continúa tu progreso"
+    },
+    "settings": {
+      "title": "Configuración",
+      "language": "Idioma",
+      "changeLanguage": "Cambiar Idioma",
+      "appearance": "Apariencia",
+      "appearanceDesc": "Personaliza cómo se ve la aplicación en tu dispositivo",
+      "theme": "Tema",
+      "themeDesc": "Selecciona tu tema preferido",
+      "light": "Claro",
+      "dark": "Oscuro",
+      "system": "Sistema",
+      "languageDesc": "Elige tu idioma preferido",
+      "selectLanguage": "Seleccionar Idioma",
+      "languageHint": "La aplicación se mostrará en el idioma seleccionado",
+      "notifications": "Notificaciones",
+      "notificationsDesc": "Administra tus preferencias de notificación",
+      "dailyReminder": "Recordatorio Diario",
+      "dailyReminderDesc": "Recibe recordatorios para completar tus tareas diarias",
+      "weeklyProgress": "Progreso Semanal",
+      "weeklyProgressDesc": "Recibe resúmenes semanales de tu progreso",
+      "achievements": "Logros",
+      "achievementsDesc": "Recibe notificaciones cuando desbloquees logros",
+      "saved": "Configuración Guardada",
+      "notificationUpdated": "Preferencias de notificación actualizadas",
+      "languageUpdated": "Preferencia de idioma actualizada",
+      "themeUpdated": "Preferencia de tema actualizada"
+    },
+    "admin": {
+      "title": "Panel de Administración",
+      "accessDenied": "Acceso Denegado",
+      "adminOnly": "Esta página solo es accesible para administradores",
+      "manageChallenges": "Desafíos",
+      "challengesDescription": "Ver y administrar todos los desafíos de usuarios",
+      "currentDay": "Día Actual",
+      "status": "Estado",
+      "actions": "Acciones",
+      "delete": "Eliminar",
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "confirmDelete": "¿Estás seguro?",
+      "confirmDeleteDescription": "Esta acción no se puede deshacer. Se eliminará permanentemente el progreso de este desafío.",
+      "cancel": "Cancelar",
+      "confirm": "Eliminar",
+      "deleteSuccess": "Éxito",
+      "challengeDeleted": "El desafío ha sido eliminado",
+      "deleteError": "Error al eliminar desafío",
+      "loadError": "Error al cargar desafíos",
+      "manageUsers": "Usuarios",
+      "usersDescription": "Ver y administrar roles y permisos de usuarios",
+      "username": "Nombre de Usuario",
+      "email": "Correo Electrónico",
+      "role": "Rol",
+      "joinedDate": "Fecha de Registro",
+      "roleUpdated": "Rol Actualizado",
+      "roleUpdateSuccess": "El rol del usuario se ha actualizado exitosamente",
+      "roleUpdateError": "Error al actualizar rol de usuario",
+      "refresh": "Actualizar",
+      "refreshed": "Actualizado",
+      "dataRefreshed": "Todos los datos se han actualizado exitosamente",
+      "rolesDistribution": "Distribución de Roles",
+      "rolesDistributionDesc": "Distribución de usuarios por sus roles en la aplicación",
+      "roles": {
+        "user": "Usuario",
+        "moderator": "Explorador",
+        "admin": "Administrador"
+      },
+      "tabs": {
+        "overview": "Vista General",
+        "database": "Base de Datos"
+      },
+      "database": {
+        "title": "Base de Datos",
+        "description": "Información detallada sobre las tablas de la base de datos",
+        "totalRecords": "Registros Totales",
+        "records": "registros"
+      },
+      "stats": {
+        "totalUsers": "Usuarios Totales",
+        "activeUsers": "Usuarios Activos",
+        "completionRate": "Tasa de Finalización",
+        "averageDays": "Días Promedio",
+        "bestStreak": "Mejor Racha",
+        "admins": "Administradores",
+        "moderators": "Exploradores",
+        "regularUsers": "Usuarios Regulares",
+        "registered": "Usuarios registrados",
+        "currentlyActive": "Actualmente activos",
+        "completed75Days": "Completaron todas las etapas",
+        "longestStreak": "Racha más larga",
+        "avgDaysCompleted": "Promedio de días completados"
+      }
+    },
+    "onboarding": {
+      "slide1": {
+        "title": "Bienvenido a Challenge 21",
+        "subtitle": "Tu Viaje Comienza Aquí",
+        "content": "Bienvenido a Challenge 21 - tu compañero personal para construir un mejor tú. ¡Estamos emocionados de tenerte a bordo!"
+      },
+      "slide2": {
+        "title": "Comienza a Construir Tu Rutina",
+        "subtitle": "Un Día a la Vez",
+        "content": "Crea hábitos diarios poderosos que perduren. Sigue tu progreso, mantente responsable y observa cómo te transformas día a día."
+      },
+      "slide3": {
+        "title": "Haz Que Cada Día Cuente",
+        "subtitle": "Cada Tarea Importa",
+        "content": "Completa tus tareas diarias para ganar puntos, mantener tu racha y desbloquear logros. Pequeñas acciones consistentes llevan a grandes resultados."
+      },
+      "slide4": {
+        "title": "Mantente Motivado",
+        "subtitle": "No Estás Solo",
+        "content": "Únete a una comunidad de personas con ideas afines que trabajan para ser su mejor versión. Compite, inspira y crece juntos."
+      },
+      "slide5": {
+        "title": "Personaliza Tu Viaje",
+        "subtitle": "Hazlo Tuyo",
+        "content": "Elige cómo quieres que se vea tu aplicación. ¡Elige el tema que mejor te convenga y comienza tu transformación!"
+      },
+      "next": "Siguiente",
+      "skip": "Omitir",
+      "start": "¡Empecemos!",
+      "lightMode": "Claro",
+      "darkMode": "Oscuro"
+    },
+    "profile": {
+      "title": "Perfil",
+      "admin": "Administrador",
+      "memberSince": "Miembro desde",
+      "journeyStats": "Estadísticas Completas del Viaje",
+      "overallProgress": "Progreso General",
+      "daysCompleted": "días completados",
+      "daysRemaining": "días restantes",
+      "stage": "Etapa",
+      "completed": "✓ Completado",
+      "inProgress": "En Progreso",
+      "upcoming": "Próximo",
+      "currentStageProgress": "Progreso de la Etapa Actual",
+      "currentDay": "Día Actual",
+      "currentStreak": "Racha Actual",
+      "streak": "Racha",
+      "completedDays": "Completados",
+      "bestStreak": "Mejor Racha",
+      "joinDate": "Fecha de Registro",
+      "startDate": "Fecha de Inicio",
+      "status": "Estado",
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "daysRemainingInStage": "días restantes en esta etapa",
+      "completedStage1": "¡Etapa 1 Completada!",
+      "completedStage1And2": "¡Etapas 1 y 2 Completadas!",
+      "daysOfDiscipline": "{{days}} días de desafío y disciplina",
+      "consecutiveDays": "Días consecutivos",
+      "personalBest": "Mejor personal",
+      "totalDays": "Total de días completados",
+      "challengeStatus": "Estado del desafío",
+      "progressTitle": "Progreso del Desafío",
+      "completion": "Finalización",
+      "expectedEnd": "Finalización Esperada",
+      "loadError": "Error al cargar perfil",
+      "noData": "No hay datos de perfil disponibles",
+      "editProfile": "Editar Perfil",
+      "editDescription": "Actualiza la información de tu perfil",
+      "username": "Nombre de Usuario",
+      "usernamePlaceholder": "Ingresa tu nombre de usuario",
+      "cancel": "Cancelar",
+      "save": "Guardar",
+      "saving": "Guardando...",
+      "updateSuccess": "Perfil Actualizado",
+      "updateSuccessDesc": "Tu perfil se ha actualizado exitosamente",
+      "updateError": "Error al actualizar perfil",
+      "avatarUpdated": "Avatar Actualizado",
+      "avatarSuccess": "Tu foto de perfil se ha actualizado",
+      "avatarError": "Error al subir avatar"
+    },
+    "reminders": {
+      "title": "Recordatorios de Tareas",
+      "description": "Administra tus recordatorios de tareas diarias",
+      "taskName": "Tarea",
+      "reminderTime": "Hora del Recordatorio",
+      "status": "Estado",
+      "enabled": "Habilitado",
+      "disabled": "Deshabilitado",
+      "actions": "Acciones",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "noReminders": "Aún no hay recordatorios configurados",
+      "addFirst": "Añade tu primer recordatorio para comenzar"
+    },
+    "paths": {
+      "title": "Elige Tu Camino",
+      "subtitle": "Selecciona un desafío para comenzar tu viaje",
+      "days": "días",
+      "completed": "completado",
+      "recommended": "Recomendado",
+      "active": "Activo",
+      "acceptChallengeTitle": "Aceptar Desafío",
+      "acceptChallengeDescription": "¿Estás listo para aceptar el desafío {{path}}? ¡Una vez que comiences, debes completar todas las tareas diarias!",
+      "cancel": "Cancelar",
+      "acceptChallenge": "Aceptar Desafío",
+      "challengeStarted": "¡Desafío Iniciado!",
+      "goodLuck": "¡Buena suerte en tu viaje!",
+      "alreadyActive": "Tienes un desafío activo",
+      "completeFirst": "Completa tu desafío actual primero",
+      "muslimHard": {
+        "title": "Desafío 21 Días",
+        "description": "Construye hábitos fuertes con 8 tareas diarias durante 21 días. La base de tu transformación."
+      },
+      "discipline": {
+        "title": "45 Días de Disciplina",
+        "description": "Sube de nivel con 11 tareas diarias durante 45 días. Para quienes dominaron lo básico."
+      },
+      "transformation": {
+        "title": "75 Días de Transformación",
+        "description": "El desafío definitivo con 12 tareas diarias durante 75 días. Conviértete en tu mejor versión."
+      },
+      "health": {
+        "title": "Camino de Salud",
+        "description": "Enfócate en la salud física: ejercicio, nutrición y sueño durante 30 días."
+      },
+      "fitness": {
+        "title": "Camino de Fitness",
+        "description": "Programa de fitness intensivo con entrenamientos diarios y seguimiento nutricional."
+      },
+      "learning": {
+        "title": "Camino de Aprendizaje",
+        "description": "Expande tu conocimiento con tareas diarias de lectura y aprendizaje."
+      }
+    },
+    "calendar": {
+      "title": "Calendario Mensual",
+      "currentStreak": "Racha Actual",
+      "bestStreak": "Mejor Racha",
+      "points": "Puntos",
+      "completed": "Completado",
+      "missed": "Perdido",
+      "today": "Hoy",
+      "day": "Día",
+      "dayCompletedMessage": "¡Buen trabajo! Completaste todas las tareas este día.",
+      "dayMissedMessage": "No completaste las tareas este día.",
+      "dayPendingMessage": "Este día aún no se ha completado."
+    },
+    "wheelOfLife": {
+      "title": "Rueda de la Vida",
+      "days": "días"
+    },
+    "customTask": {
+      "addButton": "Añadir Tarea Personalizada",
+      "title": "Añadir Nueva Tarea",
+      "description": "Crea una tarea personalizada para tu desafío",
+      "taskName": "Nombre de la Tarea",
+      "taskNamePlaceholder": "Ingresa el nombre de la tarea",
+      "taskDescription": "Descripción (opcional)",
+      "taskDescriptionPlaceholder": "Ingresa la descripción de la tarea",
+      "category": "Categoría",
+      "selectCategory": "Selecciona una categoría",
+      "add": "Añadir Tarea",
+      "added": "Tarea Añadida",
+      "addedDescription": "Tu tarea personalizada se ha añadido exitosamente",
+      "titleRequired": "Por favor ingresa un nombre de tarea"
+    },
+    "pathTasks": {
+      "dailyTasks": "Tareas Diarias",
+      "tasksCount": "tareas",
+      "startPath": "Iniciar Este Camino",
+      "goToChallenge": "Ir al Desafío"
+    }
+  }
+}

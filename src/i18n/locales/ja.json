@@ -1,0 +1,465 @@
+{
+  "translation": {
+    "nav": {
+      "home": "ホーム",
+      "menu": "メニュー",
+      "profile": "プロフィール",
+      "reminders": "リマインダー",
+      "calendar": "カレンダー",
+      "overall": "概要"
+    },
+    "overall": {
+      "title": "チャレンジ概要",
+      "overallRate": "総合評価",
+      "day": "日",
+      "bestStreaks": "ベスト連続",
+      "perfectDays": "パーフェクトデイ",
+      "habitsDone": "完了したタスク",
+      "dailyAverage": "日平均",
+      "habitTracker": "タスクトラッカー",
+      "bestDay": "ベストデイ"
+    },
+    "mood": {
+      "question": "今の気分は？",
+      "excellent": "最高",
+      "great": "素晴らしい",
+      "good": "良い",
+      "neutral": "普通",
+      "poor": "悪い",
+      "bad": "悲しい",
+      "awful": "最悪",
+      "addReason": "理由を追加",
+      "save": "保存",
+      "saved": "気分を保存しました！",
+      "savedDescription": "あなたの気分が記録されました。"
+    },
+    "createTask": {
+      "title": "新しいタスク",
+      "popular": "人気",
+      "popularDesc": "最も人気のあるタスク",
+      "customHabit": "カスタムタスク",
+      "createCustom": "カスタムタスクを作成",
+      "habitName": "タスク名",
+      "create": "作成",
+      "added": "タスクを追加しました！",
+      "habitAddedDesc": "タスクが毎日のタスクに追加されました",
+      "customHabitAdded": "カスタムタスクが作成されました",
+      "alreadyExists": "既に存在します",
+      "habitAlreadyAdded": "このタスクはすでにリストにあります",
+      "habits": {
+        "walk": "ウォーキング",
+        "sleep": "睡眠",
+        "drinkWater": "水を飲む",
+        "meditation": "瞑想",
+        "run": "ランニング",
+        "stand": "立つ",
+        "cycling": "サイクリング",
+        "workout": "運動",
+        "burnCalories": "カロリー消費",
+        "readBooks": "読書",
+        "lessCaffeine": "カフェイン控えめ",
+        "yoga": "ヨガ",
+        "stretch": "ストレッチ",
+        "noSmoking": "禁煙",
+        "eatHealthy": "健康的な食事"
+      }
+    },
+    "challenge": {
+      "title": "ハードチャレンジ",
+      "stageName": "🌱 基礎ステージ",
+      "stage2Name": "💪 戦士ステージ",
+      "stage3Name": "🏆 チャンピオンステージ",
+      "daysRemaining": "{{count}}日のチャンスが残っています",
+      "day": "🔥 {{current}}日目",
+      "totalDays": "{{total}}日間の卓越の旅",
+      "completeDay": "✨ 今日を成功させよう",
+      "allTasksRequired": "勝利まであと少し！今日の成功のためにすべてのタスクを完了しよう",
+      "dayCompleted": "素晴らしい！🎉 {{day}}日目を達成しました！",
+      "motivational1": "この勢いを続けよう！💪",
+      "motivational2": "あなたは止められない！🚀",
+      "motivational3": "偉大さにまた一歩近づいた！⭐",
+      "motivational4": "チャンピオンは毎日作られる！🏆",
+      "motivational5": "あなたの自律は素晴らしい！🔥",
+      "congratulations": "マーシャアッラー！🌟 {{days}}日間で{{stage}}を完了しました！あなたは真のチャンピオンです！",
+      "stageCompleted": "素晴らしい成果！🎊 ステージ{{stage}}完了！次のレベルに備えよう...",
+      "allStagesCompleted": "スブハンアッラー！👑 あなたは真の伝説です！すべてのステージを卓越して完了しました！",
+      "resetTitle": "⚠️ チャレンジがリセットされました",
+      "resetDescription": "前日のタスクを完了しませんでした。1日目に戻されました。より強い決意で新たに始めよう！"
+    },
+    "notifications": {
+      "endOfDayTitle": "⚠️ 警告 - 残り2時間！",
+      "endOfDayBody": "今日のタスクがまだ完了していません！チャレンジがリセットされないように真夜中までに完了してください。",
+      "urgentTitle1": "🚨 緊急警告！",
+      "urgentBody1": "残り1時間だけ！手遅れになる前に急いでタスクを完了しよう！",
+      "urgentTitle2": "⏰ 時間がない！",
+      "urgentBody2": "残り30分だけ！進捗を失わないように、今すぐタスクを完了しよう！",
+      "urgentTitle3": "🔥 最後のチャンス！",
+      "urgentBody3": "残り15分！今日を救う最後のチャンスです！"
+    },
+    "tasks": {
+      "quran": {
+        "title": "聖クルアーン",
+        "description": "アッラーの言葉とつながり、毎日のクルアーン読誦で魂を高めよう"
+      },
+      "sport": {
+        "title": "身体的卓越",
+        "description": "力強いワークアウトで体を強化し、エネルギーを高めよう"
+      },
+      "sleep": {
+        "title": "質の高い休息",
+        "description": "7-8時間の睡眠でエネルギーを充電し、明日の挑戦に備えよう"
+      },
+      "water": {
+        "title": "重要な水分補給",
+        "description": "十分な水を飲んで健康と活力を維持しよう"
+      },
+      "reading": {
+        "title": "深い読書",
+        "description": "紙の本を読んで視野を広げ、心を豊かにしよう"
+      },
+      "noSugar": {
+        "title": "砂糖なし",
+        "description": "欲望をコントロールし、今日は砂糖とお菓子を避けよう"
+      },
+      "noWoman": {
+        "title": "視線を下げる",
+        "description": "視線を守り、心を清めよう"
+      },
+      "coldShower": {
+        "title": "冷水シャワー",
+        "description": "さわやかな冷水シャワーで意志力を強化し、持久力をテストしよう"
+      },
+      "dailyTask": {
+        "title": "✅ デイリーミッション",
+        "description": "毎日の目標を達成し、選んだタスクを卓越して完了しよう"
+      },
+      "communityService": {
+        "title": "🤝 コミュニティへの影響",
+        "description": "他の人を助け、コミュニティに奉仕することで幸せの源になろう"
+      },
+      "talkToStranger": {
+        "title": "💬 意味のあるつながり",
+        "description": "恐怖の壁を破り、新しい人とインスピレーションに満ちた会話をしよう"
+      },
+      "makeDawa": {
+        "title": "🕌 ダアワの使命",
+        "description": "他の人のための光となり、イスラムの教えの美しさを共有しよう"
+      }
+    },
+    "index": {
+      "note": "メモ（任意）",
+      "notePlaceholder": "進捗についてのメモを追加...",
+      "setReminder": "リマインダーを設定",
+      "selectTime": "このタスクリマインダーの適切な時間を選択してください",
+      "time": "時間",
+      "saveReminder": "リマインダーを保存",
+      "saved": "保存済み",
+      "reminderSet": "リマインダーが正常に設定されました",
+      "uploaded": "アップロード済み",
+      "error": "エラー",
+      "failedToSaveReminder": "リマインダーの保存に失敗しました"
+    },
+    "rules": {
+      "title": "チャレンジルール",
+      "subtitle": "75日間これらのルールを厳守してください"
+    },
+    "leaderboard": {
+      "title": "リーダーボード",
+      "rank": "ランク",
+      "username": "ユーザー名",
+      "streak": "連続",
+      "bestStreak": "ベスト連続",
+      "currentDay": "現在の日",
+      "backToChallenge": "チャレンジに戻る",
+      "weeklyPoints": "週間ポイント",
+      "totalPoints": "合計ポイント",
+      "weeklyChampion": "週間チャンピオン",
+      "points": "ポイント",
+      "you": "あなた",
+      "howToEarn": "ポイントの獲得方法は？",
+      "completeTask": "タスク完了 = 1ポイント",
+      "championReward": "最高週間ポイント = 1日チャンピオンフレーム！",
+      "weeklyReset": "週間ポイントは毎週リセットされます"
+    },
+    "auth": {
+      "login": "ログイン",
+      "signup": "登録",
+      "email": "メールアドレス",
+      "password": "パスワード",
+      "username": "ユーザー名",
+      "alreadyHaveAccount": "すでにアカウントをお持ちですか？",
+      "dontHaveAccount": "アカウントをお持ちでないですか？",
+      "logout": "ログアウト",
+      "welcomeBack": "おかえりなさい",
+      "joinChallenge": "チャレンジに参加",
+      "signupDescription": "今日から75日間の変革の旅を始めよう",
+      "loginDescription": "進捗を続けよう"
+    },
+    "settings": {
+      "title": "設定",
+      "language": "言語",
+      "changeLanguage": "言語を変更",
+      "appearance": "外観",
+      "appearanceDesc": "デバイスでのアプリの見た目をカスタマイズ",
+      "theme": "テーマ",
+      "themeDesc": "お好みのテーマを選択",
+      "light": "ライト",
+      "dark": "ダーク",
+      "system": "システム",
+      "languageDesc": "お好みの言語を選択",
+      "selectLanguage": "言語を選択",
+      "languageHint": "選択した言語でアプリが表示されます",
+      "notifications": "通知",
+      "notificationsDesc": "通知設定を管理",
+      "dailyReminder": "毎日のリマインダー",
+      "dailyReminderDesc": "毎日のタスクを完了するためのリマインダーを受け取る",
+      "weeklyProgress": "週間進捗",
+      "weeklyProgressDesc": "進捗の週間サマリーを受け取る",
+      "achievements": "実績",
+      "achievementsDesc": "実績を解除した時に通知を受け取る",
+      "saved": "設定を保存しました",
+      "notificationUpdated": "通知設定が更新されました",
+      "languageUpdated": "言語設定が更新されました",
+      "themeUpdated": "テーマ設定が更新されました"
+    },
+    "admin": {
+      "title": "管理者ダッシュボード",
+      "accessDenied": "アクセス拒否",
+      "adminOnly": "このページは管理者のみアクセス可能です",
+      "manageChallenges": "チャレンジ",
+      "challengesDescription": "すべてのユーザーチャレンジを表示・管理",
+      "currentDay": "現在の日",
+      "status": "ステータス",
+      "actions": "アクション",
+      "delete": "削除",
+      "active": "アクティブ",
+      "inactive": "非アクティブ",
+      "confirmDelete": "よろしいですか？",
+      "confirmDeleteDescription": "この操作は取り消せません。このチャレンジの進捗が永久に削除されます。",
+      "cancel": "キャンセル",
+      "confirm": "削除",
+      "deleteSuccess": "成功",
+      "challengeDeleted": "チャレンジが削除されました",
+      "deleteError": "チャレンジの削除中にエラーが発生しました",
+      "loadError": "チャレンジの読み込み中にエラーが発生しました",
+      "manageUsers": "ユーザー",
+      "usersDescription": "ユーザーの役割と権限を表示・管理",
+      "username": "ユーザー名",
+      "email": "メールアドレス",
+      "role": "役割",
+      "joinedDate": "登録日",
+      "roleUpdated": "役割が更新されました",
+      "roleUpdateSuccess": "ユーザーの役割が正常に更新されました",
+      "roleUpdateError": "ユーザーの役割の更新中にエラーが発生しました",
+      "refresh": "更新",
+      "refreshed": "更新済み",
+      "dataRefreshed": "すべてのデータが正常に更新されました",
+      "rolesDistribution": "役割の分布",
+      "rolesDistributionDesc": "アプリ内の役割別ユーザー分布",
+      "roles": {
+        "user": "ユーザー",
+        "moderator": "スカウト",
+        "admin": "管理者"
+      },
+      "tabs": {
+        "overview": "概要",
+        "database": "データベース"
+      },
+      "database": {
+        "title": "データベース",
+        "description": "データベーステーブルの詳細情報",
+        "totalRecords": "総レコード数",
+        "records": "レコード"
+      },
+      "stats": {
+        "totalUsers": "総ユーザー数",
+        "activeUsers": "アクティブユーザー",
+        "completionRate": "完了率",
+        "averageDays": "平均日数",
+        "bestStreak": "ベスト連続",
+        "admins": "管理者",
+        "moderators": "スカウト",
+        "regularUsers": "一般ユーザー",
+        "registered": "登録済みユーザー",
+        "currentlyActive": "現在アクティブ",
+        "completed75Days": "全ステージ完了",
+        "longestStreak": "最長連続",
+        "avgDaysCompleted": "平均完了日数"
+      }
+    },
+    "onboarding": {
+      "slide1": {
+        "title": "チャレンジ21へようこそ",
+        "subtitle": "あなたの旅はここから始まります",
+        "content": "チャレンジ21へようこそ - より良い自分を作るためのパーソナルコンパニオン。参加していただけて嬉しいです！"
+      },
+      "slide2": {
+        "title": "ルーティンを構築しよう",
+        "subtitle": "一日ずつ",
+        "content": "持続する強力な毎日の習慣を作りましょう。進捗を追跡し、責任を持ち、日々変わっていく自分を見守りましょう。"
+      },
+      "slide3": {
+        "title": "毎日を価値あるものに",
+        "subtitle": "すべてのタスクが重要",
+        "content": "毎日のタスクを完了してポイントを獲得し、連続記録を維持し、実績をアンロックしましょう。小さな一貫した行動が大きな結果につながります。"
+      },
+      "slide4": {
+        "title": "モチベーションを維持しよう",
+        "subtitle": "あなたは一人ではない",
+        "content": "最高の自分になるために働く同じ志を持つ仲間のコミュニティに参加しましょう。競争し、インスピレーションを与え、一緒に成長しましょう。"
+      },
+      "slide5": {
+        "title": "旅をカスタマイズしよう",
+        "subtitle": "あなた仕様に",
+        "content": "アプリの見た目を選びましょう。あなたに最適なテーマを選んで、変革を始めましょう！"
+      },
+      "next": "次へ",
+      "skip": "スキップ",
+      "start": "始めよう！",
+      "lightMode": "ライト",
+      "darkMode": "ダーク"
+    },
+    "profile": {
+      "title": "プロフィール",
+      "admin": "管理者",
+      "memberSince": "メンバー登録日",
+      "journeyStats": "完全な旅の統計",
+      "overallProgress": "全体の進捗",
+      "daysCompleted": "日完了",
+      "daysRemaining": "日残り",
+      "stage": "ステージ",
+      "completed": "✓ 完了",
+      "inProgress": "進行中",
+      "upcoming": "今後",
+      "currentStageProgress": "現在のステージ進捗",
+      "currentDay": "現在の日",
+      "currentStreak": "現在の連続",
+      "streak": "連続",
+      "completedDays": "完了",
+      "bestStreak": "ベスト連続",
+      "joinDate": "登録日",
+      "startDate": "開始日",
+      "status": "ステータス",
+      "active": "アクティブ",
+      "inactive": "非アクティブ",
+      "daysRemainingInStage": "このステージの残り日数",
+      "completedStage1": "ステージ1完了！",
+      "completedStage1And2": "ステージ1と2完了！",
+      "daysOfDiscipline": "{{days}}日間のチャレンジと自律",
+      "consecutiveDays": "連続日数",
+      "personalBest": "自己ベスト",
+      "totalDays": "完了した総日数",
+      "challengeStatus": "チャレンジステータス",
+      "progressTitle": "チャレンジ進捗",
+      "completion": "完了率",
+      "expectedEnd": "予定完了日",
+      "loadError": "プロフィールの読み込み中にエラーが発生しました",
+      "noData": "プロフィールデータがありません",
+      "editProfile": "プロフィールを編集",
+      "editDescription": "プロフィール情報を更新",
+      "username": "ユーザー名",
+      "usernamePlaceholder": "ユーザー名を入力",
+      "cancel": "キャンセル",
+      "save": "保存",
+      "saving": "保存中...",
+      "updateSuccess": "プロフィール更新完了",
+      "updateSuccessDesc": "プロフィールが正常に更新されました",
+      "updateError": "プロフィールの更新中にエラーが発生しました",
+      "avatarUpdated": "アバター更新完了",
+      "avatarSuccess": "プロフィール写真が更新されました",
+      "avatarError": "アバターのアップロード中にエラーが発生しました"
+    },
+    "reminders": {
+      "title": "タスクリマインダー",
+      "description": "毎日のタスクリマインダーを管理",
+      "taskName": "タスク",
+      "reminderTime": "リマインダー時間",
+      "status": "ステータス",
+      "enabled": "有効",
+      "disabled": "無効",
+      "actions": "アクション",
+      "edit": "編集",
+      "delete": "削除",
+      "noReminders": "リマインダーはまだ設定されていません",
+      "addFirst": "最初のリマインダーを追加して始めましょう"
+    },
+    "paths": {
+      "title": "道を選ぶ",
+      "subtitle": "旅を始めるチャレンジを選択してください",
+      "days": "日",
+      "completed": "完了",
+      "recommended": "おすすめ",
+      "active": "アクティブ",
+      "acceptChallengeTitle": "チャレンジを受け入れる",
+      "acceptChallengeDescription": "{{path}}チャレンジを受け入れる準備はできていますか？開始したら、毎日すべてのタスクを完了する必要があります！",
+      "cancel": "キャンセル",
+      "acceptChallenge": "チャレンジを受け入れる",
+      "challengeStarted": "チャレンジ開始！",
+      "goodLuck": "旅の幸運を祈ります！",
+      "alreadyActive": "アクティブなチャレンジがあります",
+      "completeFirst": "まず現在のチャレンジを完了してください",
+      "muslimHard": {
+        "title": "21日間チャレンジ",
+        "description": "21日間の8つの毎日のタスクで強い習慣を作ろう。変革の基礎。"
+      },
+      "discipline": {
+        "title": "45日間の自律",
+        "description": "45日間の11の毎日のタスクでレベルアップ。基礎をマスターした人向け。"
+      },
+      "transformation": {
+        "title": "75日間の変革",
+        "description": "75日間の12の毎日のタスクによる究極のチャレンジ。最高の自分になろう。"
+      },
+      "health": {
+        "title": "ヘルスパス",
+        "description": "30日間、身体的健康に集中：運動、栄養、睡眠。"
+      },
+      "fitness": {
+        "title": "フィットネスパス",
+        "description": "毎日のワークアウトと栄養追跡を含む集中フィットネスプログラム。"
+      },
+      "learning": {
+        "title": "学習パス",
+        "description": "毎日の読書と学習タスクで知識を広げよう。"
+      }
+    },
+    "calendar": {
+      "title": "月間カレンダー",
+      "currentStreak": "現在の連続",
+      "bestStreak": "ベスト連続",
+      "points": "ポイント",
+      "completed": "完了",
+      "missed": "未完了",
+      "today": "今日",
+      "day": "日",
+      "dayCompletedMessage": "素晴らしい！この日のすべてのタスクを完了しました。",
+      "dayMissedMessage": "この日のタスクを完了できませんでした。",
+      "dayPendingMessage": "この日はまだ完了していません。"
+    },
+    "wheelOfLife": {
+      "title": "ライフホイール",
+      "days": "日"
+    },
+    "customTask": {
+      "addButton": "カスタムタスクを追加",
+      "title": "新しいタスクを追加",
+      "description": "チャレンジ用のカスタムタスクを作成",
+      "taskName": "タスク名",
+      "taskNamePlaceholder": "タスク名を入力",
+      "taskDescription": "説明（任意）",
+      "taskDescriptionPlaceholder": "タスクの説明を入力",
+      "category": "カテゴリー",
+      "selectCategory": "カテゴリーを選択",
+      "add": "タスクを追加",
+      "added": "タスクを追加しました",
+      "addedDescription": "カスタムタスクが正常に追加されました",
+      "titleRequired": "タスク名を入力してください"
+    },
+    "pathTasks": {
+      "dailyTasks": "毎日のタスク",
+      "tasksCount": "タスク",
+      "startPath": "このパスを開始",
+      "goToChallenge": "チャレンジへ"
+    }
+  }
+}

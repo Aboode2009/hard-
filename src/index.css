@@ -1,0 +1,535 @@
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Clean Light Theme with Pink Accents */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 15%;
+    
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 15%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 15%;
+    
+    /* Pink Accent Theme */
+    --primary: 350 80% 60%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 350 80% 70%;
+    
+    --secondary: 350 30% 95%;
+    --secondary-foreground: 0 0% 15%;
+    
+    --accent: 350 80% 60%;
+    --accent-foreground: 0 0% 100%;
+    
+    --muted: 350 20% 96%;
+    --muted-foreground: 0 0% 45%;
+    
+    --destructive: 0 72% 50%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 350 20% 90%;
+    --input: 350 20% 96%;
+    --ring: 350 80% 60%;
+    
+    --radius: 1.25rem;
+    
+    /* Pink Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(350 80% 60%) 0%, hsl(350 80% 70%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(350 30% 98%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(350 20% 98%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(350 80% 60%) 0%, hsl(350 80% 70%) 100%);
+    
+    /* Light Shadows */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 16px 40px rgba(0, 0, 0, 0.12);
+    
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 0 0% 15%;
+    --sidebar-primary: 350 80% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 350 30% 95%;
+    --sidebar-accent-foreground: 0 0% 15%;
+    --sidebar-border: 350 20% 90%;
+    --sidebar-ring: 350 80% 60%;
+  }
+
+  .dark {
+    /* Dark Theme */
+    --background: 0 0% 7%;
+    --foreground: 0 0% 95%;
+    
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 95%;
+    
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 95%;
+    
+    --primary: 350 80% 60%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 350 80% 70%;
+    
+    --secondary: 0 0% 20%;
+    --secondary-foreground: 0 0% 95%;
+    
+    --accent: 350 80% 60%;
+    --accent-foreground: 0 0% 100%;
+    
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 60%;
+    
+    --destructive: 0 72% 50%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 0 0% 18%;
+    --input: 0 0% 15%;
+    --ring: 350 80% 60%;
+    
+    --gradient-primary: linear-gradient(135deg, hsl(350 80% 60%) 0%, hsl(350 80% 70%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(0 0% 7%) 0%, hsl(0 0% 10%) 50%, hsl(0 0% 12%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 10%) 0%, hsl(0 0% 8%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(350 80% 60%) 0%, hsl(350 80% 70%) 100%);
+    
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.6);
+    --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.7);
+    --shadow-xl: 0 16px 40px rgba(0, 0, 0, 0.8);
+    
+    --sidebar-background: 0 0% 8%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 350 80% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 15%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 0 0% 18%;
+    --sidebar-ring: 350 80% 60%;
+  }
+}
+
+/* Prefer the Apple (iOS/macOS) color emoji set when available, falling back to
+   the platform's native emoji font elsewhere. */
+.emoji-ios {
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+    "Noto Color Emoji", "Twemoji Mozilla", sans-serif !important;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 1;
+}
+
+/* ===== Duolingo-style design system (Profile page) =====
+   Chunky rounded font + solid-bordered cards with a 3D "ledge" bottom edge.
+   No blur / glassmorphism — flat, tactile, and friendly. */
+.duo-page,
+.duo-page * {
+  font-family: 'Baloo Bhaijaan 2', 'Nunito', -apple-system, BlinkMacSystemFont,
+    system-ui, sans-serif !important;
+  letter-spacing: 0 !important;
+}
+/* duo tokens are global so .duo-card works on any page (e.g. WheelOfLife
+   inside Calendar); .duo-page itself only opts a page into the Duolingo font. */
+:root {
+  --duo-surface: 0 0% 100%;
+  --duo-border: 0 0% 89%;
+  --duo-edge: 0 0% 84%;
+  --duo-text: 0 0% 16%;
+  --duo-muted: 0 0% 52%;
+}
+.dark {
+  --duo-surface: 200 18% 12%;
+  --duo-border: 200 14% 24%;
+  --duo-edge: 200 22% 5%;
+  --duo-text: 0 0% 97%;
+  --duo-muted: 200 10% 62%;
+}
+/* Solid card that sits on a 3D ledge (Duolingo's signature look). */
+.duo-card {
+  background: hsl(var(--duo-surface));
+  border: 2px solid hsl(var(--duo-border));
+  border-radius: 1.25rem;
+  box-shadow: 0 4px 0 hsl(var(--duo-edge));
+}
+/* Pressable feedback: sink into the ledge on tap. */
+.duo-press {
+  transition: transform 0.06s ease, box-shadow 0.06s ease, filter 0.12s ease;
+}
+.duo-press:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 hsl(var(--duo-edge)) !important;
+}
+
+/* Hide Clerk's "Secured by Clerk" branding / dev badge as a fallback in case
+   the appearance `footer: hidden` option leaves any residual element. */
+.cl-footer,
+.cl-internal-branded,
+.cl-badge {
+  display: none !important;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Inter', 'Helvetica Neue', system-ui, sans-serif;
+    letter-spacing: -0.022em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: 'kern' 1;
+  }
+
+  /* Arabic font override */
+  [dir="rtl"] body,
+  [lang="ar"] body {
+    font-family: 'SF Arabic', 'IBM Plex Sans Arabic', 'Dubai', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', 'Helvetica Neue', system-ui, sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+  }
+
+  [dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3,
+  [dir="rtl"] h4, [dir="rtl"] h5, [dir="rtl"] h6 {
+    font-family: 'SF Arabic', 'IBM Plex Sans Arabic', 'Dubai', -apple-system, system-ui, sans-serif;
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+  
+  /* iOS-style icon sizing - thinner strokes */
+  svg.lucide {
+    stroke-width: 1.5;
+  }
+  /* Duo chunky icons: stylesheet rules beat SVG presentation attributes, so
+     explicit strokeWidth={2.5}/{3} must be re-asserted or the rule above
+     silently thins every "chunky" icon back to 1.5. */
+  svg.lucide[stroke-width="2.5"] {
+    stroke-width: 2.5;
+  }
+  svg.lucide[stroke-width="3"] {
+    stroke-width: 3;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  /* Professional Card */
+  .card-professional {
+    @apply relative bg-card border-2 border-border/50 transition-all duration-300 shadow-md;
+  }
+  
+  .card-professional:hover {
+    @apply shadow-xl border-border;
+    transform: translateY(-4px);
+  }
+  
+  .card-professional::before {
+    content: '';
+    @apply absolute inset-0 opacity-0 transition-opacity duration-300 pointer-events-none;
+    background: var(--gradient-primary);
+    opacity: 0.02;
+  }
+  
+  .card-professional:hover::before {
+    opacity: 0.05;
+  }
+  
+  /* Corporate Gradient Text */
+  .text-gradient {
+    @apply bg-clip-text text-transparent font-bold;
+    background-image: var(--gradient-primary);
+  }
+  
+  /* Professional Button - duplicated in button component but also here for utility classes */
+  .btn-professional {
+    @apply relative overflow-hidden transition-all duration-200 font-semibold shadow-md;
+    background: var(--gradient-primary);
+  }
+  
+  .btn-professional:hover {
+    @apply shadow-lg;
+    transform: translateY(-2px);
+  }
+  
+  .btn-professional::before {
+    content: '';
+    @apply absolute inset-0 opacity-0 transition-opacity duration-200;
+    background: linear-gradient(to right, rgba(255,255,255,0.15), rgba(255,255,255,0));
+  }
+  
+  .btn-professional:hover::before {
+    @apply opacity-100;
+  }
+  
+  /* Premium Card with Enhanced Effects */
+  .card-premium {
+    @apply relative bg-card border-2 border-primary/20 shadow-lg transition-all duration-300;
+  }
+  
+  .card-premium::after {
+    content: '';
+    @apply absolute top-0 left-0 right-0 h-1 rounded-t-xl;
+    background: var(--gradient-primary);
+  }
+  
+  .card-premium:hover {
+    @apply shadow-2xl border-primary/30;
+    transform: translateY(-6px);
+  }
+  
+  /* Corporate Section */
+  .section-header {
+    @apply relative pb-4 mb-8;
+  }
+  
+  .section-header::after {
+    content: '';
+    @apply absolute bottom-0 left-0 h-1 w-20 rounded-full;
+    background: var(--gradient-primary);
+  }
+  
+  /* Professional Badge */
+  .badge-professional {
+    @apply inline-flex items-center px-4 py-1.5 rounded-full text-sm font-semibold shadow-sm border-2;
+    background: hsl(var(--primary) / 0.1);
+    color: hsl(var(--primary));
+    border-color: hsl(var(--primary) / 0.2);
+  }
+  
+  /* Accent Badge */
+  .badge-accent {
+    @apply inline-flex items-center px-4 py-1.5 rounded-full text-sm font-semibold shadow-md border-2;
+    background: var(--gradient-accent);
+    color: white;
+    border-color: hsl(var(--accent) / 0.3);
+  }
+  
+  /* Enhanced Borders */
+  .border-professional {
+    @apply border-2 border-border/50 hover:border-primary/30 transition-colors;
+  }
+  
+  /* Accent Line */
+  .accent-line {
+    @apply relative;
+  }
+  
+  .accent-line::before {
+    content: '';
+    @apply absolute left-0 top-0 bottom-0 w-1 rounded-full;
+    background: var(--gradient-primary);
+  }
+}
+
+@layer utilities {
+  /* Float Animation */
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  /* Shimmer Effect */
+  .animate-shimmer {
+    animation: shimmer 2s linear infinite;
+    background-size: 200% 100%;
+  }
+  
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  
+  /* Fade Animations */
+  .animate-fade-in-up {
+    animation: fadeInUp 0.6s ease-out forwards;
+  }
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Scale Animation */
+  .animate-scale-in {
+    animation: scaleIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+  
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  /* Hover Lift */
+  .hover-lift {
+    @apply transition-all duration-300;
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+  }
+
+  /* Pulse Glow */
+  .animate-pulse-glow {
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
+  
+  @keyframes pulseGlow {
+    0%, 100% { 
+      box-shadow: 0 0 5px hsl(var(--primary) / 0.3);
+    }
+    50% { 
+      box-shadow: 0 0 20px hsl(var(--primary) / 0.6), 0 0 40px hsl(var(--primary) / 0.3);
+    }
+  }
+
+  /* Bounce In */
+  .animate-bounce-in {
+    animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+  }
+  
+  @keyframes bounceIn {
+    0% {
+      opacity: 0;
+      transform: scale(0.3);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+    70% {
+      transform: scale(0.9);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* Slide In from Left */
+  .animate-slide-in-left {
+    animation: slideInLeft 0.5s ease-out forwards;
+  }
+  
+  @keyframes slideInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  /* Slide In from Right */
+  .animate-slide-in-right {
+    animation: slideInRight 0.5s ease-out forwards;
+  }
+  
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  /* Wiggle Animation */
+  .animate-wiggle {
+    animation: wiggle 0.5s ease-in-out;
+  }
+  
+  @keyframes wiggle {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-5deg); }
+    75% { transform: rotate(5deg); }
+  }
+
+  /* Pop Animation */
+  .animate-pop {
+    animation: pop 0.3s ease-out;
+  }
+  
+  @keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+  }
+
+  /* Stagger delay utilities */
+  .stagger-1 { animation-delay: 0.05s; }
+  .stagger-2 { animation-delay: 0.1s; }
+  .stagger-3 { animation-delay: 0.15s; }
+  .stagger-4 { animation-delay: 0.2s; }
+  .stagger-5 { animation-delay: 0.25s; }
+  .stagger-6 { animation-delay: 0.3s; }
+  .stagger-7 { animation-delay: 0.35s; }
+  .stagger-8 { animation-delay: 0.4s; }
+
+  /* Gradient animation */
+  .animate-gradient {
+    background-size: 200% 200%;
+    animation: gradientShift 3s ease infinite;
+  }
+  
+  @keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* Success checkmark animation */
+  .animate-check {
+    animation: checkmark 0.4s ease-out forwards;
+  }
+  
+  @keyframes checkmark {
+    0% {
+      stroke-dashoffset: 50;
+    }
+    100% {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  /* Safe Area for Mobile */
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+
+  /* Spin animation */
+  .animate-spin-slow {
+    animation: spin 3s linear infinite;
+  }
+}

@@ -1,0 +1,465 @@
+{
+  "translation": {
+    "nav": {
+      "home": "Home",
+      "menu": "Menu",
+      "profile": "Profile",
+      "reminders": "Reminders",
+      "calendar": "Calendar",
+      "overall": "Overall"
+    },
+    "overall": {
+      "title": "Challenge Overview",
+      "overallRate": "Overall Rate",
+      "day": "Day",
+      "bestStreaks": "Best Streaks",
+      "perfectDays": "Perfect Days",
+      "habitsDone": "Tasks Done",
+      "dailyAverage": "Daily Average",
+      "habitTracker": "Task Tracker",
+      "bestDay": "Best Day"
+    },
+    "mood": {
+      "question": "How you feel now?",
+      "excellent": "Excellent",
+      "great": "Great",
+      "good": "Good",
+      "neutral": "Neutral",
+      "poor": "Poor",
+      "bad": "Bad",
+      "awful": "Awful",
+      "addReason": "Add reason",
+      "save": "Save",
+      "saved": "Mood saved!",
+      "savedDescription": "Your mood has been recorded."
+    },
+    "createTask": {
+      "title": "New Task",
+      "popular": "Popular",
+      "popularDesc": "Most popular tasks",
+      "customHabit": "Specific Task",
+      "createCustom": "Create Specific Task",
+      "habitName": "Task name",
+      "create": "Create",
+      "added": "Task Added!",
+      "habitAddedDesc": "The task has been added to your daily tasks",
+      "customHabitAdded": "Your specific task has been created",
+      "alreadyExists": "Already exists",
+      "habitAlreadyAdded": "This task is already in your list",
+      "habits": {
+        "walk": "Walk",
+        "sleep": "Sleep",
+        "drinkWater": "Drink Water",
+        "meditation": "Meditation",
+        "run": "Run",
+        "stand": "Stand",
+        "cycling": "Cycling",
+        "workout": "Workout",
+        "burnCalories": "Burn Calories",
+        "readBooks": "Read Books",
+        "lessCaffeine": "Less Caffeine",
+        "yoga": "Yoga",
+        "stretch": "Stretch",
+        "noSmoking": "No Smoking",
+        "eatHealthy": "Eat Healthy"
+      }
+    },
+    "challenge": {
+      "title": "Hard Challenge",
+      "stageName": "🌱 Foundation Stage",
+      "stage2Name": "💪 Warrior Stage",
+      "stage3Name": "🏆 Champion Stage",
+      "daysRemaining": "{{count}} opportunities ahead",
+      "day": "🔥 Day {{current}}",
+      "totalDays": "{{total}} days of excellence",
+      "completeDay": "✨ Complete Day Successfully",
+      "allTasksRequired": "You're steps away from victory! Complete all tasks to achieve today's success",
+      "dayCompleted": "Amazing! 🎉 You crushed Day {{day}}!",
+      "motivational1": "Keep this momentum going! 💪",
+      "motivational2": "You're unstoppable! 🚀",
+      "motivational3": "One step closer to greatness! ⭐",
+      "motivational4": "Champions are made daily! 🏆",
+      "motivational5": "Your discipline is inspiring! 🔥",
+      "congratulations": "MashaAllah! 🌟 You completed {{stage}} in {{days}} days! You're a true champion!",
+      "stageCompleted": "Outstanding achievement! 🎊 Stage {{stage}} completed! Get ready for the next level...",
+      "allStagesCompleted": "SubhanAllah! 👑 You're a true legend! You completed all stages with excellence!",
+      "resetTitle": "⚠️ Challenge Reset",
+      "resetDescription": "You missed completing tasks on previous days. You've been reset to Day 1. Start fresh with stronger determination!"
+    },
+    "notifications": {
+      "endOfDayTitle": "⚠️ Warning - 2 hours left!",
+      "endOfDayBody": "You haven't completed today's tasks yet! Complete them before midnight to avoid resetting the challenge.",
+      "urgentTitle1": "🚨 Urgent Warning!",
+      "urgentBody1": "Only 1 hour left! Hurry and complete your tasks before it's too late!",
+      "urgentTitle2": "⏰ Time is running out!",
+      "urgentBody2": "Only 30 minutes left! Don't lose your progress, complete tasks now!",
+      "urgentTitle3": "🔥 Last chance!",
+      "urgentBody3": "15 minutes left! This is your last chance to save your day!"
+    },
+    "tasks": {
+      "quran": {
+        "title": "Holy Quran",
+        "description": "Connect with Allah's words and elevate your soul with daily Quran reading"
+      },
+      "sport": {
+        "title": "first 45 workout",
+        "description": "Strengthen your body and boost your energy with an empowering workout"
+      },
+      "sleep": {
+        "title": "6-8 hours of sleep",
+        "description": "Recharge your energy and prepare for tomorrow's challenges with 7-8 hours of sleep"
+      },
+      "water": {
+        "title": "Drink three liters of water",
+        "description": "Maintain your health and vitality by drinking plenty of water"
+      },
+      "reading": {
+        "title": "Deep Reading",
+        "description": "Expand your horizons and enrich your mind by reading from a physical book"
+      },
+      "noSugar": {
+        "title": "No fast food",
+        "description": "Master your cravings and stay away from sugar and sweets today"
+      },
+      "noWoman": {
+        "title": "Lower Your Gaze",
+        "description": "Protect your sight and purify your heart by lowering your gaze"
+      },
+      "coldShower": {
+        "title": "Cold Shower",
+        "description": "Strengthen your willpower and test your resilience with a refreshing cold shower"
+      },
+      "dailyTask": {
+        "title": "✅ Daily Mission",
+        "description": "Achieve your daily goal and complete your chosen task with excellence"
+      },
+      "communityService": {
+        "title": "🤝 Community Impact",
+        "description": "Be a source of happiness by helping others and serving your community"
+      },
+      "talkToStranger": {
+        "title": "💬 Meaningful Connection",
+        "description": "Break the fear barrier and have an inspiring conversation with someone new"
+      },
+      "makeDawa": {
+        "title": "🕌 Dawah Mission",
+        "description": "Be a light for others and share the beauty of Islamic teachings"
+      }
+    },
+    "index": {
+      "note": "Note (optional)",
+      "notePlaceholder": "Add a note about your progress...",
+      "setReminder": "Set Reminder",
+      "selectTime": "Select the right time for this task reminder",
+      "time": "Time",
+      "saveReminder": "Save Reminder",
+      "saved": "Saved",
+      "reminderSet": "Reminder set successfully",
+      "uploaded": "Uploaded",
+      "error": "Error",
+      "failedToSaveReminder": "Failed to save reminder"
+    },
+    "rules": {
+      "title": "Challenge Rules",
+      "subtitle": "Follow these rules strictly for 75 days"
+    },
+    "leaderboard": {
+      "title": "Leaderboard",
+      "rank": "Rank",
+      "username": "Username",
+      "streak": "Streak",
+      "bestStreak": "Best Streak",
+      "currentDay": "Current Day",
+      "backToChallenge": "Back to Challenge",
+      "weeklyPoints": "Weekly Points",
+      "totalPoints": "Total Points",
+      "weeklyChampion": "Weekly Champion",
+      "points": "points",
+      "you": "You",
+      "howToEarn": "How to earn points?",
+      "completeTask": "Complete a task = 1 point",
+      "championReward": "Highest weekly points = Champion frame for a full day!",
+      "weeklyReset": "Weekly points reset every week"
+    },
+    "auth": {
+      "login": "Login",
+      "signup": "Sign Up",
+      "email": "Email",
+      "password": "Password",
+      "username": "Username",
+      "alreadyHaveAccount": "Already have an account?",
+      "dontHaveAccount": "Don't have an account?",
+      "logout": "Logout",
+      "welcomeBack": "Welcome Back",
+      "joinChallenge": "Join the Challenge",
+      "signupDescription": "Start your 75-day transformation journey today",
+      "loginDescription": "Continue your progress"
+    },
+    "settings": {
+      "title": "Settings",
+      "language": "Language",
+      "changeLanguage": "Change Language",
+      "appearance": "Appearance",
+      "appearanceDesc": "Customize how the app looks on your device",
+      "theme": "Theme",
+      "themeDesc": "Select your preferred theme",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System",
+      "languageDesc": "Choose your preferred language",
+      "selectLanguage": "Select Language",
+      "languageHint": "The app will be displayed in your selected language",
+      "notifications": "Notifications",
+      "notificationsDesc": "Manage your notification preferences",
+      "dailyReminder": "Daily Reminder",
+      "dailyReminderDesc": "Get reminded to complete your daily tasks",
+      "weeklyProgress": "Weekly Progress",
+      "weeklyProgressDesc": "Receive weekly summaries of your progress",
+      "achievements": "Achievements",
+      "achievementsDesc": "Get notified when you unlock achievements",
+      "saved": "Settings Saved",
+      "notificationUpdated": "Notification preferences updated",
+      "languageUpdated": "Language preference updated",
+      "themeUpdated": "Theme preference updated"
+    },
+    "admin": {
+      "title": "Admin Dashboard",
+      "accessDenied": "Access Denied",
+      "adminOnly": "This page is only accessible to administrators",
+      "manageChallenges": "Challenges",
+      "challengesDescription": "View and manage all user challenges",
+      "currentDay": "Current Day",
+      "status": "Status",
+      "actions": "Actions",
+      "delete": "Delete",
+      "active": "Active",
+      "inactive": "Inactive",
+      "confirmDelete": "Are you sure?",
+      "confirmDeleteDescription": "This action cannot be undone. This will permanently delete this challenge progress.",
+      "cancel": "Cancel",
+      "confirm": "Delete",
+      "deleteSuccess": "Success",
+      "challengeDeleted": "Challenge has been deleted",
+      "deleteError": "Error deleting challenge",
+      "loadError": "Error loading challenges",
+      "manageUsers": "Users",
+      "usersDescription": "View and manage user roles and permissions",
+      "username": "Username",
+      "email": "Email",
+      "role": "Role",
+      "joinedDate": "Joined Date",
+      "roleUpdated": "Role Updated",
+      "roleUpdateSuccess": "User role has been updated successfully",
+      "roleUpdateError": "Error updating user role",
+      "refresh": "Refresh",
+      "refreshed": "Refreshed",
+      "dataRefreshed": "All data has been refreshed successfully",
+      "rolesDistribution": "Roles Distribution",
+      "rolesDistributionDesc": "Distribution of users by their roles in the app",
+      "roles": {
+        "user": "User",
+        "moderator": "Scout",
+        "admin": "Admin"
+      },
+      "tabs": {
+        "overview": "Overview",
+        "database": "Database"
+      },
+      "database": {
+        "title": "Database",
+        "description": "Detailed information about database tables",
+        "totalRecords": "Total Records",
+        "records": "records"
+      },
+      "stats": {
+        "totalUsers": "Total Users",
+        "activeUsers": "Active Users",
+        "completionRate": "Completion Rate",
+        "averageDays": "Average Days",
+        "bestStreak": "Best Streak",
+        "admins": "Admins",
+        "moderators": "Scouts",
+        "regularUsers": "Regular Users",
+        "registered": "Registered users",
+        "currentlyActive": "Currently active",
+        "completed75Days": "Completed all stages",
+        "longestStreak": "Longest streak",
+        "avgDaysCompleted": "Average days completed"
+      }
+    },
+    "onboarding": {
+      "slide1": {
+        "title": "Welcome to Challenge 21",
+        "subtitle": "Your Journey Starts Here",
+        "content": "Welcome to Challenge 21 - your personal companion for building a better you. We're excited to have you on board!"
+      },
+      "slide2": {
+        "title": "Start Building Your Routine",
+        "subtitle": "One Day at a Time",
+        "content": "Create powerful daily habits that stick. Track your progress, stay accountable, and watch yourself transform day by day."
+      },
+      "slide3": {
+        "title": "Make Each Day Count",
+        "subtitle": "Every Task Matters",
+        "content": "Complete your daily tasks to earn points, maintain your streak, and unlock achievements. Small consistent actions lead to big results."
+      },
+      "slide4": {
+        "title": "Stay Motivated",
+        "subtitle": "You're Not Alone",
+        "content": "Join a community of like-minded individuals all working towards becoming their best selves. Compete, inspire, and grow together."
+      },
+      "slide5": {
+        "title": "Customize Your Journey",
+        "subtitle": "Make It Yours",
+        "content": "Choose how you want your app to look. Pick the theme that suits you best and start your transformation!"
+      },
+      "next": "Next",
+      "skip": "Skip",
+      "start": "Let's Start!",
+      "lightMode": "Light",
+      "darkMode": "Dark"
+    },
+    "profile": {
+      "title": "Profile",
+      "admin": "Administrator",
+      "memberSince": "Member since",
+      "journeyStats": "Complete Journey Statistics",
+      "overallProgress": "Overall Progress",
+      "daysCompleted": "days completed",
+      "daysRemaining": "days remaining",
+      "stage": "Stage",
+      "completed": "✓ Completed",
+      "inProgress": "In Progress",
+      "upcoming": "Upcoming",
+      "currentStageProgress": "Current Stage Progress",
+      "currentDay": "Current Day",
+      "currentStreak": "Current Streak",
+      "streak": "Streak",
+      "completedDays": "Completed",
+      "bestStreak": "Best Streak",
+      "joinDate": "Join Date",
+      "startDate": "Start Date",
+      "status": "Status",
+      "active": "Active",
+      "inactive": "Inactive",
+      "daysRemainingInStage": "days remaining in this stage",
+      "completedStage1": "Completed Stage 1!",
+      "completedStage1And2": "Completed Stages 1 and 2!",
+      "daysOfDiscipline": "{{days}} days of challenge and discipline",
+      "consecutiveDays": "Consecutive days",
+      "personalBest": "Personal best",
+      "totalDays": "Total days completed",
+      "challengeStatus": "Challenge status",
+      "progressTitle": "Challenge Progress",
+      "completion": "Completion",
+      "expectedEnd": "Expected Completion",
+      "loadError": "Error loading profile",
+      "noData": "No profile data available",
+      "editProfile": "Edit Profile",
+      "editDescription": "Update your profile information",
+      "username": "Username",
+      "usernamePlaceholder": "Enter your username",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving...",
+      "updateSuccess": "Profile Updated",
+      "updateSuccessDesc": "Your profile has been updated successfully",
+      "updateError": "Error updating profile",
+      "avatarUpdated": "Avatar Updated",
+      "avatarSuccess": "Your profile picture has been updated",
+      "avatarError": "Error uploading avatar"
+    },
+    "reminders": {
+      "title": "Task Reminders",
+      "description": "Manage your daily task reminders",
+      "taskName": "Task",
+      "reminderTime": "Reminder Time",
+      "status": "Status",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "actions": "Actions",
+      "edit": "Edit",
+      "delete": "Delete",
+      "noReminders": "No reminders set yet",
+      "addFirst": "Add your first reminder to get started"
+    },
+    "paths": {
+      "title": "Choose Your Path",
+      "subtitle": "Select a challenge to start your journey",
+      "days": "days",
+      "completed": "completed",
+      "recommended": "Recommended",
+      "active": "Active",
+      "acceptChallengeTitle": "Accept Challenge",
+      "acceptChallengeDescription": "Are you ready to accept the {{path}} challenge? Once you start, you must complete all tasks daily!",
+      "cancel": "Cancel",
+      "acceptChallenge": "Accept Challenge",
+      "challengeStarted": "Challenge Started!",
+      "goodLuck": "Good luck on your journey!",
+      "alreadyActive": "You have an active challenge",
+      "completeFirst": "Complete your current challenge first",
+      "muslimHard": {
+        "title": "21 Hard Challenge",
+        "description": "Build strong habits with 8 daily tasks for 21 days. The foundation of your transformation."
+      },
+      "discipline": {
+        "title": "45 Days Discipline",
+        "description": "Level up with 11 daily tasks for 45 days. For those who mastered the basics."
+      },
+      "transformation": {
+        "title": "75 Days Transformation",
+        "description": "The ultimate challenge with 12 daily tasks for 75 days. Become your best self."
+      },
+      "health": {
+        "title": "Health Path",
+        "description": "Focus on physical health: exercise, nutrition, and sleep for 30 days."
+      },
+      "fitness": {
+        "title": "Fitness Path",
+        "description": "Intensive fitness program with daily workouts and nutrition tracking."
+      },
+      "learning": {
+        "title": "Learning Path",
+        "description": "Expand your knowledge with daily reading and learning tasks."
+      }
+    },
+    "calendar": {
+      "title": "Monthly Calendar",
+      "currentStreak": "Current Streak",
+      "bestStreak": "Best Streak",
+      "points": "Points",
+      "completed": "Completed",
+      "missed": "Missed",
+      "today": "Today",
+      "day": "Day",
+      "dayCompletedMessage": "Great job! You completed all tasks this day.",
+      "dayMissedMessage": "You missed completing tasks this day.",
+      "dayPendingMessage": "This day hasn't been completed yet."
+    },
+    "wheelOfLife": {
+      "title": "Wheel of Life",
+      "days": "days"
+    },
+    "customTask": {
+      "addButton": "Add Custom Task",
+      "title": "Add New Task",
+      "description": "Create a custom task for your challenge",
+      "taskName": "Task Name",
+      "taskNamePlaceholder": "Enter task name",
+      "taskDescription": "Description (optional)",
+      "taskDescriptionPlaceholder": "Enter task description",
+      "category": "Category",
+      "selectCategory": "Select a category",
+      "add": "Add Task",
+      "added": "Task Added",
+      "addedDescription": "Your custom task has been added successfully",
+      "titleRequired": "Please enter a task name"
+    },
+    "pathTasks": {
+      "dailyTasks": "Daily Tasks",
+      "tasksCount": "tasks",
+      "startPath": "Start This Path",
+      "goToChallenge": "Go to Challenge"
+    }
+  }
+}

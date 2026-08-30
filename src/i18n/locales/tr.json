@@ -1,0 +1,465 @@
+{
+  "translation": {
+    "nav": {
+      "home": "Ana Sayfa",
+      "menu": "Menü",
+      "profile": "Profil",
+      "reminders": "Hatırlatıcılar",
+      "calendar": "Takvim",
+      "overall": "Genel Bakış"
+    },
+    "overall": {
+      "title": "Meydan Okuma Özeti",
+      "overallRate": "Genel Oran",
+      "day": "Gün",
+      "bestStreaks": "En İyi Seriler",
+      "perfectDays": "Mükemmel Günler",
+      "habitsDone": "Tamamlanan Görevler",
+      "dailyAverage": "Günlük Ortalama",
+      "habitTracker": "Görev Takipçisi",
+      "bestDay": "En İyi Gün"
+    },
+    "mood": {
+      "question": "Şu an nasıl hissediyorsun?",
+      "excellent": "Mükemmel",
+      "great": "Harika",
+      "good": "İyi",
+      "neutral": "Normal",
+      "poor": "Kötü",
+      "bad": "Üzgün",
+      "awful": "Çok Kötü",
+      "addReason": "Sebep ekle",
+      "save": "Kaydet",
+      "saved": "Ruh hali kaydedildi!",
+      "savedDescription": "Ruh haliniz kaydedildi."
+    },
+    "createTask": {
+      "title": "Yeni Görev",
+      "popular": "Popüler",
+      "popularDesc": "En popüler görevler",
+      "customHabit": "Özel Görev",
+      "createCustom": "Özel Görev Oluştur",
+      "habitName": "Görev adı",
+      "create": "Oluştur",
+      "added": "Görev Eklendi!",
+      "habitAddedDesc": "Görev günlük görevlerinize eklendi",
+      "customHabitAdded": "Özel göreviniz oluşturuldu",
+      "alreadyExists": "Zaten mevcut",
+      "habitAlreadyAdded": "Bu görev zaten listenizde",
+      "habits": {
+        "walk": "Yürüyüş",
+        "sleep": "Uyku",
+        "drinkWater": "Su İç",
+        "meditation": "Meditasyon",
+        "run": "Koşu",
+        "stand": "Ayakta Dur",
+        "cycling": "Bisiklet",
+        "workout": "Egzersiz",
+        "burnCalories": "Kalori Yak",
+        "readBooks": "Kitap Oku",
+        "lessCaffeine": "Az Kafein",
+        "yoga": "Yoga",
+        "stretch": "Esneme",
+        "noSmoking": "Sigara Yok",
+        "eatHealthy": "Sağlıklı Beslen"
+      }
+    },
+    "challenge": {
+      "title": "Zorlu Meydan Okuma",
+      "stageName": "🌱 Temel Aşama",
+      "stage2Name": "💪 Savaşçı Aşaması",
+      "stage3Name": "🏆 Şampiyon Aşaması",
+      "daysRemaining": "{{count}} fırsat kaldı",
+      "day": "🔥 Gün {{current}}",
+      "totalDays": "{{total}} gün mükemmellik",
+      "completeDay": "✨ Günü Başarıyla Tamamla",
+      "allTasksRequired": "Zaferden birkaç adım uzaktasın! Bugünün başarısını elde etmek için tüm görevleri tamamla",
+      "dayCompleted": "Harika! 🎉 {{day}}. Günü başardın!",
+      "motivational1": "Bu ivmeyi sürdür! 💪",
+      "motivational2": "Durdurulamazsın! 🚀",
+      "motivational3": "Büyüklüğe bir adım daha yakın! ⭐",
+      "motivational4": "Şampiyonlar her gün yapılır! 🏆",
+      "motivational5": "Disiplinin ilham verici! 🔥",
+      "congratulations": "Maşallah! 🌟 {{stage}} aşamasını {{days}} günde tamamladın! Gerçek bir şampiyon!",
+      "stageCompleted": "Olağanüstü başarı! 🎊 {{stage}}. Aşama tamamlandı! Sonraki seviyeye hazırlan...",
+      "allStagesCompleted": "Subhanallah! 👑 Gerçek bir efsanesin! Tüm aşamaları mükemmellikle tamamladın!",
+      "resetTitle": "⚠️ Meydan Okuma Sıfırlandı",
+      "resetDescription": "Önceki günlerin görevlerini tamamlamadın. 1. güne döndürüldün. Daha güçlü bir kararlılıkla yeniden başla!"
+    },
+    "notifications": {
+      "endOfDayTitle": "⚠️ Uyarı - 2 saat kaldı!",
+      "endOfDayBody": "Bugünün görevlerini henüz tamamlamadın! Meydan okumanın sıfırlanmaması için gece yarısından önce tamamla.",
+      "urgentTitle1": "🚨 Acil Uyarı!",
+      "urgentBody1": "Sadece 1 saat kaldı! Çok geç olmadan acele et ve görevlerini tamamla!",
+      "urgentTitle2": "⏰ Zaman daralıyor!",
+      "urgentBody2": "Sadece 30 dakika kaldı! İlerlemenizi kaybetmeyin, şimdi görevleri tamamlayın!",
+      "urgentTitle3": "🔥 Son şans!",
+      "urgentBody3": "15 dakika kaldı! Bu gününüzü kurtarmak için son şansınız!"
+    },
+    "tasks": {
+      "quran": {
+        "title": "Kuran-ı Kerim",
+        "description": "Allah'ın kelamıyla bağlan ve günlük Kuran okuyarak ruhunu yükselt"
+      },
+      "sport": {
+        "title": "Fiziksel Mükemmellik",
+        "description": "Güçlendirici bir antrenmanla vücudunu güçlendir ve enerjini artır"
+      },
+      "sleep": {
+        "title": "Kaliteli Dinlenme",
+        "description": "7-8 saat uyku ile enerjini yenile ve yarının zorluklarına hazırlan"
+      },
+      "water": {
+        "title": "Hayati Hidrasyon",
+        "description": "Bol su içerek sağlığını ve canlılığını koru"
+      },
+      "reading": {
+        "title": "Derin Okuma",
+        "description": "Fiziksel bir kitap okuyarak ufkunu genişlet ve zihnini zenginleştir"
+      },
+      "noSugar": {
+        "title": "Şekersiz",
+        "description": "Arzularına hükmet ve bugün şeker ve tatlılardan uzak dur"
+      },
+      "noWoman": {
+        "title": "Gözlerini Koru",
+        "description": "Gözlerini koru ve kalbini temizle"
+      },
+      "coldShower": {
+        "title": "Soğuk Duş",
+        "description": "İradeni güçlendir ve canlandırıcı bir soğuk duşla dayanıklılığını test et"
+      },
+      "dailyTask": {
+        "title": "✅ Günlük Görev",
+        "description": "Günlük hedefinize ulaş ve seçtiğin görevi mükemmellikle tamamla"
+      },
+      "communityService": {
+        "title": "🤝 Toplum Hizmeti",
+        "description": "Başkalarına yardım ederek ve topluma hizmet ederek mutluluk kaynağı ol"
+      },
+      "talkToStranger": {
+        "title": "💬 Anlamlı Bağlantı",
+        "description": "Korku engelini kır ve yeni biriyle ilham verici bir sohbet yap"
+      },
+      "makeDawa": {
+        "title": "🕌 Tebliğ Görevi",
+        "description": "Başkaları için bir ışık ol ve İslami öğretilerin güzelliğini paylaş"
+      }
+    },
+    "index": {
+      "note": "Not (isteğe bağlı)",
+      "notePlaceholder": "İlerlemeniz hakkında bir not ekleyin...",
+      "setReminder": "Hatırlatıcı Ayarla",
+      "selectTime": "Bu görev hatırlatıcısı için doğru zamanı seçin",
+      "time": "Zaman",
+      "saveReminder": "Hatırlatıcıyı Kaydet",
+      "saved": "Kaydedildi",
+      "reminderSet": "Hatırlatıcı başarıyla ayarlandı",
+      "uploaded": "Yüklendi",
+      "error": "Hata",
+      "failedToSaveReminder": "Hatırlatıcı kaydedilemedi"
+    },
+    "rules": {
+      "title": "Meydan Okuma Kuralları",
+      "subtitle": "75 gün boyunca bu kurallara sıkı sıkıya uyun"
+    },
+    "leaderboard": {
+      "title": "Liderlik Tablosu",
+      "rank": "Sıra",
+      "username": "Kullanıcı Adı",
+      "streak": "Seri",
+      "bestStreak": "En İyi Seri",
+      "currentDay": "Güncel Gün",
+      "backToChallenge": "Meydan Okumaya Dön",
+      "weeklyPoints": "Haftalık Puanlar",
+      "totalPoints": "Toplam Puanlar",
+      "weeklyChampion": "Haftalık Şampiyon",
+      "points": "puan",
+      "you": "Sen",
+      "howToEarn": "Puan nasıl kazanılır?",
+      "completeTask": "Görev tamamla = 1 puan",
+      "championReward": "En yüksek haftalık puan = Bir gün boyunca şampiyon çerçevesi!",
+      "weeklyReset": "Haftalık puanlar her hafta sıfırlanır"
+    },
+    "auth": {
+      "login": "Giriş Yap",
+      "signup": "Kayıt Ol",
+      "email": "E-posta",
+      "password": "Şifre",
+      "username": "Kullanıcı Adı",
+      "alreadyHaveAccount": "Zaten hesabınız var mı?",
+      "dontHaveAccount": "Hesabınız yok mu?",
+      "logout": "Çıkış Yap",
+      "welcomeBack": "Tekrar Hoş Geldiniz",
+      "joinChallenge": "Meydan Okumaya Katıl",
+      "signupDescription": "75 günlük dönüşüm yolculuğunuza bugün başlayın",
+      "loginDescription": "İlerlemenize devam edin"
+    },
+    "settings": {
+      "title": "Ayarlar",
+      "language": "Dil",
+      "changeLanguage": "Dili Değiştir",
+      "appearance": "Görünüm",
+      "appearanceDesc": "Uygulamanın cihazınızda nasıl görüneceğini özelleştirin",
+      "theme": "Tema",
+      "themeDesc": "Tercih ettiğiniz temayı seçin",
+      "light": "Açık",
+      "dark": "Koyu",
+      "system": "Sistem",
+      "languageDesc": "Tercih ettiğiniz dili seçin",
+      "selectLanguage": "Dil Seçin",
+      "languageHint": "Uygulama seçtiğiniz dilde görüntülenecek",
+      "notifications": "Bildirimler",
+      "notificationsDesc": "Bildirim tercihlerinizi yönetin",
+      "dailyReminder": "Günlük Hatırlatıcı",
+      "dailyReminderDesc": "Günlük görevlerinizi tamamlamanız için hatırlatıcı alın",
+      "weeklyProgress": "Haftalık İlerleme",
+      "weeklyProgressDesc": "İlerlemenizin haftalık özetlerini alın",
+      "achievements": "Başarılar",
+      "achievementsDesc": "Başarıların kilidini açtığınızda bildirim alın",
+      "saved": "Ayarlar Kaydedildi",
+      "notificationUpdated": "Bildirim tercihleri güncellendi",
+      "languageUpdated": "Dil tercihi güncellendi",
+      "themeUpdated": "Tema tercihi güncellendi"
+    },
+    "admin": {
+      "title": "Yönetici Paneli",
+      "accessDenied": "Erişim Engellendi",
+      "adminOnly": "Bu sayfa yalnızca yöneticiler tarafından erişilebilir",
+      "manageChallenges": "Meydan Okumalar",
+      "challengesDescription": "Tüm kullanıcı meydan okumalarını görüntüle ve yönet",
+      "currentDay": "Güncel Gün",
+      "status": "Durum",
+      "actions": "İşlemler",
+      "delete": "Sil",
+      "active": "Aktif",
+      "inactive": "Pasif",
+      "confirmDelete": "Emin misiniz?",
+      "confirmDeleteDescription": "Bu işlem geri alınamaz. Bu meydan okuma ilerlermesi kalıcı olarak silinecek.",
+      "cancel": "İptal",
+      "confirm": "Sil",
+      "deleteSuccess": "Başarılı",
+      "challengeDeleted": "Meydan okuma silindi",
+      "deleteError": "Meydan okuma silinirken hata oluştu",
+      "loadError": "Meydan okumalar yüklenirken hata oluştu",
+      "manageUsers": "Kullanıcılar",
+      "usersDescription": "Kullanıcı rollerini ve izinlerini görüntüle ve yönet",
+      "username": "Kullanıcı Adı",
+      "email": "E-posta",
+      "role": "Rol",
+      "joinedDate": "Katılma Tarihi",
+      "roleUpdated": "Rol Güncellendi",
+      "roleUpdateSuccess": "Kullanıcı rolü başarıyla güncellendi",
+      "roleUpdateError": "Kullanıcı rolü güncellenirken hata oluştu",
+      "refresh": "Yenile",
+      "refreshed": "Yenilendi",
+      "dataRefreshed": "Tüm veriler başarıyla yenilendi",
+      "rolesDistribution": "Rol Dağılımı",
+      "rolesDistributionDesc": "Uygulamadaki kullanıcıların rollerine göre dağılımı",
+      "roles": {
+        "user": "Kullanıcı",
+        "moderator": "Gözetmen",
+        "admin": "Yönetici"
+      },
+      "tabs": {
+        "overview": "Genel Bakış",
+        "database": "Veritabanı"
+      },
+      "database": {
+        "title": "Veritabanı",
+        "description": "Veritabanı tabloları hakkında detaylı bilgi",
+        "totalRecords": "Toplam Kayıtlar",
+        "records": "kayıt"
+      },
+      "stats": {
+        "totalUsers": "Toplam Kullanıcılar",
+        "activeUsers": "Aktif Kullanıcılar",
+        "completionRate": "Tamamlama Oranı",
+        "averageDays": "Ortalama Günler",
+        "bestStreak": "En İyi Seri",
+        "admins": "Yöneticiler",
+        "moderators": "Gözetmenler",
+        "regularUsers": "Normal Kullanıcılar",
+        "registered": "Kayıtlı kullanıcılar",
+        "currentlyActive": "Şu anda aktif",
+        "completed75Days": "Tüm aşamaları tamamladı",
+        "longestStreak": "En uzun seri",
+        "avgDaysCompleted": "Tamamlanan ortalama günler"
+      }
+    },
+    "onboarding": {
+      "slide1": {
+        "title": "Challenge 21'e Hoş Geldiniz",
+        "subtitle": "Yolculuğunuz Burada Başlıyor",
+        "content": "Challenge 21'e hoş geldiniz - daha iyi bir siz inşa etmek için kişisel yardımcınız. Aramızda sizi görmekten heyecan duyuyoruz!"
+      },
+      "slide2": {
+        "title": "Rutininizi Oluşturmaya Başlayın",
+        "subtitle": "Her Seferinde Bir Gün",
+        "content": "Kalıcı güçlü günlük alışkanlıklar oluşturun. İlerlemenizi takip edin, sorumlu kalın ve gün be gün kendinizi dönüştürmeyi izleyin."
+      },
+      "slide3": {
+        "title": "Her Günü Değerli Kılın",
+        "subtitle": "Her Görev Önemli",
+        "content": "Puan kazanmak, serinizi korumak ve başarılar açmak için günlük görevlerinizi tamamlayın. Küçük tutarlı eylemler büyük sonuçlara yol açar."
+      },
+      "slide4": {
+        "title": "Motive Kalın",
+        "subtitle": "Yalnız Değilsiniz",
+        "content": "En iyi halleri için çalışan benzer düşünceli bireylerden oluşan bir topluluğa katılın. Rekabet edin, ilham verin ve birlikte büyüyün."
+      },
+      "slide5": {
+        "title": "Yolculuğunuzu Özelleştirin",
+        "subtitle": "Kendinize Göre Yapın",
+        "content": "Uygulamanızın nasıl görünmesini istediğinizi seçin. Size en uygun temayı seçin ve dönüşümünüze başlayın!"
+      },
+      "next": "İleri",
+      "skip": "Atla",
+      "start": "Başlayalım!",
+      "lightMode": "Açık",
+      "darkMode": "Koyu"
+    },
+    "profile": {
+      "title": "Profil",
+      "admin": "Yönetici",
+      "memberSince": "Üyelik tarihi",
+      "journeyStats": "Tam Yolculuk İstatistikleri",
+      "overallProgress": "Genel İlerleme",
+      "daysCompleted": "gün tamamlandı",
+      "daysRemaining": "gün kaldı",
+      "stage": "Aşama",
+      "completed": "✓ Tamamlandı",
+      "inProgress": "Devam Ediyor",
+      "upcoming": "Yaklaşan",
+      "currentStageProgress": "Mevcut Aşama İlerlemesi",
+      "currentDay": "Güncel Gün",
+      "currentStreak": "Mevcut Seri",
+      "streak": "Seri",
+      "completedDays": "Tamamlandı",
+      "bestStreak": "En İyi Seri",
+      "joinDate": "Katılma Tarihi",
+      "startDate": "Başlangıç Tarihi",
+      "status": "Durum",
+      "active": "Aktif",
+      "inactive": "Pasif",
+      "daysRemainingInStage": "bu aşamada kalan günler",
+      "completedStage1": "1. Aşama Tamamlandı!",
+      "completedStage1And2": "1 ve 2. Aşamalar Tamamlandı!",
+      "daysOfDiscipline": "{{days}} gün meydan okuma ve disiplin",
+      "consecutiveDays": "Ardışık günler",
+      "personalBest": "Kişisel en iyi",
+      "totalDays": "Toplam tamamlanan günler",
+      "challengeStatus": "Meydan okuma durumu",
+      "progressTitle": "Meydan Okuma İlerlemesi",
+      "completion": "Tamamlanma",
+      "expectedEnd": "Beklenen Bitiş",
+      "loadError": "Profil yüklenirken hata oluştu",
+      "noData": "Profil verisi mevcut değil",
+      "editProfile": "Profili Düzenle",
+      "editDescription": "Profil bilgilerinizi güncelleyin",
+      "username": "Kullanıcı Adı",
+      "usernamePlaceholder": "Kullanıcı adınızı girin",
+      "cancel": "İptal",
+      "save": "Kaydet",
+      "saving": "Kaydediliyor...",
+      "updateSuccess": "Profil Güncellendi",
+      "updateSuccessDesc": "Profiliniz başarıyla güncellendi",
+      "updateError": "Profil güncellenirken hata oluştu",
+      "avatarUpdated": "Avatar Güncellendi",
+      "avatarSuccess": "Profil resminiz güncellendi",
+      "avatarError": "Avatar yüklenirken hata oluştu"
+    },
+    "reminders": {
+      "title": "Görev Hatırlatıcıları",
+      "description": "Günlük görev hatırlatıcılarınızı yönetin",
+      "taskName": "Görev",
+      "reminderTime": "Hatırlatma Zamanı",
+      "status": "Durum",
+      "enabled": "Etkin",
+      "disabled": "Devre Dışı",
+      "actions": "İşlemler",
+      "edit": "Düzenle",
+      "delete": "Sil",
+      "noReminders": "Henüz hatırlatıcı ayarlanmadı",
+      "addFirst": "Başlamak için ilk hatırlatıcınızı ekleyin"
+    },
+    "paths": {
+      "title": "Yolunu Seç",
+      "subtitle": "Yolculuğunuza başlamak için bir meydan okuma seçin",
+      "days": "gün",
+      "completed": "tamamlandı",
+      "recommended": "Önerilen",
+      "active": "Aktif",
+      "acceptChallengeTitle": "Meydan Okumayı Kabul Et",
+      "acceptChallengeDescription": "{{path}} meydan okumasını kabul etmeye hazır mısınız? Başladığınızda, her gün tüm görevleri tamamlamanız gerekir!",
+      "cancel": "İptal",
+      "acceptChallenge": "Meydan Okumayı Kabul Et",
+      "challengeStarted": "Meydan Okuma Başladı!",
+      "goodLuck": "Yolculuğunuzda iyi şanslar!",
+      "alreadyActive": "Aktif bir meydan okumanız var",
+      "completeFirst": "Önce mevcut meydan okumanızı tamamlayın",
+      "muslimHard": {
+        "title": "21 Gün Zor Meydan Okuma",
+        "description": "21 gün boyunca 8 günlük görevle güçlü alışkanlıklar oluşturun. Dönüşümünüzün temeli."
+      },
+      "discipline": {
+        "title": "45 Gün Disiplin",
+        "description": "45 gün boyunca 11 günlük görevle seviye atlayın. Temelleri ustalaşanlar için."
+      },
+      "transformation": {
+        "title": "75 Gün Dönüşüm",
+        "description": "75 gün boyunca 12 günlük görevle nihai meydan okuma. En iyi haliniz olun."
+      },
+      "health": {
+        "title": "Sağlık Yolu",
+        "description": "30 gün boyunca fiziksel sağlığa odaklanın: egzersiz, beslenme ve uyku."
+      },
+      "fitness": {
+        "title": "Fitness Yolu",
+        "description": "Günlük antrenmanlar ve beslenme takibi ile yoğun fitness programı."
+      },
+      "learning": {
+        "title": "Öğrenme Yolu",
+        "description": "Günlük okuma ve öğrenme görevleriyle bilginizi genişletin."
+      }
+    },
+    "calendar": {
+      "title": "Aylık Takvim",
+      "currentStreak": "Mevcut Seri",
+      "bestStreak": "En İyi Seri",
+      "points": "Puanlar",
+      "completed": "Tamamlandı",
+      "missed": "Kaçırıldı",
+      "today": "Bugün",
+      "day": "Gün",
+      "dayCompletedMessage": "Harika! Bu gün tüm görevleri tamamladınız.",
+      "dayMissedMessage": "Bu gün görevleri tamamlayamadınız.",
+      "dayPendingMessage": "Bu gün henüz tamamlanmadı."
+    },
+    "wheelOfLife": {
+      "title": "Yaşam Çarkı",
+      "days": "gün"
+    },
+    "customTask": {
+      "addButton": "Özel Görev Ekle",
+      "title": "Yeni Görev Ekle",
+      "description": "Meydan okumanız için özel bir görev oluşturun",
+      "taskName": "Görev Adı",
+      "taskNamePlaceholder": "Görev adını girin",
+      "taskDescription": "Açıklama (isteğe bağlı)",
+      "taskDescriptionPlaceholder": "Görev açıklamasını girin",
+      "category": "Kategori",
+      "selectCategory": "Bir kategori seçin",
+      "add": "Görev Ekle",
+      "added": "Görev Eklendi",
+      "addedDescription": "Özel göreviniz başarıyla eklendi",
+      "titleRequired": "Lütfen bir görev adı girin"
+    },
+    "pathTasks": {
+      "dailyTasks": "Günlük Görevler",
+      "tasksCount": "görev",
+      "startPath": "Bu Yolu Başlat",
+      "goToChallenge": "Meydan Okumaya Git"
+    }
+  }
+}

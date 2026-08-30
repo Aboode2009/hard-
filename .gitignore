@@ -1,0 +1,50 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Secrets — never commit. .env holds the Supabase/Clerk keys and .mcp.json
+# holds the TestSprite API key.
+.env
+.env.*
+!.env.example
+.mcp.json
+
+# TestSprite scratch output (the backslash path never matched — git wants /)
+testsprite_tests/tmp/
+
+# Per-developer local tool settings
+.claude/settings.local.json
+
+# Build output / native artifacts
+dist.zip
+*.apk
+*.aab
+android/app/build/
+android/build/
+android/.gradle/
+android/local.properties
+android/app/src/main/assets/public/
+android/app/src/main/assets/capacitor.config.json
+ios/App/Pods/
+ios/App/App/public/

@@ -1,0 +1,465 @@
+{
+  "translation": {
+    "nav": {
+      "home": "首页",
+      "menu": "菜单",
+      "profile": "个人资料",
+      "reminders": "提醒",
+      "calendar": "日历",
+      "overall": "总览"
+    },
+    "overall": {
+      "title": "挑战概览",
+      "overallRate": "总体评分",
+      "day": "天",
+      "bestStreaks": "最佳连续",
+      "perfectDays": "完美天数",
+      "habitsDone": "完成任务",
+      "dailyAverage": "日均",
+      "habitTracker": "任务追踪器",
+      "bestDay": "最佳日"
+    },
+    "mood": {
+      "question": "你现在感觉如何？",
+      "excellent": "非常好",
+      "great": "很好",
+      "good": "好",
+      "neutral": "一般",
+      "poor": "不好",
+      "bad": "难过",
+      "awful": "很糟",
+      "addReason": "添加原因",
+      "save": "保存",
+      "saved": "心情已保存！",
+      "savedDescription": "您的心情已记录。"
+    },
+    "createTask": {
+      "title": "新任务",
+      "popular": "热门",
+      "popularDesc": "最受欢迎的任务",
+      "customHabit": "自定义任务",
+      "createCustom": "创建自定义任务",
+      "habitName": "任务名称",
+      "create": "创建",
+      "added": "任务已添加！",
+      "habitAddedDesc": "任务已添加到您的日常任务",
+      "customHabitAdded": "您的自定义任务已创建",
+      "alreadyExists": "已存在",
+      "habitAlreadyAdded": "此任务已在您的列表中",
+      "habits": {
+        "walk": "散步",
+        "sleep": "睡眠",
+        "drinkWater": "喝水",
+        "meditation": "冥想",
+        "run": "跑步",
+        "stand": "站立",
+        "cycling": "骑车",
+        "workout": "锻炼",
+        "burnCalories": "燃烧卡路里",
+        "readBooks": "阅读",
+        "lessCaffeine": "减少咖啡因",
+        "yoga": "瑜伽",
+        "stretch": "拉伸",
+        "noSmoking": "戒烟",
+        "eatHealthy": "健康饮食"
+      }
+    },
+    "challenge": {
+      "title": "艰难挑战",
+      "stageName": "🌱 基础阶段",
+      "stage2Name": "💪 战士阶段",
+      "stage3Name": "🏆 冠军阶段",
+      "daysRemaining": "还有{{count}}天机会",
+      "day": "🔥 第{{current}}天",
+      "totalDays": "{{total}}天卓越之旅",
+      "completeDay": "✨ 成功完成今天",
+      "allTasksRequired": "你离胜利只差几步！完成所有任务以实现今天的成功",
+      "dayCompleted": "太棒了！🎉 你完成了第{{day}}天！",
+      "motivational1": "保持这种势头！💪",
+      "motivational2": "你势不可挡！🚀",
+      "motivational3": "离伟大又近了一步！⭐",
+      "motivational4": "冠军是每天练成的！🏆",
+      "motivational5": "你的自律令人敬佩！🔥",
+      "congratulations": "真主保佑！🌟 你在{{days}}天内完成了{{stage}}！你是真正的冠军！",
+      "stageCompleted": "杰出成就！🎊 第{{stage}}阶段完成！准备迎接下一级别...",
+      "allStagesCompleted": "赞美真主！👑 你是真正的传奇！你以卓越完成了所有阶段！",
+      "resetTitle": "⚠️ 挑战重置",
+      "resetDescription": "你没有完成前几天的任务。你已被重置到第1天。以更强的决心重新开始！"
+    },
+    "notifications": {
+      "endOfDayTitle": "⚠️ 警告 - 还剩2小时！",
+      "endOfDayBody": "你还没有完成今天的任务！在午夜前完成它们以避免重置挑战。",
+      "urgentTitle1": "🚨 紧急警告！",
+      "urgentBody1": "只剩1小时了！赶快完成你的任务，以免为时已晚！",
+      "urgentTitle2": "⏰ 时间不多了！",
+      "urgentBody2": "只剩30分钟了！不要失去你的进度，现在就完成任务！",
+      "urgentTitle3": "🔥 最后机会！",
+      "urgentBody3": "还剩15分钟！这是你挽救今天的最后机会！"
+    },
+    "tasks": {
+      "quran": {
+        "title": "古兰经",
+        "description": "与真主的话语连接，通过每日古兰经阅读提升您的灵魂"
+      },
+      "sport": {
+        "title": "身体卓越",
+        "description": "通过有力的锻炼强健身体并提升能量"
+      },
+      "sleep": {
+        "title": "优质休息",
+        "description": "通过7-8小时的睡眠恢复精力，为明天的挑战做准备"
+      },
+      "water": {
+        "title": "重要补水",
+        "description": "通过多喝水保持健康和活力"
+      },
+      "reading": {
+        "title": "深度阅读",
+        "description": "通过阅读实体书扩展视野和丰富思想"
+      },
+      "noSugar": {
+        "title": "无糖",
+        "description": "控制欲望，今天远离糖和甜食"
+      },
+      "noWoman": {
+        "title": "低下目光",
+        "description": "保护您的视线，净化您的心灵"
+      },
+      "coldShower": {
+        "title": "冷水淋浴",
+        "description": "通过清爽的冷水淋浴增强意志力并测试您的耐力"
+      },
+      "dailyTask": {
+        "title": "✅ 每日任务",
+        "description": "实现您的每日目标，出色地完成您选择的任务"
+      },
+      "communityService": {
+        "title": "🤝 社区影响",
+        "description": "通过帮助他人和服务社区成为幸福的源泉"
+      },
+      "talkToStranger": {
+        "title": "💬 有意义的连接",
+        "description": "打破恐惧障碍，与新朋友进行鼓舞人心的对话"
+      },
+      "makeDawa": {
+        "title": "🕌 宣教使命",
+        "description": "成为他人的光明，分享伊斯兰教义的美丽"
+      }
+    },
+    "index": {
+      "note": "备注（可选）",
+      "notePlaceholder": "添加关于您进度的备注...",
+      "setReminder": "设置提醒",
+      "selectTime": "选择此任务提醒的合适时间",
+      "time": "时间",
+      "saveReminder": "保存提醒",
+      "saved": "已保存",
+      "reminderSet": "提醒设置成功",
+      "uploaded": "已上传",
+      "error": "错误",
+      "failedToSaveReminder": "保存提醒失败"
+    },
+    "rules": {
+      "title": "挑战规则",
+      "subtitle": "在75天内严格遵守这些规则"
+    },
+    "leaderboard": {
+      "title": "排行榜",
+      "rank": "排名",
+      "username": "用户名",
+      "streak": "连续",
+      "bestStreak": "最佳连续",
+      "currentDay": "当前天数",
+      "backToChallenge": "返回挑战",
+      "weeklyPoints": "每周积分",
+      "totalPoints": "总积分",
+      "weeklyChampion": "每周冠军",
+      "points": "分",
+      "you": "你",
+      "howToEarn": "如何获得积分？",
+      "completeTask": "完成任务 = 1分",
+      "championReward": "最高周积分 = 一天的冠军边框！",
+      "weeklyReset": "周积分每周重置"
+    },
+    "auth": {
+      "login": "登录",
+      "signup": "注册",
+      "email": "电子邮件",
+      "password": "密码",
+      "username": "用户名",
+      "alreadyHaveAccount": "已有账户？",
+      "dontHaveAccount": "没有账户？",
+      "logout": "退出登录",
+      "welcomeBack": "欢迎回来",
+      "joinChallenge": "加入挑战",
+      "signupDescription": "今天开始您的75天转变之旅",
+      "loginDescription": "继续您的进度"
+    },
+    "settings": {
+      "title": "设置",
+      "language": "语言",
+      "changeLanguage": "更改语言",
+      "appearance": "外观",
+      "appearanceDesc": "自定义应用在您设备上的显示方式",
+      "theme": "主题",
+      "themeDesc": "选择您喜欢的主题",
+      "light": "浅色",
+      "dark": "深色",
+      "system": "系统",
+      "languageDesc": "选择您喜欢的语言",
+      "selectLanguage": "选择语言",
+      "languageHint": "应用将以您选择的语言显示",
+      "notifications": "通知",
+      "notificationsDesc": "管理您的通知偏好设置",
+      "dailyReminder": "每日提醒",
+      "dailyReminderDesc": "获取完成每日任务的提醒",
+      "weeklyProgress": "每周进度",
+      "weeklyProgressDesc": "接收您进度的每周摘要",
+      "achievements": "成就",
+      "achievementsDesc": "解锁成就时获得通知",
+      "saved": "设置已保存",
+      "notificationUpdated": "通知偏好已更新",
+      "languageUpdated": "语言偏好已更新",
+      "themeUpdated": "主题偏好已更新"
+    },
+    "admin": {
+      "title": "管理员仪表板",
+      "accessDenied": "访问被拒绝",
+      "adminOnly": "此页面仅限管理员访问",
+      "manageChallenges": "挑战",
+      "challengesDescription": "查看和管理所有用户挑战",
+      "currentDay": "当前天数",
+      "status": "状态",
+      "actions": "操作",
+      "delete": "删除",
+      "active": "活跃",
+      "inactive": "不活跃",
+      "confirmDelete": "确定吗？",
+      "confirmDeleteDescription": "此操作无法撤销。这将永久删除此挑战进度。",
+      "cancel": "取消",
+      "confirm": "删除",
+      "deleteSuccess": "成功",
+      "challengeDeleted": "挑战已删除",
+      "deleteError": "删除挑战时出错",
+      "loadError": "加载挑战时出错",
+      "manageUsers": "用户",
+      "usersDescription": "查看和管理用户角色和权限",
+      "username": "用户名",
+      "email": "电子邮件",
+      "role": "角色",
+      "joinedDate": "加入日期",
+      "roleUpdated": "角色已更新",
+      "roleUpdateSuccess": "用户角色已成功更新",
+      "roleUpdateError": "更新用户角色时出错",
+      "refresh": "刷新",
+      "refreshed": "已刷新",
+      "dataRefreshed": "所有数据已成功刷新",
+      "rolesDistribution": "角色分布",
+      "rolesDistributionDesc": "应用中按角色分类的用户分布",
+      "roles": {
+        "user": "用户",
+        "moderator": "管理员",
+        "admin": "超级管理员"
+      },
+      "tabs": {
+        "overview": "概览",
+        "database": "数据库"
+      },
+      "database": {
+        "title": "数据库",
+        "description": "数据库表的详细信息",
+        "totalRecords": "总记录",
+        "records": "条记录"
+      },
+      "stats": {
+        "totalUsers": "用户总数",
+        "activeUsers": "活跃用户",
+        "completionRate": "完成率",
+        "averageDays": "平均天数",
+        "bestStreak": "最佳连续",
+        "admins": "超级管理员",
+        "moderators": "管理员",
+        "regularUsers": "普通用户",
+        "registered": "注册用户",
+        "currentlyActive": "当前活跃",
+        "completed75Days": "完成所有阶段",
+        "longestStreak": "最长连续",
+        "avgDaysCompleted": "平均完成天数"
+      }
+    },
+    "onboarding": {
+      "slide1": {
+        "title": "欢迎来到挑战21",
+        "subtitle": "您的旅程从这里开始",
+        "content": "欢迎来到挑战21 - 您打造更好自己的个人伴侣。我们很高兴有您加入！"
+      },
+      "slide2": {
+        "title": "开始建立您的日常",
+        "subtitle": "一天一步",
+        "content": "创建持久的强大日常习惯。追踪您的进度，保持责任感，见证自己一天天的转变。"
+      },
+      "slide3": {
+        "title": "让每一天都有价值",
+        "subtitle": "每项任务都很重要",
+        "content": "完成每日任务以获得积分，保持连续记录，解锁成就。小而持续的行动带来大成果。"
+      },
+      "slide4": {
+        "title": "保持动力",
+        "subtitle": "你不是一个人",
+        "content": "加入一个志同道合的社区，大家都在努力成为最好的自己。竞争、激励，共同成长。"
+      },
+      "slide5": {
+        "title": "定制您的旅程",
+        "subtitle": "让它属于您",
+        "content": "选择您希望应用呈现的样子。选择最适合您的主题，开始您的转变！"
+      },
+      "next": "下一步",
+      "skip": "跳过",
+      "start": "开始吧！",
+      "lightMode": "浅色",
+      "darkMode": "深色"
+    },
+    "profile": {
+      "title": "个人资料",
+      "admin": "管理员",
+      "memberSince": "加入时间",
+      "journeyStats": "完整旅程统计",
+      "overallProgress": "总体进度",
+      "daysCompleted": "天已完成",
+      "daysRemaining": "天剩余",
+      "stage": "阶段",
+      "completed": "✓ 已完成",
+      "inProgress": "进行中",
+      "upcoming": "即将到来",
+      "currentStageProgress": "当前阶段进度",
+      "currentDay": "当前天数",
+      "currentStreak": "当前连续",
+      "streak": "连续",
+      "completedDays": "已完成",
+      "bestStreak": "最佳连续",
+      "joinDate": "加入日期",
+      "startDate": "开始日期",
+      "status": "状态",
+      "active": "活跃",
+      "inactive": "不活跃",
+      "daysRemainingInStage": "此阶段剩余天数",
+      "completedStage1": "第1阶段完成！",
+      "completedStage1And2": "第1和第2阶段完成！",
+      "daysOfDiscipline": "{{days}}天挑战与自律",
+      "consecutiveDays": "连续天数",
+      "personalBest": "个人最佳",
+      "totalDays": "总完成天数",
+      "challengeStatus": "挑战状态",
+      "progressTitle": "挑战进度",
+      "completion": "完成度",
+      "expectedEnd": "预计完成",
+      "loadError": "加载个人资料时出错",
+      "noData": "没有可用的个人资料数据",
+      "editProfile": "编辑资料",
+      "editDescription": "更新您的个人资料信息",
+      "username": "用户名",
+      "usernamePlaceholder": "输入您的用户名",
+      "cancel": "取消",
+      "save": "保存",
+      "saving": "保存中...",
+      "updateSuccess": "资料已更新",
+      "updateSuccessDesc": "您的个人资料已成功更新",
+      "updateError": "更新资料时出错",
+      "avatarUpdated": "头像已更新",
+      "avatarSuccess": "您的头像已更新",
+      "avatarError": "上传头像时出错"
+    },
+    "reminders": {
+      "title": "任务提醒",
+      "description": "管理您的每日任务提醒",
+      "taskName": "任务",
+      "reminderTime": "提醒时间",
+      "status": "状态",
+      "enabled": "已启用",
+      "disabled": "已禁用",
+      "actions": "操作",
+      "edit": "编辑",
+      "delete": "删除",
+      "noReminders": "尚未设置提醒",
+      "addFirst": "添加您的第一个提醒以开始"
+    },
+    "paths": {
+      "title": "选择您的道路",
+      "subtitle": "选择一个挑战开始您的旅程",
+      "days": "天",
+      "completed": "已完成",
+      "recommended": "推荐",
+      "active": "活跃",
+      "acceptChallengeTitle": "接受挑战",
+      "acceptChallengeDescription": "您准备好接受{{path}}挑战了吗？一旦开始，您必须每天完成所有任务！",
+      "cancel": "取消",
+      "acceptChallenge": "接受挑战",
+      "challengeStarted": "挑战已开始！",
+      "goodLuck": "祝您旅途顺利！",
+      "alreadyActive": "您有一个活跃的挑战",
+      "completeFirst": "请先完成您当前的挑战",
+      "muslimHard": {
+        "title": "21天挑战",
+        "description": "用21天的8项日常任务建立强大习惯。这是您转变的基础。"
+      },
+      "discipline": {
+        "title": "45天自律",
+        "description": "用45天的11项日常任务提升自我。适合已掌握基础的人。"
+      },
+      "transformation": {
+        "title": "75天转变",
+        "description": "终极挑战：75天12项日常任务。成为最好的自己。"
+      },
+      "health": {
+        "title": "健康之路",
+        "description": "30天专注于身体健康：运动、营养和睡眠。"
+      },
+      "fitness": {
+        "title": "健身之路",
+        "description": "强化健身计划，包括每日锻炼和营养追踪。"
+      },
+      "learning": {
+        "title": "学习之路",
+        "description": "通过每日阅读和学习任务拓展您的知识。"
+      }
+    },
+    "calendar": {
+      "title": "月历",
+      "currentStreak": "当前连续",
+      "bestStreak": "最佳连续",
+      "points": "积分",
+      "completed": "已完成",
+      "missed": "未完成",
+      "today": "今天",
+      "day": "天",
+      "dayCompletedMessage": "做得好！您这天完成了所有任务。",
+      "dayMissedMessage": "您这天没有完成任务。",
+      "dayPendingMessage": "这一天尚未完成。"
+    },
+    "wheelOfLife": {
+      "title": "生命之轮",
+      "days": "天"
+    },
+    "customTask": {
+      "addButton": "添加自定义任务",
+      "title": "添加新任务",
+      "description": "为您的挑战创建自定义任务",
+      "taskName": "任务名称",
+      "taskNamePlaceholder": "输入任务名称",
+      "taskDescription": "描述（可选）",
+      "taskDescriptionPlaceholder": "输入任务描述",
+      "category": "类别",
+      "selectCategory": "选择类别",
+      "add": "添加任务",
+      "added": "任务已添加",
+      "addedDescription": "您的自定义任务已成功添加",
+      "titleRequired": "请输入任务名称"
+    },
+    "pathTasks": {
+      "dailyTasks": "每日任务",
+      "tasksCount": "项任务",
+      "startPath": "开始此路径",
+      "goToChallenge": "前往挑战"
+    }
+  }
+}
