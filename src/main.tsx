@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { ClerkProvider } from "@clerk/react";
 import { arSA } from "@clerk/localizations";
 import App from "./App.tsx";
+import { ErrorBoundary } from "./components/ErrorBoundary.tsx";
 import { ProfileBootstrap } from "./components/ProfileBootstrap.tsx";
 // Duolingo-style rounded font (Arabic + Latin) used by the Profile page.
 import "@fontsource/baloo-bhaijaan-2/400.css";
@@ -27,13 +28,15 @@ const isArabic = (localStorage.getItem("language") || navigator.language || "en"
 
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <ClerkProvider
-      publishableKey={PUBLISHABLE_KEY}
-      afterSignOutUrl="/auth"
-      localization={isArabic ? arSA : undefined}
-    >
-      <ProfileBootstrap />
-      <App />
-    </ClerkProvider>
+    <ErrorBoundary>
+      <ClerkProvider
+        publishableKey={PUBLISHABLE_KEY}
+        afterSignOutUrl="/auth"
+        localization={isArabic ? arSA : undefined}
+      >
+        <ProfileBootstrap />
+        <App />
+      </ClerkProvider>
+    </ErrorBoundary>
   </React.StrictMode>
 );
