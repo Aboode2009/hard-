@@ -27,8 +27,9 @@ workflows:
         VITE_SUPABASE_URL: "https://zmkgbotvmfpsrvvgztxn.supabase.co"
         VITE_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_-KtGdG60667cJk8el4-DQw_MWlsNQaO"
         VITE_PUBLIC_WEB_URL: "https://merry-dragon-9e3add.netlify.app"
-        # Google sign-in on iPhone; empty hides the button (see IOS_RELEASE.md §5).
-        VITE_GOOGLE_IOS_CLIENT_ID: ""
+        # Google sign-in on iPhone: add VITE_GOOGLE_IOS_CLIENT_ID here once the
+        # iOS OAuth client exists (IOS_RELEASE.md §5). Until then the Google
+        # button is hidden on iPhone. (Codemagic rejects empty values.)
     scripts:
       - name: Install dependencies
         script: npm ci
