@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { readCache, readLastKnown, writeCache, homeKeys } from "@/lib/home-cache";
 import { useToast } from "@/hooks/use-toast";
+import type { XPResult } from "@/lib/challenge-rpc";
 
 interface XPData {
   xp: number;
@@ -31,12 +33,26 @@ export const getXPProgress = (xp: number, level: number): number => {
 };
 
 export const useXP = (userId: string | null) => {
-  const [xpData, setXPData] = useState<XPData>({ xp: 0, level: 1 });
+  // Last known value for the first frame, so the bar does not show "Level 1"
+  // and then jump to the real level once the query returns.
+  const [xpData, setXPData] = useState<XPData>(
+    () => (userId && readLastKnown<XPData>(homeKeys.xp(userId), true)) || { xp: 0, level: 1 },
+  );
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
   const fetchXP = useCallback(async () => {
     if (!userId) {
+      setLoading(false);
+      return;
+    }
+
+    // The XP bar sits on the home screen, which remounts on every tab return.
+    // `applyServerXP` rewrites this entry from the server's own response, so a hit is
+    // always the value the query would have produced.
+    const cached = readCache<{ xp: number; level: number }>(homeKeys.xp(userId));
+    if (cached) {
+      setXPData(cached);
       setLoading(false);
       return;
     }
@@ -50,10 +66,9 @@ export const useXP = (userId: string | null) => {
 
       if (error) throw error;
 
-      setXPData({
-        xp: data.xp || 0,
-        level: data.level || 1,
-      });
+      const next = { xp: data.xp || 0, level: data.level || 1 };
+      writeCache(homeKeys.xp(userId), next);
+      setXPData(next);
     } catch (error) {
       console.error("Error fetching XP:", error);
     } finally {
@@ -65,54 +80,42 @@ export const useXP = (userId: string | null) => {
     fetchXP();
   }, [fetchXP]);
 
-  const addXP = useCallback(async (
-    amount: number, 
+  /**
+   * XP is granted on the server by the task/day RPCs (the client can no longer
+   * call add_xp). This folds the server's answer into the bar and fires the
+   * level-up callback when the server says a level was reached.
+   */
+  const applyServerXP = useCallback((
+    result: XPResult | null | undefined,
     isArabic: boolean = false,
     onLevelUp?: (newLevel: number) => void
-  ): Promise<{ leveledUp: boolean; newLevel: number }> => {
-    if (!userId) return { leveledUp: false, newLevel: xpData.level };
+  ): { leveledUp: boolean; newLevel: number } => {
+    if (!userId || !result) return { leveledUp: false, newLevel: xpData.level };
 
-    try {
-      const { data, error } = await supabase.rpc("add_xp", {
-        p_user_id: userId,
-        p_amount: amount,
-      });
+    const next = { xp: result.new_xp, level: result.new_level };
+    writeCache(homeKeys.xp(userId), next);
+    setXPData(next);
 
-      if (error) throw error;
-
-      const result = data?.[0] || { new_xp: xpData.xp + amount, new_level: xpData.level, leveled_up: false };
-      
-      setXPData({
-        xp: result.new_xp,
-        level: result.new_level,
-      });
-
-      if (result.leveled_up) {
-        // Call the onLevelUp callback if provided (for level up rewards)
-        if (onLevelUp) {
-          onLevelUp(result.new_level);
-        } else {
-          // Default toast if no callback
-          toast({
-            title: isArabic ? "🎉 مستوى جديد!" : "🎉 Level Up!",
-            description: isArabic 
-              ? `تهانينا! وصلت للمستوى ${result.new_level}` 
-              : `Congratulations! You reached Level ${result.new_level}`,
-          });
-        }
+    if (result.leveled_up) {
+      if (onLevelUp) {
+        onLevelUp(result.new_level);
+      } else {
+        toast({
+          title: isArabic ? "🎉 مستوى جديد!" : "🎉 Level Up!",
+          description: isArabic
+            ? `تهانينا! وصلت للمستوى ${result.new_level}`
+            : `Congratulations! You reached Level ${result.new_level}`,
+        });
       }
-
-      return { leveledUp: result.leveled_up, newLevel: result.new_level };
-    } catch (error) {
-      console.error("Error adding XP:", error);
-      return { leveledUp: false, newLevel: xpData.level };
     }
-  }, [userId, xpData, toast]);
+
+    return { leveledUp: result.leveled_up, newLevel: result.new_level };
+  }, [userId, xpData.level, toast]);
 
   return {
     ...xpData,
     loading,
-    addXP,
+    applyServerXP,
     refetch: fetchXP,
     xpProgress: getXPProgress(xpData.xp, xpData.level),
     xpForCurrentLevel: getXPForLevel(xpData.level),

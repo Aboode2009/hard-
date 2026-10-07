@@ -14,8 +14,8 @@ android {
         applicationId "com.hardchallenge.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 2
-        versionName "1.1"
+        versionCode 8
+        versionName "1.6"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -32,11 +32,22 @@ android {
     signingConfigs {
         release {
             if (keystorePropertiesFile.exists()) {
-                storeFile file(keystoreProperties['storeFile'])
+                // rootProject.file: resolves against android/, where both
+                // keystore.properties and the .jks live. Plain file() would
+                // resolve against android/app/ and silently miss the key.
+                storeFile rootProject.file(keystoreProperties['storeFile'])
                 storePassword keystoreProperties['storePassword']
                 keyAlias keystoreProperties['keyAlias']
                 keyPassword keystoreProperties['keyPassword']
             }
+        }
+    }
+    packaging {
+        jniLibs {
+            // Store .so uncompressed and page-aligned so the loader can mmap
+            // them straight out of the APK. This is the AGP 8 default, set
+            // explicitly because 16 KB support depends on it.
+            useLegacyPackaging = false
         }
     }
     buildTypes {

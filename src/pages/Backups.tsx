@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { clerkAuth } from "@/lib/clerk-auth";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Download, RefreshCw, Trash2, Database, Calendar, HardDrive } from "lucide-react";
@@ -42,7 +41,7 @@ const Backups = () => {
 
   const checkAdminAndFetchBackups = async () => {
     try {
-      const { data: { user } } = await clerkAuth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
         navigate('/auth');
@@ -92,7 +91,7 @@ const Backups = () => {
   const createBackup = async () => {
     setCreating(true);
     try {
-      const { data: { session } } = await clerkAuth.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
       
       const response = await supabase.functions.invoke('create-backup', {
         headers: {

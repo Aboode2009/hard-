@@ -1,11 +1,12 @@
-import { useState, useRef, useEffect, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { bi } from "@/i18n/bi";
 import { useTranslation } from "react-i18next";
-import { ChevronRight, Sun, Moon, Hand, ArrowRight } from "lucide-react";
+import { ChevronRight, Sun, Moon, ArrowRight, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { saveOnboardingName, saveOnboardingProfile } from "@/lib/onboarding";
 import welcomeBoard from "@/assets/welcome-board.png";
 import thinkingBoy from "@/assets/thinking-boy.png";
 import openArmsBoy from "@/assets/open-arms-boy.png";
@@ -43,17 +44,17 @@ const DecorativeVines = ({ position }: { position: "top-left" | "top-right" | "b
           </linearGradient>
         </defs>
         {/* Vine branches */}
-        <path 
-          d="M20 180 Q60 140 80 100 Q100 60 140 40 Q160 30 180 20" 
-          stroke="url(#vineGradient)" 
-          strokeWidth="3" 
+        <path
+          d="M20 180 Q60 140 80 100 Q100 60 140 40 Q160 30 180 20"
+          stroke="url(#vineGradient)"
+          strokeWidth="3"
           fill="none"
           className="animate-[drawPath_2s_ease-out]"
         />
-        <path 
-          d="M40 160 Q70 130 90 100 Q110 70 130 60" 
-          stroke="url(#vineGradient)" 
-          strokeWidth="2" 
+        <path
+          d="M40 160 Q70 130 90 100 Q110 70 130 60"
+          stroke="url(#vineGradient)"
+          strokeWidth="2"
           fill="none"
         />
         {/* Leaves */}
@@ -69,7 +70,7 @@ const DecorativeVines = ({ position }: { position: "top-left" | "top-right" | "b
   );
 };
 
-/* Drawn avatars for the gender cards — same art direction as the mascot
+/* Drawn avatars for the gender cards — same art direction as the onboarding
    (black spiky hair, black hoodie with orange accents). */
 const MaleAvatar = () => (
   <svg viewBox="0 0 100 100" className="h-14 w-14">
@@ -111,7 +112,7 @@ const FemaleAvatar = () => (
 
 /**
  * Open-arms boy for the gender slide: an illustrated pick CARD floats over
- * each hand. Same physics as the other mascots — springy entrance, endless
+ * each hand. Same physics as the other figures — springy entrance, endless
  * float/sway; the cards bob on their own on top of the boy's motion.
  */
 const GenderPickBoy = ({
@@ -191,7 +192,7 @@ const GenderPickBoy = ({
 };
 
 /**
- * The mascot boy holding a whiteboard: springs in, then floats and sways
+ * The boy holding a whiteboard: springs in, then floats and sways
  * forever. The slide text is pinned INSIDE the whiteboard and moves with it.
  * Remounted per slide (key={current}) so the entrance replays on each slide.
  */
@@ -207,7 +208,9 @@ const BoardBoy = ({ text }: { text: string }) => (
     {/* springy entrance */}
     <motion.div
       className="relative"
-      style={{ width: "min(84vw, 360px, calc(46dvh * 0.8))" }}
+      // containerType makes 1cqw equal 1% of the board's real width, which is
+      // what the slide text sizes itself against.
+      style={{ width: "min(84vw, 360px, calc(46dvh * 0.8))", containerType: "inline-size" }}
       initial={{ y: -60, opacity: 0, scale: 0.9 }}
       animate={{ y: 0, opacity: 1, scale: 1 }}
       transition={{ type: "spring", stiffness: 130, damping: 12, mass: 0.9 }}
@@ -227,8 +230,8 @@ const BoardBoy = ({ text }: { text: string }) => (
         >
           <p
             dir="auto"
-            className={`px-1 text-center font-bold leading-snug text-gray-700 ${
-              text.length > 100 ? "text-[10px]" : "text-[12px]"
+            className={`px-1 text-center font-bold leading-snug text-gray-700 board-text ${
+              text.length > 100 ? "board-text--long" : ""
             }`}
           >
             {text}
@@ -270,7 +273,9 @@ const ThinkingBoy = ({ children }: { children: ReactNode }) => (
 
 export const WelcomeOnboarding = ({ onComplete }: WelcomeOnboardingProps) => {
   const [current, setCurrent] = useState(0);
-  const [showHint, setShowHint] = useState(true);
+  /** Saving the name or the final answers; the Next button waits on it. */
+  const [busy, setBusy] = useState(false);
+  const [nameError, setNameError] = useState<string | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') return true;
@@ -280,12 +285,9 @@ export const WelcomeOnboarding = ({ onComplete }: WelcomeOnboardingProps) => {
   const [userName, setUserName] = useState('');
   const [userAge, setUserAge] = useState('');
   const [userGender, setUserGender] = useState<'male' | 'female' | null>(null);
-  
+
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === 'ar';
-  
-  const touchStartX = useRef<number>(0);
-  const touchEndX = useRef<number>(0);
 
   // Define slide types
   type SlideType = 'content' | 'name' | 'age' | 'gender' | 'theme';
@@ -346,14 +348,6 @@ export const WelcomeOnboarding = ({ onComplete }: WelcomeOnboardingProps) => {
 
   const slide = slides[current];
 
-  // Hide hint after 3 seconds or first swipe
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowHint(false);
-    }, 4000);
-    return () => clearTimeout(timer);
-  }, []);
-
   const handleThemeChange = (dark: boolean) => {
     setIsDarkMode(dark);
     const theme = dark ? 'dark' : 'light';
@@ -364,9 +358,10 @@ export const WelcomeOnboarding = ({ onComplete }: WelcomeOnboardingProps) => {
   const canProceed = () => {
     switch (slide.type) {
       case 'name':
-        return userName.trim().length > 0;
+        return userName.trim().length >= 2;
       case 'age':
-        return userAge.trim().length > 0 && !isNaN(Number(userAge)) && Number(userAge) > 0;
+        // Same range the server accepts in complete_onboarding (1–120, whole years).
+        return userAge.trim().length > 0 && Number.isInteger(Number(userAge)) && Number(userAge) >= 1 && Number(userAge) <= 120;
       case 'gender':
         return userGender !== null;
       default:
@@ -374,15 +369,42 @@ export const WelcomeOnboarding = ({ onComplete }: WelcomeOnboardingProps) => {
     }
   };
 
-  const handleNext = () => {
-    if (!canProceed()) return;
-    
-    setShowHint(false);
+  const handleNext = async () => {
+    if (!canProceed() || busy) return;
+
+    // The name typed here becomes the account's username in the app,
+    // replacing the one taken from Google at sign-up. Saved on this step so a
+    // taken name can be fixed right here, not discovered at the end.
+    if (slide.type === 'name') {
+      const name = userName.trim();
+      if (name.length > 30) {
+        setNameError(bi("الاسم طويل جداً — 30 حرفاً كحد أقصى", "Too long — 30 characters at most"));
+        return;
+      }
+      setBusy(true);
+      setNameError(null);
+      const result = await saveOnboardingName(name);
+      setBusy(false);
+      if (result === "taken") {
+        setNameError(bi("هذا الاسم مستخدم، اختر اسماً آخر", "That name is taken — pick another"));
+        return;
+      }
+      if (result === "error") {
+        setNameError(bi("تعذّر حفظ الاسم، تأكد من اتصالك وحاول مجدداً", "Couldn't save the name. Check your connection and try again"));
+        return;
+      }
+    }
+
     if (current === slides.length - 1) {
-      // Save user data to localStorage
-      localStorage.setItem('userName', userName);
-      localStorage.setItem('userAge', userAge);
-      localStorage.setItem('userGender', userGender || '');
+      setBusy(true);
+      try {
+        await saveOnboardingProfile(Number(userAge), userGender ?? 'male');
+      } catch (err) {
+        // Not worth trapping a new user here; the flow is still marked done
+        // on this device by the caller.
+        console.warn("Saving onboarding answers failed:", err);
+      }
+      setBusy(false);
       onComplete();
     } else {
       setCurrent((prev) => prev + 1);
@@ -390,53 +412,9 @@ export const WelcomeOnboarding = ({ onComplete }: WelcomeOnboardingProps) => {
   };
 
   const handlePrev = () => {
-    setShowHint(false);
+    if (busy) return;
     if (current > 0) {
       setCurrent((prev) => prev - 1);
-    }
-  };
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.targetTouches[0].clientX;
-    // Reset the end position too: without this, a plain TAP (which fires no
-    // touchmove) leaves a stale touchEndX from a previous gesture, so
-    // handleTouchEnd sees a huge diff and treats the tap as a swipe —
-    // navigating away instead of focusing the tapped input/button.
-    touchEndX.current = e.targetTouches[0].clientX;
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    touchEndX.current = e.targetTouches[0].clientX;
-  };
-
-  const handleTouchEnd = () => {
-    const swipeThreshold = 50;
-    const diff = touchStartX.current - touchEndX.current;
-
-    if (Math.abs(diff) > swipeThreshold) {
-      if (isArabic) {
-        // RTL: swipe right = next, swipe left = prev
-        if (diff < 0 && canProceed()) {
-          handleNext();
-        } else if (diff > 0) {
-          handlePrev();
-        }
-      } else {
-        // LTR: swipe left = next, swipe right = prev
-        if (diff > 0 && canProceed()) {
-          handleNext();
-        } else if (diff < 0) {
-          handlePrev();
-        }
-      }
-    }
-  };
-
-  const handleDotClick = (index: number) => {
-    // Only allow going back or staying on current
-    if (index <= current) {
-      setShowHint(false);
-      setCurrent(index);
     }
   };
 
@@ -450,10 +428,22 @@ export const WelcomeOnboarding = ({ onComplete }: WelcomeOnboardingProps) => {
                 type="text"
                 placeholder={bi("أحمد، محمد، فاطمة...", "Dennis, Frank, Mac...")}
                 value={userName}
-                onChange={(e) => setUserName(e.target.value)}
+                maxLength={30}
+                onChange={(e) => {
+                  setUserName(e.target.value);
+                  setNameError(null);
+                }}
                 className="h-full w-full border-0 bg-transparent text-center text-lg font-bold text-gray-800 shadow-none placeholder:text-gray-400 focus-visible:ring-0"
               />
             </ThinkingBoy>
+            <p className="mt-3 text-sm font-medium text-gray-600">
+              {bi("هذا سيكون اسمك داخل التطبيق", "This will be your name in the app")}
+            </p>
+            {nameError && (
+              <p className="mt-1 text-sm font-bold text-red-600" role="alert">
+                {nameError}
+              </p>
+            )}
           </div>
         );
       case 'age':
@@ -488,7 +478,7 @@ export const WelcomeOnboarding = ({ onComplete }: WelcomeOnboardingProps) => {
         return (
           <div className="space-y-4 animate-fade-in">
             <BoardBoy key={current} text={slide.content || ""} />
-            <div className="rounded-2xl border border-white/60 bg-white/70 p-4 shadow-lg backdrop-blur-sm">
+            <div className="rounded-2xl border border-white/60 bg-white/90 p-4 shadow-lg">
               <div className="flex items-center justify-center gap-6">
                 <div className="flex items-center gap-3">
                   <Sun className="w-6 h-6 text-amber-500" />
@@ -518,47 +508,16 @@ export const WelcomeOnboarding = ({ onComplete }: WelcomeOnboardingProps) => {
   };
 
   return (
-    <div 
-      className="fixed inset-0 z-50 flex items-center justify-center touch-pan-y overflow-hidden"
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden"
       style={{
         background: 'linear-gradient(180deg, #FDE8E0 0%, #FECDD3 50%, #F9A8B5 100%)'
       }}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
     >
       {/* Decorative Vines */}
       <DecorativeVines position="top-left" />
       <DecorativeVines position="top-right" />
       <DecorativeVines position="bottom-left" />
-
-      {/* Skip Button */}
-      <button
-        onClick={onComplete}
-        className="absolute top-6 right-6 z-[70] px-4 py-2 text-gray-600 hover:text-gray-800 text-sm font-medium transition-colors"
-      >
-        {t('onboarding.skip')}
-      </button>
-
-      {/* Swipe Hint Overlay */}
-      {showHint && current === 0 && (
-        <div className="absolute inset-0 z-[60] flex items-center justify-center bg-foreground/60 backdrop-blur-sm animate-fade-in">
-          <div className="flex flex-col items-center gap-4 text-background">
-            <div className="relative">
-              <Hand className="w-16 h-16 animate-[swipe_1.5s_ease-in-out_infinite]" />
-            </div>
-            <p className="text-lg font-medium text-center px-4">
-              {bi("مرر للانتقال للشريحة التالية", "Swipe to go to the next slide")}
-            </p>
-            <button 
-              onClick={() => setShowHint(false)}
-              className="mt-2 px-4 py-2 bg-background/20 rounded-full text-sm hover:bg-background/30 transition-colors"
-            >
-              {bi("فهمت", "Got it")}
-            </button>
-          </div>
-        </div>
-      )}
 
       <div className="h-full w-full flex flex-col items-center justify-center p-8 animate-fade-in relative z-10">
         <div className="max-w-md w-full space-y-8 text-center">
@@ -583,39 +542,43 @@ export const WelcomeOnboarding = ({ onComplete }: WelcomeOnboardingProps) => {
         {/* Dots */}
         <div className="mt-8 flex flex-col items-center gap-3">
           <div className="flex items-center justify-center gap-2">
+            {/* Progress only — moving between steps is the buttons' job. */}
             {slides.map((_, index) => (
-              <button
+              <span
                 key={index}
+                aria-hidden="true"
                 className={`h-2 rounded-full transition-all duration-500 ${
-                  index === current 
-                    ? "w-8 bg-gray-800 shadow-md" 
-                    : "w-2 bg-gray-400/50 hover:bg-gray-500/50"
+                  index === current
+                    ? "w-8 bg-gray-800 shadow-md"
+                    : "w-2 bg-gray-400/50"
                 }`}
-                onClick={() => handleDotClick(index)}
-                aria-label={`Go to slide ${index + 1}`}
               />
             ))}
           </div>
-          
+
           {/* Page indicator */}
           <span className="text-gray-600 text-sm">
-            {current + 1} / {slides.length}
+            <span dir="ltr">{current + 1} / {slides.length}</span>
           </span>
         </div>
 
         {/* Large circular navigation button */}
         <div className="mt-8">
           <button
-            onClick={handleNext}
-            disabled={!canProceed()}
+            onClick={() => void handleNext()}
+            disabled={!canProceed() || busy}
             className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 shadow-xl group ${
-              canProceed()
+              canProceed() && !busy
                 ? 'bg-gray-800 hover:scale-110'
                 : 'bg-gray-400 cursor-not-allowed'
             }`}
             aria-label={current === slides.length - 1 ? t('onboarding.start') : t('onboarding.next')}
           >
-            <ArrowRight className="w-7 h-7 text-white group-hover:translate-x-0.5 transition-transform" />
+            {busy ? (
+              <Loader2 className="w-7 h-7 text-white animate-spin" />
+            ) : (
+              <ArrowRight className={`w-7 h-7 text-white transition-transform ${bi("rotate-180", "")}`} />
+            )}
           </button>
         </div>
 
@@ -624,7 +587,7 @@ export const WelcomeOnboarding = ({ onComplete }: WelcomeOnboardingProps) => {
           <button
             onClick={handlePrev}
             className="absolute bottom-8 left-8 text-gray-600 hover:text-gray-800 text-sm font-medium transition-colors flex items-center gap-1"
-            aria-label="Previous"
+            aria-label={bi("السابق", "Previous")}
           >
             <ChevronRight className={`w-4 h-4 ${bi("", "rotate-180")}`} />
             {bi("السابق", "Back")}
@@ -633,10 +596,6 @@ export const WelcomeOnboarding = ({ onComplete }: WelcomeOnboardingProps) => {
       </div>
 
       <style>{`
-        @keyframes swipe {
-          0%, 100% { transform: translateX(0); opacity: 1; }
-          50% { transform: translateX(${bi("20px", "-20px")}); opacity: 0.5; }
-        }
         @keyframes drawPath {
           from { stroke-dashoffset: 300; }
           to { stroke-dashoffset: 0; }

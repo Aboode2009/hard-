@@ -22,14 +22,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- Deep link for Clerk OAuth: the in-app browser redirects to
-                 com.hardchallenge.app://sso-callback after Google auth, and
-                 singleTask routes it back into the running app (appUrlOpen). -->
+            <!-- Deep link for Supabase OAuth. Supabase redirects the Custom Tab
+                 to capacitor://localhost?code=... once Google is done; this
+                 filter hands it to the app, and singleTask routes it into the
+                 already-running instance as an appUrlOpen event.
+                 Must stay identical to NATIVE_OAUTH_REDIRECT in
+                 src/config/auth.ts and to the allow-listed Redirect URL. -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="com.hardchallenge.app" android:host="sso-callback" />
+                <data android:scheme="capacitor" android:host="localhost" />
             </intent-filter>
 
         </activity>
@@ -39,6 +42,53 @@
         <meta-data
             android:name="com.google.mlkit.vision.DEPENDENCIES"
             android:value="barcode_ui" />
+
+
+        <!-- AdMob App ID. MUST match the app id in src/config/ads.ts — the
+             manifest can't read TS, so update BOTH when going live.
+             Currently Google's sample app id (test ads only). -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3940256099942544~3347511713" />
+        <!-- Home-screen widgets (src/lib/widget-sync.ts feeds them). Not
+             exported: only the system's AppWidget service broadcasts to them. -->
+        <receiver
+            android:name=".widget.StreakWidgetProvider"
+            android:exported="false"
+            android:label="@string/widget_streak_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_streak_info" />
+        </receiver>
+        <receiver
+            android:name=".widget.TasksWidgetProvider"
+            android:exported="false"
+            android:label="@string/widget_tasks_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_tasks_info" />
+        </receiver>
+        <receiver
+            android:name=".widget.WeekWidgetProvider"
+            android:exported="false"
+            android:label="@string/widget_week_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_week_info" />
+        </receiver>
+        <!-- Baghdad-midnight refresh, fired by an AlarmManager PendingIntent. -->
+        <receiver
+            android:name=".widget.WidgetMidnightReceiver"
+            android:exported="false" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -54,7 +104,32 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- AdMob -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
     <!-- NASS attendance barcode scanning -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
+
+    <!--
+        Package visibility (Android 11+ / targetSdk 30+).
+
+        WAYL checkout must open in the user's real browser, outside the WebView,
+        because Google Play does not allow paying for digital goods in-app.
+        @capacitor/app-launcher does that with an ACTION_VIEW intent, but it
+        first calls resolveActivity() to check the intent can be handled — and
+        under package visibility that returns null unless the app declares what
+        it intends to query. Without this block openUrl() reports
+        completed:false and checkout fails silently on every modern device.
+    -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="http" />
+        </intent>
+    </queries>
 </manifest>

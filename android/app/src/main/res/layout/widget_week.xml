@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    4x1 week widget — design: widget-3-week-4x1.svg.
+    Direction is set at runtime (RTL for Arabic), so Saturday sits at the
+    start: rightmost in Arabic, leftmost in English. On a short cell the
+    letters row and flame are hidden (see WeekWidgetProvider) so the dots and
+    title never get squeezed.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_bg"
+    android:layoutDirection="rtl"
+    android:paddingHorizontal="12dp"
+    android:paddingVertical="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <!-- Streak: flame, number, unit -->
+        <LinearLayout
+            android:id="@+id/week_streak"
+            android:layout_width="44dp"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/week_flame"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_widget_flame" />
+
+            <TextView
+                android:id="@+id/week_count"
+                android:layout_width="match_parent"
+                android:layout_height="26dp"
+                android:autoSizeMaxTextSize="24sp"
+                android:autoSizeMinTextSize="12sp"
+                android:autoSizeTextType="uniform"
+                android:fontFamily="@font/tajawal_extrabold"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:textColor="@color/widget_text"
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/week_unit"
+                android:layout_width="match_parent"
+                android:layout_height="14dp"
+                android:autoSizeMaxTextSize="10sp"
+                android:autoSizeMinTextSize="7sp"
+                android:autoSizeTextType="uniform"
+                android:fontFamily="@font/tajawal_regular"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:textColor="@color/widget_muted"
+                android:textSize="10sp" />
+        </LinearLayout>
+
+        <!-- Title + week -->
+        <LinearLayout
+            android:id="@+id/week_body"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/week_title"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:autoSizeMaxTextSize="14sp"
+                android:autoSizeMinTextSize="8sp"
+                android:autoSizeTextType="uniform"
+                android:fontFamily="@font/tajawal_extrabold"
+                android:gravity="start|center_vertical"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:textColor="@color/widget_text"
+                android:textSize="14sp" />
+
+            <LinearLayout
+                android:id="@+id/week_letters"
+                android:layout_width="match_parent"
+                android:layout_height="14dp"
+                android:layout_marginTop="2dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/week_letter_0"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/tajawal_regular"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:textColor="@color/widget_muted"
+                    android:textSize="10sp" />
+                <TextView
+                    android:id="@+id/week_letter_1"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/tajawal_regular"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:textColor="@color/widget_muted"
+                    android:textSize="10sp" />
+                <TextView
+                    android:id="@+id/week_letter_2"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/tajawal_regular"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:textColor="@color/widget_muted"
+                    android:textSize="10sp" />
+                <TextView
+                    android:id="@+id/week_letter_3"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/tajawal_regular"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:textColor="@color/widget_muted"
+                    android:textSize="10sp" />
+                <TextView
+                    android:id="@+id/week_letter_4"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/tajawal_regular"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:textColor="@color/widget_muted"
+                    android:textSize="10sp" />
+                <TextView
+                    android:id="@+id/week_letter_5"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/tajawal_regular"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:textColor="@color/widget_muted"
+                    android:textSize="10sp" />
+                <TextView
+                    android:id="@+id/week_letter_6"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/tajawal_regular"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:textColor="@color/widget_muted"
+                    android:textSize="10sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="22dp"
+                android:layout_marginTop="2dp"
+                android:orientation="horizontal">
+
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <ImageView
+                        android:id="@+id/week_dot_0"
+                        android:layout_width="match_parent"
+                        android:layout_height="18dp"
+                        android:layout_gravity="center"
+                        android:layout_marginHorizontal="1dp"
+                        android:scaleType="fitCenter"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/widget_dot_idle" />
+                </FrameLayout>
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <ImageView
+                        android:id="@+id/week_dot_1"
+                        android:layout_width="match_parent"
+                        android:layout_height="18dp"
+                        android:layout_gravity="center"
+                        android:layout_marginHorizontal="1dp"
+                        android:scaleType="fitCenter"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/widget_dot_idle" />
+                </FrameLayout>
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <ImageView
+                        android:id="@+id/week_dot_2"
+                        android:layout_width="match_parent"
+                        android:layout_height="18dp"
+                        android:layout_gravity="center"
+                        android:layout_marginHorizontal="1dp"
+                        android:scaleType="fitCenter"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/widget_dot_idle" />
+                </FrameLayout>
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <ImageView
+                        android:id="@+id/week_dot_3"
+                        android:layout_width="match_parent"
+                        android:layout_height="18dp"
+                        android:layout_gravity="center"
+                        android:layout_marginHorizontal="1dp"
+                        android:scaleType="fitCenter"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/widget_dot_idle" />
+                </FrameLayout>
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <ImageView
+                        android:id="@+id/week_dot_4"
+                        android:layout_width="match_parent"
+                        android:layout_height="18dp"
+                        android:layout_gravity="center"
+                        android:layout_marginHorizontal="1dp"
+                        android:scaleType="fitCenter"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/widget_dot_idle" />
+                </FrameLayout>
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <ImageView
+                        android:id="@+id/week_dot_5"
+                        android:layout_width="match_parent"
+                        android:layout_height="18dp"
+                        android:layout_gravity="center"
+                        android:layout_marginHorizontal="1dp"
+                        android:scaleType="fitCenter"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/widget_dot_idle" />
+                </FrameLayout>
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <ImageView
+                        android:id="@+id/week_dot_6"
+                        android:layout_width="match_parent"
+                        android:layout_height="18dp"
+                        android:layout_gravity="center"
+                        android:layout_marginHorizontal="1dp"
+                        android:scaleType="fitCenter"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/widget_dot_idle" />
+                </FrameLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Signed out / out of date: replaces streak + week -->
+        <TextView
+            android:id="@+id/week_message"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:autoSizeMaxTextSize="14sp"
+            android:autoSizeMinTextSize="8sp"
+            android:autoSizeTextType="uniform"
+            android:fontFamily="@font/tajawal_bold"
+            android:gravity="start|center_vertical"
+            android:maxLines="2"
+            android:textColor="@color/widget_text"
+            android:textSize="14sp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/week_button"
+            android:layout_width="50dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="10dp"
+            android:autoSizeMaxTextSize="13sp"
+            android:autoSizeMinTextSize="8sp"
+            android:autoSizeTextType="uniform"
+            android:background="@drawable/widget_button_bg"
+            android:fontFamily="@font/tajawal_bold"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:paddingHorizontal="4dp"
+            android:textColor="#FFFFFF"
+            android:textSize="13sp" />
+    </LinearLayout>
+</FrameLayout>

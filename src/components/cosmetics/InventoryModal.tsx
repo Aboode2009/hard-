@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { bi } from "@/i18n/bi";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
+import { challengeRpc } from "@/lib/challenge-rpc";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -15,7 +16,7 @@ import {
 import { BadgeArt } from "./BadgeArt";
 import { MedalIcon, ChestIcon } from "@/components/nav-icons";
 import { DuoThickCheck } from "@/components/icons/DuolingoIcons";
-import { LootBoxAnimation } from "./LootBoxAnimation";
+import { ChestCeremony } from "./ChestCeremony";
 import { useToast } from "@/hooks/use-toast";
 import { haptic } from "@/lib/haptics";
 
@@ -49,7 +50,6 @@ export const InventoryModal = ({
   const [lootBoxes, setLootBoxes] = useState(0);
   const [loading, setLoading] = useState(true);
   const [showLootBox, setShowLootBox] = useState(false);
-  const [isOpening, setIsOpening] = useState(false);
   const [reward, setReward] = useState<CosmeticItem | null>(null);
 
   useEffect(() => {
@@ -138,64 +138,37 @@ export const InventoryModal = ({
     }
   };
 
+  /** Runs on the chest tap; a rejection puts the chest back to "tap to open". */
   const openLootBox = async () => {
-    if (lootBoxes <= 0 || isOpening) return;
-
-    setIsOpening(true);
+    if (lootBoxes <= 0) throw new Error("no_loot_boxes");
 
     try {
-      // Get badge items not owned by user
-      const availableItems = allItems.filter(item => !inventory.includes(item.id));
-
-      if (availableItems.length === 0) {
-        // All items owned, give random duplicate
-        const randomItem = allItems[Math.floor(Math.random() * allItems.length)];
-        setReward(randomItem);
-      } else {
-        // Weighted random selection based on rarity
-        const weights = {
-          common: 0.50,
-          rare: 0.30,
-          epic: 0.15,
-          legendary: 0.05,
-        };
-
-        const weightedItems: CosmeticItem[] = [];
-        availableItems.forEach(item => {
-          const weight = Math.ceil(weights[item.rarity] * 100);
-          for (let i = 0; i < weight; i++) {
-            weightedItems.push(item);
-          }
-        });
-
-        const randomItem = weightedItems[Math.floor(Math.random() * weightedItems.length)];
-
-        // Add to inventory
-        await supabase.from("user_inventory").insert({
-          user_id: userId,
-          item_id: randomItem.id,
-        });
-
-        setInventory(prev => [...prev, randomItem.id]);
-        setReward(randomItem);
+      // The server consumes the box and picks the badge (rarity-weighted,
+      // unowned first); the client only shows it.
+      const result = await challengeRpc.openLootBox();
+      const item = allItems.find((i) => i.id === result.item.id) ?? {
+        ...result.item,
+        type: result.item.type as CosmeticItem["type"],
+        rarity: result.item.rarity as CosmeticItem["rarity"],
+      };
+      if (!result.duplicate) {
+        setInventory(prev => [...prev, result.item.id]);
       }
-
-      // Decrement loot boxes
-      await supabase
-        .from("profiles")
-        .update({ loot_boxes: lootBoxes - 1 })
-        .eq("id", userId);
-
-      setLootBoxes(prev => prev - 1);
+      setReward(item);
+      setLootBoxes(result.loot_boxes);
     } catch (error) {
       console.error("Error opening loot box:", error);
-      setIsOpening(false);
+      toast({
+        variant: "destructive",
+        title: bi("خطأ", "Error"),
+        description: bi("تعذّر فتح الصندوق، حاول مرة ثانية", "Couldn't open the box, try again"),
+      });
+      throw error;
     }
   };
 
   const handleLootBoxClose = () => {
     setShowLootBox(false);
-    setIsOpening(false);
     setReward(null);
   };
 
@@ -206,7 +179,13 @@ export const InventoryModal = ({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="duo-page max-w-md max-h-[85vh] overflow-y-auto" dir={bi("rtl", "ltr")}>
+        <DialogContent
+          className="duo-page max-w-md max-h-[85vh] overflow-y-auto"
+          dir={bi("rtl", "ltr")}
+          // Taps on the chest screen are "outside" this dialog; they must not close it.
+          onInteractOutside={(e) => showLootBox && e.preventDefault()}
+          onEscapeKeyDown={(e) => showLootBox && e.preventDefault()}
+        >
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 font-extrabold" style={{ color: "hsl(var(--duo-text))" }}>
               <MedalIcon className="w-6 h-6" />
@@ -220,7 +199,7 @@ export const InventoryModal = ({
               {bi("تم جمعها", "Collected")}
             </span>
             <span className="font-extrabold" style={{ color: "#FFC800" }}>
-              {ownedCount} / {totalCount}
+              <span dir="ltr">{ownedCount} / {totalCount}</span>
             </span>
           </div>
 
@@ -351,12 +330,12 @@ export const InventoryModal = ({
         </DialogContent>
       </Dialog>
 
-      <LootBoxAnimation
+      <ChestCeremony
         isOpen={showLootBox}
+        title={bi("صندوق الشارات", "Badge Chest")}
+        reward={reward ? { item: reward } : null}
+        onOpen={openLootBox}
         onClose={handleLootBoxClose}
-        reward={reward}
-        onOpenBox={openLootBox}
-        isOpening={isOpening}
       />
     </>
   );

@@ -99,3 +99,10 @@ app/src/main/assets/public
 app/src/main/assets/capacitor.config.json
 app/src/main/assets/capacitor.plugins.json
 app/src/main/res/xml/config.xml
+
+# Release signing — never commit these.
+# The passwords for the OLD key are already in this repo history; the key
+# itself was lost and replaced, so that exposure is moot, but do not repeat it.
+keystore.properties
+*.jks
+*.keystore

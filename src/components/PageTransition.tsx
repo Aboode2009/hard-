@@ -1,49 +1,18 @@
 import { ReactNode } from "react";
-import { motion, Transition } from "framer-motion";
-import { useLocation } from "react-router-dom";
 
 interface PageTransitionProps {
   children: ReactNode;
 }
 
-const pageVariants = {
-  initial: {
-    opacity: 0,
-    x: 20,
-    scale: 0.98
-  },
-  enter: {
-    opacity: 1,
-    x: 0,
-    scale: 1
-  },
-  exit: {
-    opacity: 0,
-    x: -20,
-    scale: 0.98
-  }
-};
-
-const pageTransition: Transition = {
-  type: "tween",
-  ease: "anticipate" as const,
-  duration: 0.3
-};
-
-export const PageTransition = ({ children }: PageTransitionProps) => {
-  const location = useLocation();
-
-  return (
-    <motion.div
-      key={location.pathname}
-      initial="initial"
-      animate="enter"
-      exit="exit"
-      variants={pageVariants}
-      transition={pageTransition}
-      className="w-full h-full"
-    >
-      {children}
-    </motion.div>
-  );
-};
+/**
+ * The wrapper every route renders in. Deliberately no animation.
+ *
+ * It used to fade the new page in from opacity 0 over 0.14s. The outgoing
+ * page is unmounted on the tap, so for those first frames there was nothing
+ * opaque on screen at all — measured on a real phone as 2–5 blank frames on
+ * every single tab switch, which read as the whole app blinking. Native tab
+ * bars swap instantly; so does this.
+ */
+export const PageTransition = ({ children }: PageTransitionProps) => (
+  <div className="w-full h-full">{children}</div>
+);

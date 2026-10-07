@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { BrowserMultiFormatReader } from "@zxing/browser";
 import type { IScannerControls } from "@zxing/browser";
-import { CameraOff, CheckCircle2, Clock3, RefreshCw, ScanLine, Settings, XCircle } from "lucide-react";
+import { Building2, CameraOff, CheckCircle2, Clock3, Crown, Download, RefreshCw, ScanLine, Settings, XCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { bi } from "@/i18n/bi";
 import {
@@ -12,23 +13,36 @@ import {
   ScanError,
 } from "@/lib/attendance-scanner";
 
+const GREEN = "#58CC02";
+const AMBER = "#FFC800";
+const RED = "#FF4B4B";
+
+/** Every verdict record_attendance can return. */
+type AttendanceStatus =
+  | "on_time"
+  | "late"
+  | "invalid_code"
+  | "too_early"
+  | "too_late"
+  | "already"
+  | "premium_required"
+  | "no_company"
+  | "no_config"
+  | "unauthenticated";
+
 /** Row returned by the record_attendance RPC (server does ALL validation). */
 interface AttendanceResult {
   success: boolean;
-  status:
-    | "on_time"
-    | "late"
-    | "invalid_code"
-    | "too_early"
-    | "too_late"
-    | "already"
-    | "no_company"
-    | "no_config"
-    | "unauthenticated";
+  status: AttendanceStatus;
   message: string;
   checked_in_at: string | null;
 }
 
+/**
+ * `supabase.rpc()` hands back a PostgrestFilterBuilder — a thenable you can
+ * `await`, but NOT a real promise: it has no `.catch()` and no `.finally()`.
+ * Always `await` these calls inside try/catch.
+ */
 interface AttendanceWindow {
   window_start: string;
   window_end: string;
@@ -38,10 +52,12 @@ interface AttendanceWindow {
 
 type Phase =
   | "scanning" // camera open (web video / native fullscreen scanner)
+  | "downloading" // Android is fetching the Play services scanner module
   | "verifying" // RPC in flight
   | "result" // server answered — show colored message
   | "permission" // camera permission denied
   | "timeout" // web scan ran too long without a detection
+  | "unsupported" // this device cannot run the native scanner at all
   | "error"; // unexpected failure
 
 interface AttendanceScannerDialogProps {
@@ -84,6 +100,7 @@ export const AttendanceScannerDialog = ({
   onOpenChange,
   onAttendanceRecorded,
 }: AttendanceScannerDialogProps) => {
+  const navigate = useNavigate();
   const [phase, setPhase] = useState<Phase>("scanning");
   const [result, setResult] = useState<AttendanceResult | null>(null);
   /** true when the error phase is specifically "no usable camera". */
@@ -120,7 +137,7 @@ export const AttendanceScannerDialog = ({
         return;
       }
 
-      const row = (Array.isArray(data) ? data[0] : data) as AttendanceResult | undefined;
+      const row: AttendanceResult | undefined = data?.[0] as AttendanceResult | undefined;
       if (!row) {
         setPhase("error");
         return;
@@ -144,12 +161,15 @@ export const AttendanceScannerDialog = ({
 
     if (isNativeScannerPlatform) {
       try {
-        const value = await scanNativeBarcode();
+        // First ever scan on Android may need the Play services scanner module;
+        // the callback swaps the spinner text so the wait is explained.
+        const value = await scanNativeBarcode(() => setPhase("downloading"));
         await submitScan(value);
       } catch (err) {
         if (err instanceof ScanError) {
           if (err.reason === "permission_denied") setPhase("permission");
           else if (err.reason === "cancelled") onOpenChange(false);
+          else if (err.reason === "module_unavailable") setPhase("unsupported");
           else setPhase("error");
         } else {
           console.error("Native scan failed:", err);
@@ -204,33 +224,86 @@ export const AttendanceScannerDialog = ({
       stopWebScanner();
       return;
     }
-    supabase
-      .rpc("get_attendance_window")
-      .then(({ data }) => {
-        const row = (Array.isArray(data) ? data[0] : data) as AttendanceWindow | undefined;
+    let alive = true;
+
+    // The window is a nicety — it shows the allowed check-in time. A failure
+    // here must never take the scanner down with it, so it is awaited inside
+    // its own try/catch and its result is optional everywhere below.
+    void (async () => {
+      try {
+        const { data, error } = await supabase.rpc("get_attendance_window");
+        if (error) throw new Error(error.message);
+        if (!alive) return;
+
+        // A TABLE(...) function returns an array of rows, and it is legitimately
+        // EMPTY for a user with no company or no active subscription — so there
+        // may be no row at all, and `row` stays undefined.
+        const row: AttendanceWindow | undefined = data?.[0];
         if (row) setAttendanceWindow(row);
-      });
+      } catch (err) {
+        console.warn("get_attendance_window failed:", err);
+      }
+    })();
+
     void startScan();
-    return stopWebScanner;
+    return () => {
+      alive = false;
+      stopWebScanner();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  const resultColor =
-    result?.status === "on_time"
-      ? "#58CC02"
-      : result?.status === "late"
-        ? "#FFC800"
-        : "#FF4B4B";
-  const ResultIcon =
-    result?.status === "on_time" ? CheckCircle2 : result?.status === "late" ? Clock3 : XCircle;
+  /**
+   * Every status the server can return, handled explicitly.
+   *
+   * `action` decides the button under the message: "done" closes on a success,
+   * "retry" re-opens the camera for something the user can fix by scanning
+   * again, "subscribe" routes to checkout, "close" is a dead end.
+   *
+   * Typed as a full Record of AttendanceStatus, so adding a status to the union
+   * without handling it here is a compile error rather than a blank screen.
+   */
+  const STATUS_UI: Record<
+    AttendanceStatus,
+    { color: string; Icon: typeof CheckCircle2; action: "done" | "retry" | "subscribe" | "close" }
+  > = {
+    on_time: { color: GREEN, Icon: CheckCircle2, action: "done" },
+    late: { color: AMBER, Icon: Clock3, action: "done" },
+    already: { color: AMBER, Icon: CheckCircle2, action: "done" },
+    too_early: { color: AMBER, Icon: Clock3, action: "close" },
+    premium_required: { color: AMBER, Icon: Crown, action: "subscribe" },
+    invalid_code: { color: RED, Icon: XCircle, action: "retry" },
+    too_late: { color: RED, Icon: XCircle, action: "close" },
+    no_company: { color: RED, Icon: Building2, action: "close" },
+    no_config: { color: RED, Icon: XCircle, action: "close" },
+    unauthenticated: { color: RED, Icon: XCircle, action: "close" },
+  };
 
-  const windowLine = attendanceWindow
-    ? attendanceWindow.display_time ||
-      bi(
-        `الحضور من ${attendanceWindow.window_start} إلى ${attendanceWindow.window_end}`,
-        `Check-in from ${attendanceWindow.window_start} to ${attendanceWindow.window_end}`,
-      )
-    : null;
+  // A status outside the union would mean the server grew one we do not know
+  // about; treat it as a plain failure rather than crashing on a missing entry.
+  const ui = (result && STATUS_UI[result.status]) || {
+    color: RED,
+    Icon: XCircle,
+    action: "close" as const,
+  };
+  const resultColor = ui.color;
+  const ResultIcon = ui.Icon;
+
+  /**
+   * The check-in window line.
+   *
+   * `get_attendance_window` returns a TABLE, so it is legitimately empty for a
+   * user with no company or no subscription — and even when a row exists its
+   * columns can be null. Both are checked, because interpolating a null here
+   * printed "الحضور من null إلى null" on screen.
+   */
+  const windowLine = (() => {
+    if (!attendanceWindow) return null;
+    if (attendanceWindow.display_time) return attendanceWindow.display_time;
+    const { window_start: from, window_end: to } = attendanceWindow;
+    if (!from || !to) return null;
+    return bi(`الحضور من ${from} إلى ${to}`, `Check-in from ${from} to ${to}`);
+  })();
 
   const retryButton = (label: string) => (
     <button
@@ -246,7 +319,10 @@ export const AttendanceScannerDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-sm">
+      {/* aria-describedby={undefined}: this dialog's body is a live camera and a
+          status message, not static descriptive prose, so Radix is told there
+          is intentionally no description rather than warning on every open. */}
+      <DialogContent className="max-w-sm" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle
             className="flex items-center justify-center gap-2 text-center text-lg font-extrabold"
@@ -322,17 +398,30 @@ export const AttendanceScannerDialog = ({
                 {result.message}
               </p>
             </div>
-            {result.success ? (
+            {ui.action === "done" ? (
               <button
                 type="button"
                 onClick={() => onOpenChange(false)}
                 className="duo-press h-12 w-full rounded-2xl font-extrabold text-white"
-                style={{ background: "#58CC02", boxShadow: "0 4px 0 #45A302" }}
+                style={{ background: GREEN, boxShadow: "0 4px 0 #45A302" }}
               >
                 {bi("تم", "Done")}
               </button>
-            ) : result.status === "invalid_code" ? (
+            ) : ui.action === "retry" ? (
               retryButton(bi("إعادة المسح", "Scan again"))
+            ) : ui.action === "subscribe" ? (
+              <button
+                type="button"
+                onClick={() => {
+                  onOpenChange(false);
+                  navigate("/premium");
+                }}
+                className="duo-press flex h-12 w-full items-center justify-center gap-2 rounded-2xl font-extrabold text-white"
+                style={{ background: AMBER, boxShadow: "0 4px 0 #D9A800" }}
+              >
+                <Crown className="h-5 w-5" strokeWidth={2.5} />
+                {bi("اشترك الآن", "Subscribe now")}
+              </button>
             ) : (
               <button
                 type="button"
@@ -343,6 +432,39 @@ export const AttendanceScannerDialog = ({
                 {bi("إغلاق", "Close")}
               </button>
             )}
+          </div>
+        )}
+
+        {phase === "downloading" && (
+          <div className="flex flex-col items-center gap-3 py-6 text-center">
+            <Download className="h-9 w-9 animate-pulse text-primary" strokeWidth={2.5} />
+            <p className="text-sm font-bold leading-relaxed" style={{ color: "hsl(var(--duo-text))" }}>
+              {bi(
+                "جارٍ تجهيز الماسح لأول مرة…",
+                "Getting the scanner ready for the first time…",
+              )}
+            </p>
+            <p className="text-xs font-semibold" style={{ color: "hsl(var(--duo-muted))" }}>
+              {bi(
+                "يحدث هذا مرة واحدة فقط ويحتاج اتصالاً بالإنترنت.",
+                "This happens once and needs an internet connection.",
+              )}
+            </p>
+          </div>
+        )}
+
+        {phase === "unsupported" && (
+          <div className="space-y-4 py-2">
+            <div className="flex flex-col items-center gap-3 rounded-2xl border-2 border-[#FF4B4B] bg-[#FF4B4B14] p-5 text-center">
+              <CameraOff className="h-10 w-10 text-[#FF4B4B]" strokeWidth={2.5} />
+              <p className="text-sm font-bold leading-relaxed" style={{ color: "hsl(var(--duo-text))" }}>
+                {bi(
+                  "هذا الجهاز لا يدعم ماسح الباركود. تأكد من تحديث خدمات Google Play ثم أعد المحاولة.",
+                  "This device can't run the barcode scanner. Update Google Play services, then try again.",
+                )}
+              </p>
+            </div>
+            {retryButton(bi("إعادة المحاولة", "Try again"))}
           </div>
         )}
 

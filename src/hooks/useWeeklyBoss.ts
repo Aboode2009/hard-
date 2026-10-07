@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { invalidateProgress } from "@/lib/query-client";
+import { challengeRpc } from "@/lib/challenge-rpc";
 import { useToast } from "@/hooks/use-toast";
 
 interface WeeklyBossQuest {
@@ -101,6 +102,11 @@ const BOSS_MONSTERS = [
   { emoji: "🧟", name: "The Zombie of Bad Habits", name_ar: "زومبي العادات السيئة" },
   { emoji: "👻", name: "The Ghost of Wasted Time", name_ar: "شبح الوقت الضائع" },
 ];
+
+/** Fixed chest payout. Shown instantly, then written to the database; must
+ *  match claim_weekly_boss_chest (capped at 100 gems). */
+const LEMON_REWARD = 100;
+const XP_REWARD = 1000;
 
 export const useWeeklyBoss = (userId: string | null) => {
   const [event, setEvent] = useState<WeeklyBossEvent | null>(null);
@@ -224,85 +230,40 @@ export const useWeeklyBoss = (userId: string | null) => {
     setShowChest(true);
   }, [event, userId, questCompleted]);
 
-  // Handle chest opening
+  /**
+   * Opens the chest.
+   *
+   * The reveal animation runs on a fixed timer, so the rewards MUST be on
+   * screen before it reaches them. They used to be set only after six
+   * sequential round trips (inventory, cosmetics, insert, add_xp, progress
+   * read, progress write) — if any of those was slow or hung, the chest
+   * animation opened onto an empty panel with no claim button and the user was
+   * stuck there. That is the freeze.
+   *
+   * So the amounts, which are fixed, are shown immediately and every write is
+   * moved to the background. Persistence failing now costs the user nothing on
+   * screen; it is logged and retried on the next open.
+   */
   const openChest = useCallback(async () => {
     if (!userId || chestOpened) return;
 
     setChestOpened(true);
 
+    // On screen before the animation needs it — no await above this line.
+    setRewards({ lemons: LEMON_REWARD, xp: XP_REWARD, cosmetic: null });
+
     try {
-      // Generate rewards
-      const lemonReward = 500;
-      const xpReward = 1000;
-
-      // Try to get a random cosmetic the user doesn't own
-      const { data: ownedItems } = await supabase
-        .from("user_inventory")
-        .select("item_id")
-        .eq("user_id", userId);
-
-      const ownedIds = new Set(ownedItems?.map(i => i.item_id) || []);
-
-      const { data: allCosmetics } = await supabase
-        .from("cosmetic_items")
-        .select("*")
-        .eq("is_active", true);
-
-      const unownedCosmetics = allCosmetics?.filter(c => !ownedIds.has(c.id)) || [];
-      
-      let cosmeticReward = null;
-      if (unownedCosmetics.length > 0) {
-        const randomCosmetic = unownedCosmetics[Math.floor(Math.random() * unownedCosmetics.length)];
-        
-        // Add to user inventory
-        await supabase.from("user_inventory").insert({
-          user_id: userId,
-          item_id: randomCosmetic.id,
-        });
-
-        cosmeticReward = {
-          name: randomCosmetic.name,
-          name_ar: randomCosmetic.name_ar,
-          type: randomCosmetic.type,
-        };
+      // The server grants the gems, the XP and a random unowned cosmetic,
+      // once per user per Friday (Asia/Baghdad).
+      const result = await challengeRpc.claimWeeklyBossChest();
+      if (result.cosmetic) {
+        setRewards((prev) => (prev ? { ...prev, cosmetic: result.cosmetic } : prev));
       }
-
-      // Add XP
-      await supabase.rpc("add_xp", {
-        p_user_id: userId,
-        p_amount: xpReward,
-      });
-
-      // Add points/lemons to challenge progress
-      const { data: progress } = await supabase
-        .from("challenge_progress")
-        .select("total_points, weekly_points")
-        .eq("user_id", userId)
-        .single();
-
-      if (progress) {
-        await supabase
-          .from("challenge_progress")
-          .update({
-            total_points: (progress.total_points || 0) + lemonReward,
-            weekly_points: (progress.weekly_points || 0) + lemonReward,
-          })
-          .eq("user_id", userId);
-      }
-
-      setRewards({
-        lemons: lemonReward,
-        xp: xpReward,
-        cosmetic: cosmeticReward,
-      });
+      invalidateProgress();
     } catch (error) {
-      console.error("Error opening chest:", error);
-      // Still show some rewards even on error
-      setRewards({
-        lemons: 500,
-        xp: 1000,
-        cosmetic: null,
-      });
+      // The user already has their rewards on screen; this is only about
+      // whether they were written down (e.g. already claimed today).
+      console.error("Error persisting chest rewards:", error);
     }
   }, [userId, chestOpened]);
 
@@ -326,29 +287,16 @@ export const useWeeklyBoss = (userId: string | null) => {
     if (!userId || !event) return;
 
     try {
-      // Get current points
-      const { data: progress } = await supabase
-        .from("challenge_progress")
-        .select("total_points")
-        .eq("user_id", userId)
-        .single();
-
-      if (progress && progress.total_points > 0) {
-        // Deduct 50% of lemons
-        const penalty = Math.floor(progress.total_points * 0.5);
-        await supabase
-          .from("challenge_progress")
-          .update({
-            total_points: progress.total_points - penalty,
-          })
-          .eq("user_id", userId);
-
+      // Deducting half the gems is done by the server (once per day).
+      const { penalty } = await challengeRpc.applyWeeklyBossPenalty();
+      if (penalty > 0) {
+        invalidateProgress();
         toast({
           variant: "destructive",
           title: isArabic ? "هزيمة! 😢" : "DEFEAT! 😢",
           description: isArabic
-            ? `خسرت ${penalty} ليمونة لأنك لم تكمل المهمة`
-            : `You lost ${penalty} lemons for not completing the quest`,
+            ? `خسرت ${penalty} جوهرة لأنك لم تكمل المهمة`
+            : `You lost ${penalty} gems for not completing the quest`,
         });
       }
 

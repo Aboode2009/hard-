@@ -1,11 +1,20 @@
 import { useState, useEffect } from "react";
 import { bi } from "@/i18n/bi";
+import { useRewardedAd } from "@/hooks/useRewardedAd";
+import { PointPacks } from "@/components/PointPacks";
+import { onBalanceChange } from "@/lib/premium";
+import { REWARDED_POINTS_HINT } from "@/config/ads";
+import { Play } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
-import { clerkAuth } from "@/lib/clerk-auth";
-import { ChevronLeft, ChevronRight, Sparkles, TrendingUp, Leaf, Check } from "lucide-react";
+import { ChevronLeft, ChevronRight, Sparkles, TrendingUp, Check } from "lucide-react";
+import { DuoGem } from "@/components/icons/DuolingoIcons";
 import { format, startOfDay, endOfDay } from "date-fns";
+
+/** The app's one currency is the blue gem; this page is themed after it. */
+const GEM = "#1CB0F6";
+const GEM_DARK = "#1899D6";
 
 interface PointEntry {
   id: string;
@@ -20,62 +29,77 @@ const Points = () => {
   const navigate = useNavigate();
 
   const [totalPoints, setTotalPoints] = useState(0);
+  // A purchase is credited server-side by the WAYL webhook, so when the app
+  // comes back to the foreground EntitlementsRefresher re-reads the balance
+  // and broadcasts it here — otherwise this screen would keep showing the
+  // pre-purchase total until the user navigated away and back.
+  useEffect(() => onBalanceChange(setTotalPoints), []);
+
   const [todayPoints, setTodayPoints] = useState(0);
   const [pointsHistory, setPointsHistory] = useState<PointEntry[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // "Watch an ad for points" — the server grants via grant_ad_reward; we just
+  // refresh the totals afterwards. Hidden entirely on web (no AdMob there).
+  const { watchAd, watching, canWatchAds } = useRewardedAd("points_page", () => {
+    void fetchPointsData();
+  });
 
   useEffect(() => {
     fetchPointsData();
   }, []);
 
   const fetchPointsData = async () => {
-    const { data: { user } } = await clerkAuth.getUser();
-    if (!user) {
+    // Without this a failed read left the spinner running forever;
+    // `finally` guarantees the page renders something either way.
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Fetch total points from challenge_progress
+      const { data: progress } = await supabase
+        .from("challenge_progress")
+        .select("total_points")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (progress) {
+        setTotalPoints(progress.total_points);
+      }
+
+      // Fetch today's points
+      const today = new Date();
+      const startOfToday = startOfDay(today).toISOString();
+      const endOfToday = endOfDay(today).toISOString();
+
+      const { data: todayData } = await supabase
+        .from("task_completions")
+        .select("points_earned")
+        .eq("user_id", user.id)
+        .gte("completed_at", startOfToday)
+        .lte("completed_at", endOfToday);
+
+      if (todayData) {
+        const sum = todayData.reduce((acc, curr) => acc + curr.points_earned, 0);
+        setTodayPoints(sum);
+      }
+
+      // Fetch all points history
+      const { data: history } = await supabase
+        .from("task_completions")
+        .select("id, task_key, points_earned, completed_at")
+        .eq("user_id", user.id)
+        .order("completed_at", { ascending: false })
+        .limit(100);
+
+      if (history) {
+        setPointsHistory(history);
+      }
+    } catch (err) {
+      console.error("fetchPointsData failed:", err);
+    } finally {
       setLoading(false);
-      return;
     }
-
-    // Fetch total points from challenge_progress
-    const { data: progress } = await supabase
-      .from("challenge_progress")
-      .select("total_points")
-      .eq("user_id", user.id)
-      .maybeSingle();
-
-    if (progress) {
-      setTotalPoints(progress.total_points);
-    }
-
-    // Fetch today's points
-    const today = new Date();
-    const startOfToday = startOfDay(today).toISOString();
-    const endOfToday = endOfDay(today).toISOString();
-
-    const { data: todayData } = await supabase
-      .from("task_completions")
-      .select("points_earned")
-      .eq("user_id", user.id)
-      .gte("completed_at", startOfToday)
-      .lte("completed_at", endOfToday);
-
-    if (todayData) {
-      const sum = todayData.reduce((acc, curr) => acc + curr.points_earned, 0);
-      setTodayPoints(sum);
-    }
-
-    // Fetch all points history
-    const { data: history } = await supabase
-      .from("task_completions")
-      .select("id, task_key, points_earned, completed_at")
-      .eq("user_id", user.id)
-      .order("completed_at", { ascending: false })
-      .limit(100);
-
-    if (history) {
-      setPointsHistory(history);
-    }
-
-    setLoading(false);
   };
 
   const getTaskDisplayName = (taskKey: string) => {
@@ -106,10 +130,7 @@ const Points = () => {
       {/* Hero banner */}
       <div
         className="px-4 pt-5 pb-8 rounded-b-3xl text-white"
-        style={{
-          background: "hsl(var(--primary))",
-          boxShadow: "0 4px 0 color-mix(in srgb, hsl(350 80% 60%) 70%, black)",
-        }}
+        style={{ background: GEM, boxShadow: `0 4px 0 ${GEM_DARK}` }}
       >
         <div className="max-w-lg mx-auto">
           <div className="flex items-center justify-between mb-4">
@@ -133,7 +154,13 @@ const Points = () => {
           {/* Points Display */}
           <div className="flex flex-col items-center pt-2">
             <div className="relative mb-4">
-              <div className="text-6xl">🍋</div>
+              {/* White disc: a blue gem straight on the blue banner disappears. */}
+              <div
+                className="w-24 h-24 rounded-full bg-white flex items-center justify-center"
+                style={{ boxShadow: `0 4px 0 ${GEM_DARK}` }}
+              >
+                <DuoGem className="w-14 h-14" />
+              </div>
               <Sparkles className="absolute -top-2 -left-3 w-5 h-5 animate-pulse" style={{ color: "#FFC800" }} strokeWidth={2.5} />
               <Sparkles className="absolute -top-1 -right-2 w-4 h-4 animate-pulse delay-150" style={{ color: "#FFC800" }} strokeWidth={2.5} />
               <Sparkles className="absolute bottom-0 -right-3 w-3 h-3 animate-pulse delay-300" style={{ color: "#FFC800" }} strokeWidth={2.5} />
@@ -148,12 +175,9 @@ const Points = () => {
 
             <div
               className="bg-white rounded-full px-6 py-2 flex items-center gap-2"
-              style={{
-                color: "hsl(var(--primary))",
-                boxShadow: "0 3px 0 color-mix(in srgb, hsl(350 80% 60%) 70%, black)",
-              }}
+              style={{ color: GEM, boxShadow: `0 3px 0 ${GEM_DARK}` }}
             >
-              <span className="text-lg">🍋</span>
+              <DuoGem className="w-5 h-5" />
               <span className="font-bold">
                 {bi("اليوم", "Today")}
               </span>
@@ -162,6 +186,32 @@ const Points = () => {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Rewarded ad — native only; the server decides the actual reward */}
+      {canWatchAds && (
+        <div className="max-w-lg mx-auto px-4 pt-5">
+          <button
+            type="button"
+            onClick={watchAd}
+            disabled={watching}
+            className="duo-press flex h-14 w-full items-center justify-center gap-2 rounded-2xl text-base font-extrabold text-white disabled:opacity-60"
+            style={{ background: "#FFC800", boxShadow: "0 4px 0 #D9A800" }}
+          >
+            <Play className="h-5 w-5" strokeWidth={3} />
+            {watching
+              ? bi("جارٍ تشغيل الإعلان…", "Playing ad…")
+              : bi(
+                  `شاهد إعلان واحصل على ${REWARDED_POINTS_HINT} نقطة`,
+                  `Watch an ad for ${REWARDED_POINTS_HINT} points`,
+                )}
+          </button>
+        </div>
+      )}
+
+      {/* Buy points (WAYL checkout) */}
+      <div className="max-w-lg mx-auto px-4 pt-6">
+        <PointPacks />
       </div>
 
       {/* Points History */}
@@ -175,15 +225,21 @@ const Points = () => {
             <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
           </div>
         ) : pointsHistory.length === 0 ? (
-          <div className="flex flex-col items-center py-20">
+          <div className="flex flex-col items-center py-20 text-center">
             <div
               className="w-20 h-20 rounded-full flex items-center justify-center mb-4"
               style={{ background: "hsl(var(--duo-border) / 0.5)" }}
             >
-              <Leaf className="w-10 h-10" style={{ color: "hsl(var(--duo-muted))" }} strokeWidth={2.5} />
+              <DuoGem className="w-10 h-10 grayscale opacity-60" />
             </div>
             <p className="font-semibold" style={{ color: "hsl(var(--duo-muted))" }}>
               {bi("لا يوجد سجل للنقاط", "No points record yet")}
+            </p>
+            <p className="mt-1 max-w-xs text-sm font-medium" style={{ color: "hsl(var(--duo-muted))" }}>
+              {bi(
+                "أكمل أول مهمة لك اليوم وستظهر نقاطك هنا.",
+                "Finish your first task today and your points will show up here.",
+              )}
             </p>
           </div>
         ) : (
@@ -200,7 +256,8 @@ const Points = () => {
                         ? (bi("اليوم", "Today"))
                         : format(new Date(date), bi("dd/MM/yyyy", "MMM dd, yyyy"))}
                     </span>
-                    <span className="text-sm font-extrabold" style={{ color: "#58CC02" }}>
+                    <span className="flex items-center gap-1 text-sm font-extrabold" style={{ color: GEM }}>
+                      <DuoGem className="w-4 h-4" />
                       +{dayTotal} {bi("نقطة", "pts")}
                     </span>
                   </div>
@@ -227,9 +284,9 @@ const Points = () => {
                             </p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-1 font-extrabold" style={{ color: "#58CC02" }}>
+                        <div className="flex items-center gap-1 font-extrabold" style={{ color: GEM }}>
                           <span>+{entry.points_earned}</span>
-                          <span className="text-lg">🍋</span>
+                          <DuoGem className="w-5 h-5" />
                         </div>
                       </div>
                     ))}

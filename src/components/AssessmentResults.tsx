@@ -84,7 +84,7 @@ export const AssessmentResultsScreen = ({ results, onContinue }: AssessmentResul
         </Card>
 
         {/* All Areas */}
-        <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+        <Card className="bg-white/15 border-white/20">
           <CardContent className="p-4 space-y-3">
             {Object.entries(results).map(([key, value]) => {
               const config = areaConfig[key as keyof typeof areaConfig];

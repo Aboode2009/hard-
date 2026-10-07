@@ -1,48 +1,31 @@
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { supabase } from "@/integrations/supabase/client";
-import { clerkAuth } from "@/lib/clerk-auth";
+import { useSessionUserId } from "@/lib/session-user";
+import { completionsCountQuery, progressQuery } from "@/lib/queries";
 import { MonthlyCalendar } from "@/components/MonthlyCalendar";
 import { HabitTracker } from "@/components/HabitTracker";
 import { BottomNav } from "@/components/BottomNav";
 import { WheelOfLife } from "@/components/WheelOfLife";
 import { Trophy, CalendarCheck, ClipboardCheck, TrendingUp, Heart, Dumbbell, BookOpen, Globe, Moon, Briefcase, Users, Wrench } from "lucide-react";
 import { motion } from "framer-motion";
+import { ProductTour } from "@/components/ProductTour";
+import { statsTourSteps, usePageTour } from "@/lib/page-tours";
 
 const Overall = () => {
   const { t } = useTranslation();
-  const [challengeProgress, setChallengeProgress] = useState<any>(null);
-  const [taskCompletions, setTaskCompletions] = useState<number>(0);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchProgress = async () => {
-      const { data: { user } } = await clerkAuth.getUser();
-      if (!user) {
-        setLoading(false);
-        return;
-      }
-
-      const [progressResult, completionsResult] = await Promise.all([
-        supabase
-          .from("challenge_progress")
-          .select("*")
-          .eq("user_id", user.id)
-          .eq("is_active", true)
-          .maybeSingle(),
-        supabase
-          .from("task_completions")
-          .select("id")
-          .eq("user_id", user.id)
-      ]);
-
-      setChallengeProgress(progressResult.data);
-      setTaskCompletions(completionsResult.data?.length || 0);
-      setLoading(false);
-    };
-
-    fetchProgress();
-  }, []);
+  const uid = useSessionUserId();
+  // Cached across visits: a revisit paints at once and refreshes in the
+  // background. The completion total is a server-side count — it used to
+  // download every completion row just to read `.length`.
+  const progressQ = useQuery(progressQuery(uid));
+  const completionsQ = useQuery(completionsCountQuery(uid));
+  // Overall has always shown only an active challenge.
+  const challengeProgress = progressQ.data?.is_active ? progressQ.data : null;
+  const taskCompletions = completionsQ.data ?? 0;
+  const loading = !!uid && (progressQ.isPending || completionsQ.isPending);
+  // First visit only. The sections stagger in, so the delay lets them reach
+  // their final positions before the first hole is measured.
+  const tour = usePageTour("stats", !loading, 800);
 
   // Convert completed_days array to Set<number>
   const completedDaysArray = challengeProgress?.completed_days as string[] || [];
@@ -91,8 +74,9 @@ const Overall = () => {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2
+        // Short, so data that is already cached reads as immediate.
+        staggerChildren: 0.05,
+        delayChildren: 0.03
       }
     }
   } as const;
@@ -133,7 +117,7 @@ const Overall = () => {
             animate="visible"
           >
             {/* Monthly Calendar */}
-            <motion.div variants={itemVariants}>
+            <motion.div variants={itemVariants} data-tour="stats-calendar">
               <MonthlyCalendar
                 completedDays={completedDays}
                 startDate={startDate}
@@ -142,7 +126,7 @@ const Overall = () => {
             </motion.div>
 
             {/* Habit Tracker */}
-            <motion.div variants={itemVariants} className="my-6">
+            <motion.div variants={itemVariants} className="my-6" data-tour="stats-habits">
               <HabitTracker />
             </motion.div>
 
@@ -150,6 +134,7 @@ const Overall = () => {
             <motion.div
               variants={itemVariants}
               className="duo-card p-4 mb-6"
+              data-tour="stats-summary"
             >
               {/* Overall Rate - Compact */}
               <div
@@ -226,7 +211,7 @@ const Overall = () => {
             </motion.div>
 
             {/* Wheel of Life */}
-            <motion.div variants={itemVariants}>
+            <motion.div variants={itemVariants} data-tour="stats-wheel">
               <WheelOfLife />
             </motion.div>
           </motion.div>
@@ -234,6 +219,8 @@ const Overall = () => {
       </div>
       
       <BottomNav />
+
+      <ProductTour steps={statsTourSteps()} run={tour.run} onDone={tour.onDone} />
     </div>
   );
 };

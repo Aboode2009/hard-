@@ -1,9 +1,13 @@
 import { useState, useEffect } from "react";
 import { bi } from "@/i18n/bi";
+import { useTimers } from "@/hooks/useTimers";
+import { ProgressFill } from "@/components/ui/progress-fill";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
-import { clerkAuth } from "@/lib/clerk-auth";
+import { Capacitor } from "@capacitor/core";
+import { Share } from "@capacitor/share";
+import { shareableOrigin } from "@/config/auth";
 import { ChevronLeft, ChevronRight, Share2, Copy, Check, Flame, Star, CheckCircle2, UsersRound } from "lucide-react";
 import { DuoGem, DuoUsers } from "@/components/icons/DuolingoIcons";
 import { StatsIcon, StoreIcon, TrophyIcon, ChestIcon } from "@/components/nav-icons";
@@ -24,13 +28,15 @@ const Rewards = () => {
   const [referralCode, setReferralCode] = useState("");
   const [totalReferrals, setTotalReferrals] = useState(0);
   const [copied, setCopied] = useState(false);
+  /** Auto-cleared on unmount. */
+  const after = useTimers();
 
   useEffect(() => {
     fetchRewardsData();
   }, []);
 
   const fetchRewardsData = async () => {
-    const { data: { user } } = await clerkAuth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
     const { data: progress } = await supabase
@@ -53,28 +59,40 @@ const Rewards = () => {
     }
   };
 
+  // The public web address, not the WebView's https://localhost.
+  const referralLink = () => `${shareableOrigin()}/auth?ref=${referralCode}`;
+
   const copyReferralLink = async () => {
-    const link = `${window.location.origin}/auth?ref=${referralCode}`;
+    const link = referralLink();
     try {
       await navigator.clipboard.writeText(link);
       setCopied(true);
       haptic("light");
       toast({ title: bi("تم النسخ!", "Copied!"), description: bi("تم نسخ رابط الدعوة", "Referral link copied") });
-      setTimeout(() => setCopied(false), 2000);
+      after(() => setCopied(false), 2000);
     } catch {
       toast({ variant: "destructive", title: bi("خطأ", "Error"), description: bi("فشل في نسخ الرابط", "Failed to copy") });
     }
   };
 
   const shareReferral = async () => {
-    const link = `${window.location.origin}/auth?ref=${referralCode}`;
+    const link = referralLink();
+    const title = bi("دعوة للتحدي", "Challenge Invitation");
     const text = isArabic
-      ? `انضم إلي في تحدي الـ 75 يوم! استخدم رابط الدعوة: ${link}`
-      : `Join me on the 75-day challenge! Use my referral link: ${link}`;
-    if (navigator.share) {
-      try { await navigator.share({ title: bi("دعوة للتحدي", "Challenge Invitation"), text, url: link }); }
-      catch { copyReferralLink(); }
-    } else { copyReferralLink(); }
+      ? `انضم إلي في تحدي Hard 21! استخدم رابط الدعوة: ${link}`
+      : `Join me on the Hard 21 challenge! Use my referral link: ${link}`;
+    // Closing the share sheet rejects too; that is the user's choice, not a
+    // failure, so it must not fall through to copying.
+    const cancelled = (err: unknown) => /cancel|abort/i.test(String((err as Error)?.message ?? err));
+    try {
+      // Android's WebView has no navigator.share, so native goes through the
+      // system share sheet plugin.
+      if (Capacitor.isNativePlatform()) await Share.share({ title, text, dialogTitle: title });
+      else if (navigator.share) await navigator.share({ title, text });
+      else await copyReferralLink();
+    } catch (err) {
+      if (!cancelled(err)) await copyReferralLink();
+    }
   };
 
   const referralProgress = Math.min(100, (totalReferrals / MAX_REFERRALS) * 100);
@@ -177,20 +195,19 @@ const Rewards = () => {
                     className="relative flex-1 h-6 rounded-full overflow-hidden"
                     style={{ background: "hsl(var(--duo-border) / 0.6)" }}
                   >
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${referralProgress}%` }}
-                      transition={{ duration: 1, delay: 0.4, ease: "easeOut" }}
-                      className="absolute inset-y-0 start-0 rounded-full"
+                    <ProgressFill
+                      value={referralProgress}
+                      duration={1}
+                      className="rounded-full"
                       style={{ background: "#FFC800" }}
                     >
                       <div className="absolute inset-x-3 top-1 h-1.5 rounded-full bg-white/40" />
-                    </motion.div>
+                    </ProgressFill>
                     <span
                       className="absolute inset-0 flex items-center justify-center text-xs font-extrabold"
                       style={{ color: "hsl(var(--duo-text))" }}
                     >
-                      {totalReferrals} / {MAX_REFERRALS}
+                      <span dir="ltr">{totalReferrals} / {MAX_REFERRALS}</span>
                     </span>
                   </div>
                   <ChestIcon className="w-9 h-9 flex-shrink-0" />

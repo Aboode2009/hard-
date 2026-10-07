@@ -1,20 +1,28 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { bi } from "@/i18n/bi";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { clerkAuth } from "@/lib/clerk-auth";
+import { useQuery } from "@tanstack/react-query";
+import { useSessionUserId } from "@/lib/session-user";
+import { isAdminQuery, profileQuery } from "@/lib/queries";
+import { qk, queryClient } from "@/lib/query-client";
 import { useTranslation } from "react-i18next";
 import { BottomNav } from "@/components/BottomNav";
 import { useToast } from "@/hooks/use-toast";
-import { Flame, Calendar, Trophy, Settings, LogOut, ChevronLeft, ChevronRight, Pencil, Check, X, Camera, User, Sprout, Gem, Medal, Zap, CircleCheck, ShieldCheck } from "lucide-react";
+import { Flame, Calendar, Trophy, Settings, LogOut, ChevronLeft, ChevronRight, Pencil, Check, X, Sprout, Gem, Medal, Zap, CircleCheck, ShieldCheck } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { UserAvatar } from "@/components/UserAvatar";
+import { AvatarPicker } from "@/components/AvatarPicker";
+import { dropCache, homeKeys } from "@/lib/home-cache";
 import { motion } from "framer-motion";
+
+type ProfileBundle = Awaited<ReturnType<ReturnType<typeof profileQuery>["queryFn"]>>;
 
 interface ProfileData {
   username: string;
   created_at: string;
-  avatar_url: string | null;
+  avatar_id: string | null;
+  gender: string | null;
 }
 
 interface ProgressData {
@@ -31,106 +39,50 @@ const Profile = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [profile, setProfile] = useState<ProfileData | null>(null);
-  const [progress, setProgress] = useState<ProgressData | null>(null);
+  const uid = useSessionUserId();
+  // Cached across visits: a revisit paints the profile at once and refreshes it
+  // in the background. Profile and progress are read together, not in turn.
+  const profileQ = useQuery(profileQuery(uid));
+  const adminQ = useQuery(isAdminQuery(uid));
+  const isAdmin = adminQ.data === true;
+  const loading = !!uid && profileQ.isPending;
+  const profile: ProfileData | null = profileQ.data?.profile ?? null;
+  const rawProgress = profileQ.data?.progress ?? null;
+  const progress: ProgressData | null = rawProgress
+    ? {
+        current_day: rawProgress.current_day,
+        current_streak: rawProgress.current_streak,
+        best_streak: rawProgress.best_streak,
+        completed_days: (Array.isArray(rawProgress.completed_days) ? rawProgress.completed_days : []) as number[],
+        start_date: rawProgress.start_date,
+        is_active: rawProgress.is_active,
+        stage_level: rawProgress.stage_level || 1,
+      }
+    : null;
+  /** Keeps the cached profile in step with a confirmed write. */
+  const setProfile = (update: (prev: ProfileData | null) => ProfileData | null) =>
+    queryClient.setQueryData<ProfileBundle>(qk.profile(uid), (old) =>
+      old ? { ...old, profile: update(old.profile) } : old,
+    );
   const [isEditingName, setIsEditingName] = useState(false);
   const [newUsername, setNewUsername] = useState("");
   const [savingName, setSavingName] = useState(false);
-  const [uploadingAvatar, setUploadingAvatar] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    checkAuthAndFetchData();
-  }, []);
+    if (!uid) navigate("/auth");
+  }, [uid, navigate]);
 
-  const checkAuthAndFetchData = async () => {
-    try {
-      const { data: { user } } = await clerkAuth.getUser();
-      
-      if (!user) {
-        navigate("/auth");
-        return;
-      }
-
-      // Check admin status
-      const { data: adminData } = await supabase.rpc('is_admin');
-      if (adminData) {
-        setIsAdmin(true);
-      }
-
-      // Fetch profile
-      const { data: profileData, error: profileError } = await supabase
-        .from("profiles")
-        .select("username, created_at, avatar_url")
-        .eq("id", user.id)
-        .maybeSingle();
-
-      if (profileError) throw profileError;
-      
-      if (!profileData) {
-        // Profile doesn't exist yet, create it
-        const { data: newProfile, error: createError } = await supabase
-          .from("profiles")
-          .insert({ id: user.id, username: user.email?.split('@')[0] || 'user' })
-          .select("username, created_at, avatar_url")
-          .single();
-        
-        if (createError) throw createError;
-        setProfile(newProfile);
-      } else {
-        setProfile(profileData);
-      }
-
-      // Fetch progress
-      const { data: progressData, error: progressError } = await supabase
-        .from("challenge_progress")
-        .select("*")
-        .eq("user_id", user.id)
-        .maybeSingle();
-
-      if (progressError) throw progressError;
-      
-      if (!progressData) {
-        // Create challenge progress if missing
-        const { data: newProgress, error: cpError } = await supabase
-          .from("challenge_progress")
-          .insert({ user_id: user.id, start_date: new Date().toISOString().split('T')[0] })
-          .select("*")
-          .single();
-        
-        if (cpError) throw cpError;
-        setProgress(newProgress ? {
-          current_day: newProgress.current_day,
-          current_streak: newProgress.current_streak,
-          best_streak: newProgress.best_streak,
-          completed_days: Array.isArray(newProgress.completed_days) ? newProgress.completed_days as number[] : [],
-          start_date: newProgress.start_date,
-          is_active: newProgress.is_active,
-          stage_level: newProgress.stage_level || 1,
-        } : null);
-        setLoading(false);
-        return;
-      }
-      
-      const formattedProgress: ProgressData = {
-        ...progressData,
-        completed_days: (progressData.completed_days || []) as number[],
-      };
-      
-      setProgress(formattedProgress);
-
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      toast({
-        title: t('profile.loadError'),
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    // A cached error (say, from a moment offline) stays in `isError` while the
+    // revisit's refetch is still running; only a failure that is final gets
+    // the toast, not one the refetch is about to replace.
+    if (!profileQ.isError || profileQ.fetchStatus !== "idle") return;
+    console.error("Error fetching data:", profileQ.error);
+    toast({
+      title: t('profile.loadError'),
+      variant: "destructive",
+    });
+  }, [profileQ.isError, profileQ.fetchStatus, profileQ.error, toast, t]);
 
   if (loading) {
     return (
@@ -184,10 +136,13 @@ const Profile = () => {
   // Use the higher value between completed_days array length and current_streak
   // since a streak of N means N days were completed consecutively
   const daysCompleted = Math.max(progress.completed_days.length, progress.current_streak);
-  const startDate = new Date(progress.start_date).toLocaleDateString('ar-EG');
+  // Arabic month names with 0-9 digits, like every other number in the app;
+  // English dates in English.
+  const dateLocale = i18n.language === 'ar' ? 'ar-IQ-u-nu-latn' : 'en-GB';
+  const startDate = new Date(progress.start_date).toLocaleDateString(dateLocale);
 
   const handleLogout = async () => {
-    await clerkAuth.signOut();
+    await supabase.auth.signOut();
     navigate("/auth");
   };
 
@@ -217,7 +172,7 @@ const Profile = () => {
 
     setSavingName(true);
     try {
-      const { data: { user } } = await clerkAuth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
       const { error } = await supabase
@@ -250,85 +205,28 @@ const Profile = () => {
     setNewUsername("");
   };
 
-  const handleAvatarClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      toast({
-        title: bi("نوع ملف غير صالح", "Invalid file type"),
-        description: bi("يرجى اختيار صورة", "Please select an image file"),
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast({
-        title: bi("الصورة كبيرة جداً", "Image too large"),
-        description: bi("الحد الأقصى 5 ميجابايت", "Maximum size is 5MB"),
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setUploadingAvatar(true);
-    try {
-      const { data: { user } } = await clerkAuth.getUser();
-      if (!user) return;
-
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${user.id}/avatar.${fileExt}`;
-
-      // Upload to storage
-      const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(fileName, file, { upsert: true });
-
-      if (uploadError) throw uploadError;
-
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(fileName);
-
-      // Add timestamp to bust cache
-      const avatarUrl = `${publicUrl}?t=${Date.now()}`;
-
-      // Update profile
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ avatar_url: avatarUrl })
-        .eq('id', user.id);
-
-      if (updateError) throw updateError;
-
-      setProfile(prev => prev ? { ...prev, avatar_url: avatarUrl } : null);
-      toast({
-        title: bi("تم التحديث", "Updated"),
-        description: bi("تم تغيير الصورة الشخصية بنجاح", "Profile picture updated successfully"),
-      });
-    } catch (error) {
-      console.error("Error uploading avatar:", error);
+  /** Saves the picked avatar; everything that shows it reads it again. */
+  const handlePickAvatar = async (avatarId: string) => {
+    if (!uid) return;
+    const { error } = await supabase.from("profiles").update({ avatar_id: avatarId }).eq("id", uid);
+    if (error) {
+      console.error("Error saving avatar:", error);
       toast({
         title: bi("خطأ", "Error"),
-        description: bi("فشل تحميل الصورة", "Failed to upload image"),
+        description: bi("ما انحفظت الشخصية، حاول مرة ثانية", "Couldn't save your character, try again"),
         variant: "destructive",
       });
-    } finally {
-      setUploadingAvatar(false);
-      // Reset input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
+      return;
     }
+    setProfile((prev) => (prev ? { ...prev, avatar_id: avatarId } : prev));
+    // The home header and the leaderboards draw it too.
+    dropCache(homeKeys.profile(uid));
+    void queryClient.invalidateQueries({ queryKey: qk.leaderboard() });
+    void queryClient.invalidateQueries({ queryKey: qk.nassLeaderboard() });
   };
+
+  const scrollToPicker = () =>
+    document.getElementById("avatar-picker")?.scrollIntoView({ behavior: "smooth", block: "center" });
 
   const isArabic = i18n.language === 'ar';
 
@@ -384,27 +282,24 @@ const Profile = () => {
         {/* === AVATAR + NAME === */}
         <div className="flex flex-col items-center mt-3 px-5">
           <div className="relative">
-            <Avatar
-              className="w-28 h-28 cursor-pointer relative"
-              onClick={handleAvatarClick}
-              style={{ border: "4px solid hsl(var(--duo-surface))", boxShadow: `0 0 0 4px ${DUO.gold}` }}
-            >
-              <AvatarImage src={profile?.avatar_url || undefined} alt={profile?.username} className="object-cover" />
-              <AvatarFallback className="text-4xl font-extrabold text-white" style={{ background: `linear-gradient(160deg, ${DUO.purple}, #a34fd6)` }}>
-                {profile?.username?.charAt(0)?.toUpperCase() || <User className="w-12 h-12" />}
-              </AvatarFallback>
-            </Avatar>
+            <button type="button" onClick={scrollToPicker} aria-label={bi("غيّر شخصيتك", "Change your character")} className="block rounded-full">
+              <UserAvatar
+                avatarId={profile.avatar_id}
+                gender={profile.gender}
+                seed={uid}
+                alt={profile.username}
+                className="w-28 h-28"
+                style={{ border: "4px solid hsl(var(--duo-surface))", boxShadow: `0 0 0 4px ${DUO.gold}` }}
+              />
+            </button>
             <button
-              onClick={handleAvatarClick}
-              disabled={uploadingAvatar}
-              className="duo-press absolute -bottom-1 rtl:-left-1 ltr:-right-1 w-10 h-10 rounded-2xl flex items-center justify-center disabled:opacity-50"
+              type="button"
+              onClick={scrollToPicker}
+              aria-label={bi("غيّر شخصيتك", "Change your character")}
+              className="duo-press absolute -bottom-1 rtl:-left-1 ltr:-right-1 w-10 h-10 rounded-2xl flex items-center justify-center"
               style={{ background: DUO.blue, boxShadow: "0 3px 0 #1487c4", border: "3px solid hsl(var(--duo-surface))" }}
             >
-              {uploadingAvatar ? (
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              ) : (
-                <Camera className="w-4 h-4 text-white" strokeWidth={2.5} />
-              )}
+              <Pencil className="w-4 h-4 text-white" strokeWidth={2.5} />
             </button>
           </div>
 
@@ -435,7 +330,7 @@ const Profile = () => {
                 </h1>
                 <p className="text-sm font-semibold mt-1 flex items-center justify-center gap-1.5" style={{ color: "hsl(var(--duo-muted))" }}>
                   <Calendar className="w-3.5 h-3.5" strokeWidth={2.5} />
-                  {t('profile.memberSince')} {new Date(profile.created_at).toLocaleDateString('ar-EG')}
+                  {t('profile.memberSince')} {new Date(profile.created_at).toLocaleDateString(dateLocale)}
                 </p>
               </button>
             )}
@@ -452,10 +347,12 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Hidden file input */}
-        <input type="file" ref={fileInputRef} onChange={handleAvatarChange} accept="image/*" className="hidden" />
-
         <div className="px-5 mt-7 space-y-3">
+          {/* === CHARACTER PICKER === */}
+          <div id="avatar-picker">
+            <AvatarPicker avatarId={profile.avatar_id} gender={profile.gender} seed={uid} onPick={handlePickAvatar} />
+          </div>
+
           {/* === STATS GRID === */}
           <div className="grid grid-cols-2 gap-3">
             {statCards.map((stat, i) => {
@@ -505,7 +402,7 @@ const Profile = () => {
                 <div>
                   <h3 className="text-base font-extrabold" style={{ color: "hsl(var(--duo-text))" }}>{t('profile.journeyStats')}</h3>
                   <p className="text-sm font-semibold" style={{ color: "hsl(var(--duo-muted))" }}>
-                    {getCurrentStageDaysCompleted()} / {getCurrentStageTotalDays()} {bi("يوم", "days")}
+                    <span dir="ltr">{getCurrentStageDaysCompleted()} / {getCurrentStageTotalDays()}</span> {bi("يوم", "days")}
                   </p>
                 </div>
 

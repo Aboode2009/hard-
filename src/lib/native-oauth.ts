@@ -1,96 +1,150 @@
 import { Capacitor } from "@capacitor/core";
-import { Browser } from "@capacitor/browser";
 import { App } from "@capacitor/app";
+import { Browser } from "@capacitor/browser";
 import type { PluginListenerHandle } from "@capacitor/core";
-import type { SignInResource } from "@clerk/react";
-
-/** OAuth providers we start natively. Extend the union to add more later. */
-type NativeOAuthStrategy = "oauth_google";
+import { supabase } from "@/integrations/supabase/client";
+import { NATIVE_OAUTH_REDIRECT } from "@/config/auth";
+import { signInWithGoogleNative } from "@/lib/native-google";
 
 /**
- * In-app-browser OAuth for Clerk on Capacitor (native).
+ * Google sign-in, per platform.
  *
- * Why this exists: on native, Clerk's prebuilt Google button does a
- * `window.location` redirect, which inside an Android/iOS WebView either leaves
- * the app for the system browser or hits Google's "disallowed_useragent" wall.
- * Instead we drive Clerk's OAuth manually: `signIn.create()` hands us the
- * provider URL, we open it in an in-app browser (Chrome Custom Tab /
- * SFSafariViewController), and Clerk redirects back to our custom-scheme deep
- * link carrying a one-time nonce. A deep-link listener routes the app to
- * `/sso-callback`, where Clerk's <AuthenticateWithRedirectCallback> exchanges
- * that nonce for a session — so the browser's cookie jar is never needed.
+ * **Android takes the native path and never opens a browser.** Credential
+ * Manager shows an account sheet over the app, branded "Hard 21", and returns
+ * an ID token that Supabase exchanges for a session — see native-google.ts.
  *
- * On web this module is inert: `isNativePlatform` is false, callers keep using
- * Clerk's own social buttons, and none of this runs.
+ * **Web** keeps the ordinary redirect: `signInWithOAuth` navigates the tab and
+ * `detectSessionInUrl` picks the session up on the way back.
+ *
+ * The browser-based native flow below is kept as a documented fallback for a
+ * device where Credential Manager cannot work (no Play Services, say). It is
+ * not wired to anything: reach it by calling `startGoogleOAuthViaBrowser`
+ * explicitly.
  */
 
 export const isNativeApp = Capacitor.isNativePlatform();
 
 /**
- * Custom-scheme deep link Clerk redirects back to after the provider auth.
- * Must match: the Android intent-filter (AndroidManifest.xml), the iOS URL
- * type (Info.plist), and Clerk Dashboard → allowed redirect URLs.
+ * Starts Google sign-in on whichever platform we are on.
+ *
+ * On Android this resolves only once the session exists. On web the page has
+ * already navigated away by the time it resolves.
  */
-export const OAUTH_REDIRECT_URL = "com.hardchallenge.app://sso-callback";
-
-/** Path the deep-link listener routes to; a React route renders the callback. */
-export const SSO_CALLBACK_PATH = "/sso-callback";
-
-/**
- * Kick off a native OAuth flow: create the sign-in attempt, then open the
- * provider's URL in the in-app browser. Completion happens later via the
- * deep-link listener + /sso-callback route.
- */
-export async function startNativeOAuth(
-  signIn: SignInResource,
-  strategy: NativeOAuthStrategy,
-): Promise<void> {
-  await signIn.create({
-    strategy,
-    redirectUrl: OAUTH_REDIRECT_URL,
-    actionCompleteRedirectUrl: OAUTH_REDIRECT_URL,
-  });
-
-  const externalUrl = signIn.firstFactorVerification?.externalVerificationRedirectURL;
-  if (!externalUrl) {
-    throw new Error("Clerk did not return an external verification URL for OAuth.");
+export async function startGoogleOAuth(): Promise<void> {
+  if (isNativeApp) {
+    await signInWithGoogleNative();
+    return;
   }
 
-  await Browser.open({ url: externalUrl.toString() });
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo: `${window.location.origin}/` },
+  });
+  if (error) throw error;
 }
 
 /**
- * Register the deep-link listener that catches Clerk's redirect back into the
- * app, closes the in-app browser, and routes to /sso-callback with the OAuth
- * params so Clerk can finalize the session. No-op on web.
+ * FALLBACK ONLY — the browser-based flow, kept for a device where Credential
+ * Manager is unavailable. Opens a Custom Tab and returns through the deep link
+ * registered in AndroidManifest.xml; pair it with
+ * `registerOAuthDeepLinkListener`.
+ */
+export async function startGoogleOAuthViaBrowser(): Promise<void> {
+  // `skipBrowserRedirect` hands us the URL instead of navigating the WebView,
+  // which is what lets us open it in a Custom Tab instead.
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: NATIVE_OAUTH_REDIRECT,
+      skipBrowserRedirect: true,
+    },
+  });
+  if (error) throw error;
+  if (!data?.url) throw new Error("Supabase returned no OAuth URL");
+
+  await Browser.open({ url: data.url, presentationStyle: "popover" });
+}
+
+/**
+ * Pulls the callback parameters out of a deep link and completes the session.
  *
- * @param onCallback receives the callback path incl. query string, e.g.
- *   "/sso-callback?rotating_token_nonce=..." — route the SPA there.
+ * PKCE returns `?code=`; an error, or an implicit-flow token pair, arrives in
+ * the fragment instead, so both halves of the URL are checked.
+ */
+async function completeFromUrl(url: string): Promise<boolean> {
+  const afterHash = url.includes("#") ? url.slice(url.indexOf("#") + 1) : "";
+  const afterQuery = url.includes("?")
+    ? url.slice(url.indexOf("?") + 1).split("#")[0]
+    : "";
+
+  for (const raw of [afterQuery, afterHash]) {
+    if (!raw) continue;
+    const params = new URLSearchParams(raw);
+
+    const code = params.get("code");
+    if (code) {
+      const { error } = await supabase.auth.exchangeCodeForSession(code);
+      if (error) throw error;
+      return true;
+    }
+
+    const access_token = params.get("access_token");
+    const refresh_token = params.get("refresh_token");
+    if (access_token && refresh_token) {
+      const { error } = await supabase.auth.setSession({ access_token, refresh_token });
+      if (error) throw error;
+      return true;
+    }
+
+    const errDesc = params.get("error_description") || params.get("error");
+    if (errDesc) throw new Error(decodeURIComponent(errDesc));
+  }
+
+  return false;
+}
+
+/**
+ * Registers the deep-link listener that finishes OAuth inside the app.
+ *
+ * @param onDone called once the attempt resolves — with an Error if it failed,
+ *   with nothing if a session was established.
  * @returns a cleanup function that removes the listener.
  */
 export function registerOAuthDeepLinkListener(
-  onCallback: (pathWithQuery: string) => void,
+  onDone: (error?: Error) => void,
 ): () => void {
   if (!isNativeApp) return () => {};
 
   let handle: PluginListenerHandle | undefined;
+  let cancelled = false;
 
-  App.addListener("appUrlOpen", async ({ url }) => {
-    // Only react to our OAuth deep link, not other app links.
-    if (!url.includes("sso-callback")) return;
+  void App.addListener("appUrlOpen", ({ url }) => {
+    // Only react to our own callback, not other app links.
+    if (!url.startsWith(NATIVE_OAUTH_REDIRECT)) return;
 
-    // Close the in-app browser (may already be gone — ignore failures).
-    await Browser.close().catch(() => {});
+    // The Custom Tab is still sitting on top of the app at this point.
+    void Browser.close().catch(() => {
+      /* already gone on some devices; nothing to do */
+    });
 
-    // com.hardchallenge.app://sso-callback?foo=bar  →  /sso-callback?foo=bar
-    const queryIndex = url.indexOf("?");
-    const query = queryIndex >= 0 ? url.slice(queryIndex) : "";
-    onCallback(SSO_CALLBACK_PATH + query);
+    void completeFromUrl(url)
+      .then((ok) => {
+        if (ok) onDone();
+      })
+      .catch((err) => {
+        console.error("[oauth] deep-link completion failed:", err);
+        onDone(err instanceof Error ? err : new Error(String(err)));
+      });
   }).then((h) => {
+    if (cancelled) {
+      void h.remove();
+      return;
+    }
     handle = h;
   });
 
   return () => {
-    handle?.remove();
+    cancelled = true;
+    void handle?.remove();
   };
 }

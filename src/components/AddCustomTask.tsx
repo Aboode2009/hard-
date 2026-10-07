@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { bi } from "@/i18n/bi";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
-import { clerkAuth } from "@/lib/clerk-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,7 +21,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Palette, Clock, Timer } from "lucide-react";
+import { Plus, Palette, Clock, Timer, Lock } from "lucide-react";
+import { usePremium } from "@/hooks/usePremium";
+import { PremiumGate } from "@/components/PremiumGate";
+import { isPremiumRequiredError } from "@/lib/premium";
 import { cn } from "@/lib/utils";
 
 interface LifeAreaTag {
@@ -58,6 +60,8 @@ export const AddCustomTask = ({ onTaskAdded, stageLevel = 1 }: AddCustomTaskProp
   const isArabic = i18n.language === 'ar';
   const { toast } = useToast();
   
+  // Adding tasks is for subscribers only (also enforced by the server).
+  const { isPremium, loading: premiumLoading } = usePremium();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [tags, setTags] = useState<LifeAreaTag[]>([]);
@@ -92,7 +96,7 @@ export const AddCustomTask = ({ onTaskAdded, stageLevel = 1 }: AddCustomTaskProp
     setLoading(true);
     
     try {
-      const { data: { session } } = await clerkAuth.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
       const { error } = await supabase
@@ -146,10 +150,15 @@ export const AddCustomTask = ({ onTaskAdded, stageLevel = 1 }: AddCustomTaskProp
       onTaskAdded?.();
     } catch (error) {
       console.error('Error adding task:', error);
-      toast({
-        variant: "destructive",
-        title: t('index.error'),
-      });
+      toast(
+        isPremiumRequiredError(error)
+          ? {
+              variant: "destructive",
+              title: bi("للمشتركين فقط", "Subscribers only"),
+              description: bi("إضافة المهام متاحة لمشتركي بريميوم.", "Adding tasks is available with Premium."),
+            }
+          : { variant: "destructive", title: t('index.error') },
+      );
     } finally {
       setLoading(false);
     }
@@ -162,12 +171,26 @@ export const AddCustomTask = ({ onTaskAdded, stageLevel = 1 }: AddCustomTaskProp
         className="w-full h-12 gap-2 border-dashed border-2 hover:border-primary hover:bg-primary/5"
         onClick={() => setOpen(true)}
       >
-        <Plus className="w-5 h-5" />
+        {isPremium ? <Plus className="w-5 h-5" /> : <Lock className="w-5 h-5" />}
         {t('customTask.addButton')}
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-h-[90vh] overflow-y-auto">
+          {!isPremium ? (
+            premiumLoading ? (
+              <div className="h-56 rounded-2xl animate-pulse" style={{ background: "hsl(var(--duo-border))" }} />
+            ) : (
+              <PremiumGate
+                title={bi("إضافة المهام للمشتركين", "Adding tasks is for subscribers")}
+                message={bi(
+                  "اشترك في بريميوم لتضيف مهاماً جاهزة أو تبتكر مهامك الخاصة إلى تحدّيك اليومي.",
+                  "Subscribe to Premium to add ready-made habits or create your own tasks for your daily challenge.",
+                )}
+              />
+            )
+          ) : (
+          <>
           <DialogHeader>
             <DialogTitle>{t('customTask.title')}</DialogTitle>
             <DialogDescription>
@@ -324,6 +347,8 @@ export const AddCustomTask = ({ onTaskAdded, stageLevel = 1 }: AddCustomTaskProp
               {loading ? t('profile.saving') : t('customTask.add')}
             </Button>
           </div>
+          </>
+          )}
         </DialogContent>
       </Dialog>
     </>

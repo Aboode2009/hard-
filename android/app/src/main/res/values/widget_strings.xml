@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Home-screen widget text. English is the default; values-ar holds Arabic.
+    The widgets pick the locale from the APP's language (sent in the snapshot),
+    not the device's, via a configuration context — see WidgetUpdater.localized.
+    Numbers are passed as %s strings so they stay Western digits (0-9) in both
+    languages, as in the designs.
+-->
+<resources>
+    <!-- Widget picker -->
+    <string name="widget_streak_label">Streak</string>
+    <string name="widget_streak_description">Your streak and progress through the challenge</string>
+    <string name="widget_tasks_label">Today\'s tasks</string>
+    <string name="widget_tasks_description">Today\'s tasks and how many are left</string>
+    <string name="widget_week_label">This week</string>
+    <string name="widget_week_description">The days you completed this week</string>
+
+    <string name="widget_day_of">Day %1$s of %2$s</string>
+    <string name="widget_tasks_title">Today\'s tasks</string>
+    <string name="widget_done_of">%1$s of %2$s</string>
+    <string name="widget_open">Open</string>
+    <string name="widget_sign_in">Sign in to start the challenge</string>
+    <string name="widget_stale">Open the app to update your progress</string>
+    <string name="widget_separator">" — "</string>
+
+    <string name="widget_finish_day">Finish your day now</string>
+    <string name="widget_day_complete">Nice! Day complete</string>
+    <string name="widget_all_done_today">All done for today</string>
+    <string name="widget_finish_to_keep">finish your day to keep it</string>
+    <string name="widget_finish_to_start">Finish your day to start your streak</string>
+    <string name="widget_streak_day_done">day complete</string>
+
+    <!-- Saturday first. -->
+    <string-array name="widget_week_letters">
+        <item>Sa</item>
+        <item>Su</item>
+        <item>Mo</item>
+        <item>Tu</item>
+        <item>We</item>
+        <item>Th</item>
+        <item>Fr</item>
+    </string-array>
+
+    <!-- 2x2 button: "2 tasks left — finish them" -->
+    <plurals name="widget_cta_tasks_left">
+        <item quantity="one">%s task left — finish it</item>
+        <item quantity="other">%s tasks left — finish them</item>
+    </plurals>
+
+    <!-- 2x2, under the streak number -->
+    <plurals name="widget_streak_unit">
+        <item quantity="one">day in a row</item>
+        <item quantity="other">days in a row</item>
+    </plurals>
+
+    <!-- 4x1, under the streak number -->
+    <plurals name="widget_day_unit">
+        <item quantity="one">day</item>
+        <item quantity="other">days</item>
+    </plurals>
+
+    <!-- 4x2 footer: "5-day streak" -->
+    <plurals name="widget_streak_prefix">
+        <item quantity="one">%s-day streak</item>
+        <item quantity="other">%s-day streak</item>
+    </plurals>
+
+    <!-- 4x2 footer, after the streak: "2 tasks left to keep it" -->
+    <plurals name="widget_keep_tasks_left">
+        <item quantity="one">%s task left to keep it</item>
+        <item quantity="other">%s tasks left to keep it</item>
+    </plurals>
+
+    <!-- 4x2 footer with no streak yet -->
+    <plurals name="widget_start_tasks_left">
+        <item quantity="one">%s task left to start your streak</item>
+        <item quantity="other">%s tasks left to start your streak</item>
+    </plurals>
+
+    <!-- 4x1 title: "3 tasks left today" -->
+    <plurals name="widget_tasks_left_today">
+        <item quantity="one">%s task left today</item>
+        <item quantity="other">%s tasks left today</item>
+    </plurals>
+</resources>

@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Star, Zap, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
+import { bi } from "@/i18n/bi";
 
 interface LevelSummaryModalProps {
   open: boolean;
@@ -20,7 +21,7 @@ export const LevelSummaryModal = ({
   starsEarned,
   grade,
 }: LevelSummaryModalProps) => {
-  const { t } = useTranslation();
+  useTranslation(); // keeps bi() reactive on language change
 
   return (
     <AnimatePresence>
@@ -29,7 +30,7 @@ export const LevelSummaryModal = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
           onClick={onClose}
         >
           <motion.div
@@ -43,13 +44,14 @@ export const LevelSummaryModal = ({
             <div className="flex justify-between items-start mb-6">
               <div>
                 <h2 className="text-2xl font-bold text-foreground">
-                  Day {dayNumber}
+                  {bi(`اليوم ${dayNumber}`, `Day ${dayNumber}`)}
                 </h2>
-                <p className="text-muted-foreground text-sm">Completed</p>
+                <p className="text-muted-foreground text-sm">{bi("مكتمل", "Completed")}</p>
               </div>
               <button
                 onClick={onClose}
                 className="p-2 hover:bg-muted rounded-full transition-colors"
+                aria-label={bi("إغلاق", "Close")}
               >
                 <X className="w-5 h-5 text-muted-foreground" />
               </button>
@@ -96,8 +98,8 @@ export const LevelSummaryModal = ({
                 className="bg-muted/50 rounded-xl p-4 text-center"
               >
                 <Zap className="w-6 h-6 text-purple-500 mx-auto mb-2" />
-                <p className="text-2xl font-bold text-foreground">+{xpEarned}</p>
-                <p className="text-xs text-muted-foreground">XP Earned</p>
+                <p className="text-2xl font-bold text-foreground" dir="ltr">+{xpEarned}</p>
+                <p className="text-xs text-muted-foreground">{bi("خبرة مكتسبة", "XP Earned")}</p>
               </motion.div>
               <motion.div
                 initial={{ x: 20, opacity: 0 }}
@@ -106,14 +108,14 @@ export const LevelSummaryModal = ({
                 className="bg-muted/50 rounded-xl p-4 text-center"
               >
                 <Trophy className="w-6 h-6 text-amber-500 mx-auto mb-2" />
-                <p className="text-2xl font-bold text-foreground">{starsEarned}/3</p>
-                <p className="text-xs text-muted-foreground">Stars</p>
+                <p className="text-2xl font-bold text-foreground" dir="ltr">{starsEarned}/3</p>
+                <p className="text-xs text-muted-foreground">{bi("النجوم", "Stars")}</p>
               </motion.div>
             </div>
 
             {/* Close Button */}
             <Button onClick={onClose} className="w-full" size="lg">
-              Close
+              {bi("إغلاق", "Close")}
             </Button>
           </motion.div>
         </motion.div>

@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { Flame, Lock, Unlock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { DuoGem } from "@/components/icons/DuolingoIcons";
+import { ProgressFill } from "@/components/ui/progress-fill";
 import confetti from "canvas-confetti";
 
 interface HostageVaultProps {
@@ -113,13 +115,15 @@ export const HostageVault = ({
       {/* Compact floating button */}
       <motion.button
         onClick={() => setIsExpanded(!isExpanded)}
+        aria-label={bi("خزنة مكافأة السلسلة", "Streak bonus vault")}
+        aria-expanded={isExpanded}
         className={cn(
           "w-12 h-12 rounded-xl flex flex-col items-center justify-center gap-0.5 shadow-lg border",
           showCooldown
             ? "bg-green-500/20 border-green-500/50"
             : isReleased
-            ? "bg-amber-500/20 border-amber-400/50"
-            : "bg-card/90 backdrop-blur-sm border-border/50"
+            ? "bg-[#1CB0F6]/20 border-[#1CB0F6]/50"
+            : "bg-card/95 border-border/50"
         )}
         whileTap={{ scale: 0.9 }}
         animate={!isReleased && !showCooldown ? { scale: [1, 1.05, 1] } : {}}
@@ -128,11 +132,11 @@ export const HostageVault = ({
         {showCooldown ? (
           <Unlock className="w-4 h-4 text-green-500" />
         ) : isReleased ? (
-          <span className="text-lg">🍋</span>
+          <DuoGem className="w-5 h-5" />
         ) : (
           <>
             <Lock className="w-3.5 h-3.5 text-muted-foreground" />
-            <span className="text-[8px] font-bold text-amber-500">+{todayReward}</span>
+            <span className="text-[8px] font-bold text-[#1CB0F6]">+{todayReward}</span>
           </>
         )}
       </motion.button>
@@ -146,7 +150,7 @@ export const HostageVault = ({
             exit={{ opacity: 0, scale: 0.8 }}
             transition={{ duration: 0.15 }}
             className={cn(
-              "absolute bottom-14 bg-card/95 backdrop-blur-sm rounded-xl",
+              "absolute bottom-14 bg-card rounded-xl",
               "border border-border/50 shadow-xl p-3 min-w-[160px]",
               bi("left-0", "right-0")
             )}
@@ -161,18 +165,17 @@ export const HostageVault = ({
             ) : (
               <>
                 <div className="flex items-center justify-center gap-1 mb-2">
-                  <span className="text-2xl">🍋</span>
-                  <span className="text-xl font-bold text-amber-500">+{todayReward}</span>
+                  <DuoGem className="w-7 h-7" />
+                  <span className="text-xl font-bold text-[#1CB0F6]">+{todayReward}</span>
                 </div>
 
                 {/* Progress bar */}
                 <div className="h-1.5 bg-muted rounded-full overflow-hidden mb-2">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${completionPercentage}%` }}
+                  <ProgressFill
+                    value={completionPercentage}
                     className={cn(
-                      "h-full rounded-full",
-                      isReleased ? "bg-amber-400" : "bg-primary"
+                      "rounded-full",
+                      isReleased ? "bg-[#1CB0F6]" : "bg-primary"
                     )}
                   />
                 </div>

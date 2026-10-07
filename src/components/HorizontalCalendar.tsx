@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { bi } from "@/i18n/bi";
 import { cn } from "@/lib/utils";
+import { useTimers } from "@/hooks/useTimers";
 import { useTranslation } from "react-i18next";
 import { format, addDays, subDays, isSameDay, startOfDay } from "date-fns";
 import { ChevronLeft, ChevronRight, CheckCircle2, X, Flame, Target, TrendingUp } from "lucide-react";
@@ -38,6 +39,8 @@ export const HorizontalCalendar = ({
   const [selectedStats, setSelectedStats] = useState<DayStats | null>(null);
   const [centerDate, setCenterDate] = useState<Date>(new Date());
   const [isTransitioning, setIsTransitioning] = useState(false);
+  /** Auto-cleared on unmount. */
+  const after = useTimers();
 
   // Generate days array centered around the centerDate
   const generateDays = (center: Date, range: number = 15) => {
@@ -85,7 +88,7 @@ export const HorizontalCalendar = ({
     if (challengeDay < 1 || clickedDate > today) return;
     
     setIsTransitioning(true);
-    setTimeout(() => setIsTransitioning(false), 300);
+    after(() => setIsTransitioning(false), 300);
     
     setSelectedDate(date);
     const stats = getDayStats(date);
@@ -210,7 +213,7 @@ export const HorizontalCalendar = ({
                   "flex flex-col items-center min-w-[52px] py-2 px-3 rounded-xl transition-all duration-200",
                   isToday && "border-2 border-[#1CB0F6]",
                   isSelected && !isToday && "bg-[#1CB0F61e]",
-                  isCompleted && "bg-[#58CC021e]",
+                  isCompleted && "bg-[hsl(var(--duo-accent)/0.12)]",
                   isMissed && "bg-[#FF4B4B1e]",
                   (isFuture || isBeforeChallenge) && "opacity-40",
                   !isFuture && !isBeforeChallenge && "hover:bg-[hsl(var(--duo-border)/0.4)] cursor-pointer hover:scale-105 active:scale-95"
@@ -228,7 +231,7 @@ export const HorizontalCalendar = ({
                 <div className={cn(
                   "w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold transition-all",
                   isToday && "border-2 border-[#1CB0F6] bg-[#1CB0F61e] text-[#1CB0F6]",
-                  isCompleted && !isToday && "bg-[#58CC02] text-white shadow-[0_3px_0_#45A302]",
+                  isCompleted && !isToday && "bg-[hsl(var(--duo-accent))] text-white shadow-[0_3px_0_hsl(var(--duo-accent-edge))]",
                   isMissed && "bg-[#FF4B4B1e] text-[#FF4B4B]",
                   !isToday && !isCompleted && !isMissed && "border-2 border-[hsl(var(--duo-border))] bg-[hsl(var(--duo-surface))] text-[hsl(var(--duo-text))]"
                 )}>
@@ -271,13 +274,13 @@ export const HorizontalCalendar = ({
               <div className={cn(
                 "text-center py-4 rounded-2xl border-2",
                 selectedStats.isCompleted
-                  ? "bg-[#58CC021e] border-[#58CC02]"
+                  ? "bg-[hsl(var(--duo-accent)/0.12)] border-[hsl(var(--duo-accent))]"
                   : "bg-[hsl(var(--duo-surface))] border-[hsl(var(--duo-border))]"
               )}>
                 {selectedStats.isCompleted ? (
                   <div className="flex flex-col items-center gap-2">
-                    <CheckCircle2 className="w-12 h-12 text-[#58CC02]" strokeWidth={2.5} />
-                    <span className="font-bold text-[#58CC02]">
+                    <CheckCircle2 className="w-12 h-12 text-[hsl(var(--duo-accent))]" strokeWidth={2.5} />
+                    <span className="font-bold text-[hsl(var(--duo-accent))]">
                       {bi("يوم مكتمل!", "Day Completed!")}
                     </span>
                   </div>
@@ -314,7 +317,7 @@ export const HorizontalCalendar = ({
                 </div>
 
                 <div className="rounded-2xl border-2 border-[hsl(var(--duo-border))] bg-[hsl(var(--duo-surface))] p-3 text-center">
-                  <TrendingUp className="w-5 h-5 mx-auto mb-1 text-[#58CC02]" strokeWidth={2.5} />
+                  <TrendingUp className="w-5 h-5 mx-auto mb-1 text-[hsl(var(--duo-accent))]" strokeWidth={2.5} />
                   <div className="text-lg font-bold text-[hsl(var(--duo-text))]">
                     {Math.round((selectedStats.tasksCompleted / selectedStats.totalTasks) * 100)}%
                   </div>

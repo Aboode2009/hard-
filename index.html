@@ -1,27 +1,40 @@
 <!doctype html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" class="hc-booting hc-veil">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Fallback Arabic font only (the app's font, Baloo Bhaijaan 2, is bundled).
+         Loaded without blocking first paint: as a plain stylesheet the app
+         stayed blank until Google answered, and offline until it gave up. -->
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
     
-    <title>Hard Challenge - تحدي صعب</title>
-    <meta name="description" content="Hard Challenge - تطبيق تحدي شامل لتطوير الذات واللياقة البدنية. تتبع تقدمك اليومي وحقق أهدافك" />
-    <meta name="author" content="Hard Challenge" />
+    <!-- Dark from the very first frame until the launch animation ends
+         (SplashScreen removes the class), so nothing flashes white between
+         the native splash and it. hc-veil keeps the app itself unpainted
+         until it has committed, so its first paint lands before the motion. -->
+    <style>.hc-booting, .hc-booting body { background: #070608; } .hc-veil #root > :not(.hc-sp) { visibility: hidden; }</style>
+    <!-- The launch animation's face (Archivo Black Italic, latin only, 15 KB),
+         fetched alongside the scripts so the animation never waits for it. -->
+    <link rel="preload" href="/fonts/archivo-latin-900-italic.woff2" as="font" type="font/woff2" crossorigin>
+    <style>@font-face { font-family: 'Archivo'; font-style: italic; font-weight: 900; font-display: block; src: url(/fonts/archivo-latin-900-italic.woff2) format('woff2'); }</style>
+
+    <title>Hard 21</title>
+    <meta name="description" content="Hard 21 - تطبيق تحدي شامل لتطوير الذات واللياقة البدنية. تتبع تقدمك اليومي وحقق أهدافك" />
+    <meta name="author" content="Hard 21" />
     <meta name="theme-color" content="#000000" />
 
     <!-- PWA Meta Tags -->
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="Hard Challenge" />
+    <meta name="apple-mobile-web-app-title" content="Hard 21" />
     <link rel="apple-touch-icon" href="/pwa-192x192.png" />
     <link rel="mask-icon" href="/mask-icon.svg" color="#000000" />
 
-    <meta property="og:title" content="Hard Challenge - تحدي صعب" />
-    <meta property="og:description" content="Hard Challenge - تطبيق تحدي شامل لتطوير الذات واللياقة البدنية" />
+    <meta property="og:title" content="Hard 21" />
+    <meta property="og:description" content="Hard 21 - تطبيق تحدي شامل لتطوير الذات واللياقة البدنية" />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
 

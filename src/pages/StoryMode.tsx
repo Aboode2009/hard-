@@ -1,13 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useSessionUserId } from "@/lib/session-user";
+import { progressQuery } from "@/lib/queries";
 import { bi } from "@/i18n/bi";
+import { ProgressFill } from "@/components/ui/progress-fill";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { clerkAuth } from "@/lib/clerk-auth";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
 import { useTranslation } from "react-i18next";
 import { haptic } from "@/lib/haptics";
+import { ProductTour } from "@/components/ProductTour";
+import { storyTourSteps, usePageTour } from "@/lib/page-tours";
 
 const TOTAL_PIECES = 21;
 
@@ -44,55 +48,47 @@ const StoryMode = () => {
   const { i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
 
-  const [pieces, setPieces] = useState(0);
+  const uid = useSessionUserId();
+  // Cached: the same progress row the other screens read, so a revisit (or a
+  // visit after the home screen prefetched it) paints the house at once.
+  const progressQ = useQuery(progressQuery(uid));
+  const progress = progressQ.data;
+  const loading = !!uid && progressQ.isPending;
+
+  const completedCount = (Array.isArray(progress?.completed_days) ? progress!.completed_days : [])
+    .map((d) => Number(d))
+    .filter((n) => !isNaN(n)).length;
+  const totalDays = getStageDays(progress?.stage_level || 1);
+  // Map completed days onto the 21 build pieces (slower rhythm on 45/75-day paths)
+  const pieces = completedCount <= 0
+    ? 0
+    : Math.max(1, Math.min(TOTAL_PIECES, Math.floor((completedCount * TOTAL_PIECES) / totalDays)));
+
   const [newPiece, setNewPiece] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
   const [isNight] = useState(() => document.documentElement.classList.contains("dark"));
+  // First visit only. Waits out the "new piece" drop so the tour does not
+  // talk over the celebration.
+  const tour = usePageTour("story", !loading, newPiece !== null ? 2200 : 450);
 
   useEffect(() => {
-    fetchProgress();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (!uid) navigate("/auth");
+  }, [uid, navigate]);
 
-  const fetchProgress = async () => {
+  // Trigger the "new piece" event when progress grew since the last visit.
+  // Evaluated once, on fresh data — not on a cached copy being refreshed.
+  const checkedNewPiece = useRef(false);
+  useEffect(() => {
+    if (checkedNewPiece.current || !uid || !progressQ.isSuccess || progressQ.isFetching) return;
+    checkedNewPiece.current = true;
     try {
-      const { data: { user } } = await clerkAuth.getUser();
-      if (!user) {
-        navigate("/auth");
-        return;
-      }
-
-      const { data: progress } = await supabase
-        .from("challenge_progress")
-        .select("completed_days, stage_level")
-        .eq("user_id", user.id)
-        .maybeSingle();
-
-      const completedCount = (Array.isArray(progress?.completed_days) ? progress!.completed_days : [])
-        .map((d) => Number(d))
-        .filter((n) => !isNaN(n)).length;
-      const totalDays = getStageDays(progress?.stage_level || 1);
-
-      // Map completed days onto the 21 build pieces (slower rhythm on 45/75-day paths)
-      const built = completedCount <= 0
-        ? 0
-        : Math.max(1, Math.min(TOTAL_PIECES, Math.floor((completedCount * TOTAL_PIECES) / totalDays)));
-
-      setPieces(built);
-
-      // Trigger the "new piece" event when progress grew since the last visit
-      const seenKey = `story_seen_${user.id}`;
+      const seenKey = `story_seen_${uid}`;
       const prevSeen = parseInt(localStorage.getItem(seenKey) || "0", 10);
-      if (built > prevSeen) {
-        setNewPiece(built - 1);
-      }
-      localStorage.setItem(seenKey, String(built));
-    } catch (error) {
-      console.error("Error fetching progress:", error);
-    } finally {
-      setLoading(false);
+      if (pieces > prevSeen) setNewPiece(pieces - 1);
+      localStorage.setItem(seenKey, String(pieces));
+    } catch {
+      /* storage unavailable — skip the celebration */
     }
-  };
+  }, [uid, progressQ.isSuccess, progressQ.isFetching, pieces]);
 
   // Celebrate the newly landed piece, then dismiss the banner
   useEffect(() => {
@@ -224,7 +220,7 @@ const StoryMode = () => {
       />
 
       {/* ===== The house ===== */}
-      <div className="absolute bottom-[10%] left-1/2 -translate-x-1/2 w-[min(92vw,420px)]" dir="ltr">
+      <div className="absolute bottom-[10%] left-1/2 -translate-x-1/2 w-[min(92vw,420px)]" dir="ltr" data-tour="story-house">
         <svg viewBox="0 0 360 300" className="w-full overflow-visible">
           {/* 0 — Stone foundation */}
           <Piece i={0}>
@@ -460,31 +456,32 @@ const StoryMode = () => {
               : <ChevronLeft className="w-5 h-5" style={{ color: "hsl(var(--duo-text))" }} strokeWidth={2.5} />}
           </button>
 
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0" data-tour="story-progress">
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-xs font-extrabold" style={{ color: "hsl(var(--duo-text))" }}>
                 {bi("بيتي", "My Home")} — {pieces}/{TOTAL_PIECES}
               </span>
-              <span className="text-xs font-bold truncate" style={{ color: "hsl(var(--duo-muted))" }}>
+              <span className="text-xs font-bold truncate" style={{ color: "hsl(var(--duo-muted))" }} data-tour="story-next">
                 {nextName
                   ? (isArabic ? `التالي: ${nextName}` : `Next: ${nextName}`)
                   : (bi("اكتمل بيتك!", "Home complete!"))}
               </span>
             </div>
             <div className="relative h-3.5 rounded-full overflow-hidden" style={{ background: "hsl(var(--duo-border) / 0.6)" }}>
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${(pieces / TOTAL_PIECES) * 100}%` }}
-                transition={{ duration: 0.9, ease: "easeOut" }}
-                className="absolute inset-y-0 start-0 rounded-full"
+              <ProgressFill
+                value={(pieces / TOTAL_PIECES) * 100}
+                duration={0.9}
+                className="rounded-full"
                 style={{ background: "#FFC800" }}
               >
                 <div className="absolute inset-x-2 top-[3px] h-1 rounded-full bg-white/40" />
-              </motion.div>
+              </ProgressFill>
             </div>
           </div>
         </div>
       </div>
+
+      <ProductTour steps={storyTourSteps()} run={tour.run} onDone={tour.onDone} />
     </div>
   );
 };

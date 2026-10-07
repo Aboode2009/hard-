@@ -1,10 +1,14 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { UserAvatar } from "@/components/UserAvatar";
 
 import { BadgeArt } from "./BadgeArt";
 
 interface AvatarWithFrameProps {
-  avatarUrl?: string | null;
+  /** Built-in avatar (`profiles.avatar_id`); NULL → the gender default. */
+  avatarId?: string | null;
+  gender?: string | null;
+  /** The user id — fixes the circle colour. */
+  seed?: string | null;
   username?: string;
   frameClass?: string | null;
   badgeEmoji?: string | null;
@@ -45,7 +49,9 @@ const frameStyles: Record<string, string> = {
 };
 
 export const AvatarWithFrame = ({
-  avatarUrl,
+  avatarId,
+  gender,
+  seed,
   username = "User",
   frameClass,
   badgeEmoji,
@@ -69,12 +75,13 @@ export const AvatarWithFrame = ({
         frameSizeClasses[size],
         frameStyle
       )}>
-        <Avatar className={cn(sizeClasses[size], "border-2 border-background")}>
-          <AvatarImage src={avatarUrl || undefined} />
-          <AvatarFallback className="bg-primary/10 text-primary font-bold">
-            {username?.charAt(0).toUpperCase() || "U"}
-          </AvatarFallback>
-        </Avatar>
+        <UserAvatar
+          avatarId={avatarId}
+          gender={gender}
+          seed={seed}
+          alt={username}
+          className={cn(sizeClasses[size], "border-2 border-background")}
+        />
       </div>
       
       {/* Badge icon */}

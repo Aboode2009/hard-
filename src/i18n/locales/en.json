@@ -65,7 +65,7 @@
       }
     },
     "challenge": {
-      "title": "Hard Challenge",
+      "title": "Hard 21",
       "stageName": "🌱 Foundation Stage",
       "stage2Name": "💪 Warrior Stage",
       "stage3Name": "🏆 Champion Stage",
@@ -460,6 +460,58 @@
       "tasksCount": "tasks",
       "startPath": "Start This Path",
       "goToChallenge": "Go to Challenge"
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "appName": "Hard 21",
+      "lastUpdated": "Last updated: September 1, 2026",
+      "intro": "This Privacy Policy explains how the Hard 21 app collects, uses, and protects your information. By using the App, you agree to the practices described below.",
+      "sections": [
+        {
+          "heading": "1. Information We Collect",
+          "bullets": [
+            "Account information (via Supabase): name, email, profile image, account ID.",
+            "In-app usage data (via Supabase): username, challenge progress, points and level, completed tasks, store purchases, ad-reward history, and attendance data.",
+            "Profile photo: stored securely if uploaded.",
+            "Advertising information (via Google AdMob): device advertising identifiers and technical data used to serve ads.",
+            "Technical data: basic device and OS information."
+          ]
+        },
+        {
+          "heading": "2. How We Use Your Information",
+          "body": "To operate the App and save progress, enable secure sign-in, power leaderboards and interactive features, display ads and grant their rewards, run the attendance feature, and improve the App."
+        },
+        {
+          "heading": "3. Information Sharing",
+          "body": "We do not sell your personal information. We share it only with essential providers: Supabase (authentication and data storage), Google (sign-in), Google AdMob (advertising)."
+        },
+        {
+          "heading": "4. Advertising & Advertising ID",
+          "body": "The App uses Google AdMob, including rewarded ads. Google may use your Advertising ID to personalize and measure ads. You can reset it or opt out in device settings."
+        },
+        {
+          "heading": "5. Data Security",
+          "body": "We take reasonable measures to protect your data via encrypted connections and trusted providers. No method is 100% secure."
+        },
+        {
+          "heading": "6. Data Retention & Account Deletion",
+          "body": "We retain your data while your account is active. Request deletion via the email below."
+        },
+        {
+          "heading": "7. Children's Privacy",
+          "body": "The App is not directed to children under 13, and we do not knowingly collect their data."
+        },
+        {
+          "heading": "8. Your Rights",
+          "body": "You may access, correct, or delete your data, and opt out of personalized ads in device settings."
+        },
+        {
+          "heading": "9. Changes to This Policy",
+          "body": "We may update this policy and post changes here with an updated date."
+        }
+      ],
+      "contactHeading": "10. Contact Us",
+      "contactLabel": "Email"
     }
   }
 }

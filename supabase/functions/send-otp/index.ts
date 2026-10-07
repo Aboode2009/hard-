@@ -169,12 +169,12 @@ serve(async (req: Request): Promise<Response> => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from: "Hard Challenge <onboarding@resend.dev>",
+          from: "Hard 21 <onboarding@resend.dev>",
           to: [email],
           subject: "رمز التحقق - Password Reset Code",
           html: `
             <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-              <h1 style="color: #333; text-align: center;">Hard Challenge</h1>
+              <h1 style="color: #333; text-align: center;">Hard 21</h1>
               <h2 style="color: #666; text-align: center;">رمز استعادة كلمة المرور</h2>
               <div style="background: #f5f5f5; border-radius: 10px; padding: 30px; text-align: center; margin: 20px 0;">
                 <p style="font-size: 16px; color: #666; margin-bottom: 20px;">رمز التحقق الخاص بك هو:</p>

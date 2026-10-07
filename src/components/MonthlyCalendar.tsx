@@ -1,10 +1,11 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useSessionUserId } from "@/lib/session-user";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
-import { clerkAuth } from "@/lib/clerk-auth";
 import { MOODS } from "./MoodTracker";
 
 interface MonthlyCalendarProps {
@@ -27,38 +28,34 @@ export const MonthlyCalendar = ({
 }: MonthlyCalendarProps) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [direction, setDirection] = useState(0);
-  const [moodEntries, setMoodEntries] = useState<Record<string, string>>({});
   const { i18n } = useTranslation();
   const isArabic = i18n.language === 'ar';
 
-  useEffect(() => {
-    fetchMoodEntries();
-  }, [currentMonth]);
-
-  const fetchMoodEntries = async () => {
-    const { data: { user } } = await clerkAuth.getUser();
-    if (!user) return;
-
-    const year = currentMonth.getFullYear();
-    const month = currentMonth.getMonth();
-    const firstDay = new Date(year, month, 1).toISOString().split('T')[0];
-    const lastDay = new Date(year, month + 1, 0).toISOString().split('T')[0];
-
-    const { data } = await supabase
-      .from("mood_entries")
-      .select("mood, entry_date")
-      .eq("user_id", user.id)
-      .gte("entry_date", firstDay)
-      .lte("entry_date", lastDay);
-
-    if (data) {
+  const uid = useSessionUserId();
+  const year = currentMonth.getFullYear();
+  const month = currentMonth.getMonth();
+  // Cached per month, so paging back and forth or revisiting the tab does not
+  // re-read what has already been shown.
+  const { data: moodEntries = {} } = useQuery({
+    queryKey: ["mood-month", uid, year, month],
+    enabled: !!uid,
+    queryFn: async (): Promise<Record<string, string>> => {
+      const firstDay = new Date(year, month, 1).toISOString().split('T')[0];
+      const lastDay = new Date(year, month + 1, 0).toISOString().split('T')[0];
+      const { data, error } = await supabase
+        .from("mood_entries")
+        .select("mood, entry_date")
+        .eq("user_id", uid!)
+        .gte("entry_date", firstDay)
+        .lte("entry_date", lastDay);
+      if (error) throw error;
       const entries: Record<string, string> = {};
-      data.forEach((entry: MoodEntry) => {
+      (data ?? []).forEach((entry: MoodEntry) => {
         entries[entry.entry_date] = entry.mood;
       });
-      setMoodEntries(entries);
-    }
-  };
+      return entries;
+    },
+  });
 
   const getMoodForDate = (date: Date): typeof MOODS[0] | null => {
     const dateStr = date.toISOString().split('T')[0];

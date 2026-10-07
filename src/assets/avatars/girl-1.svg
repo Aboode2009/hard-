@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200"><circle cx="100" cy="100" r="80" fill="#fff" opacity=".13"/>
+<defs>
+<radialGradient id="girl1face" cx="47%" cy="38%" r="64%"><stop offset="0" stop-color="#FCE0CB"/><stop offset=".6" stop-color="#F4C6A4"/><stop offset="1" stop-color="#E3A781"/></radialGradient>
+<linearGradient id="girl1neck" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C98563"/><stop offset=".5" stop-color="#E3A781"/><stop offset="1" stop-color="#F4C6A4"/></linearGradient>
+<linearGradient id="girl1ear" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#E3A781"/><stop offset="1" stop-color="#F4C6A4"/></linearGradient>
+<linearGradient id="girl1cloth" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3F3F49"/><stop offset=".45" stop-color="#2B2B32"/><stop offset="1" stop-color="#141418"/></linearGradient>
+<linearGradient id="girl1hood" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF6A2C"/><stop offset="1" stop-color="#D9441A"/></linearGradient>
+<linearGradient id="girl1collar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF6A2C"/><stop offset="1" stop-color="#D9441A"/></linearGradient>
+<linearGradient id="girl1hair" x1="0" y1="0" x2=".35" y2="1"><stop offset="0" stop-color="#2A2A33"/><stop offset="1" stop-color="#17171C"/></linearGradient>
+<radialGradient id="girl1iris" cx="45%" cy="38%" r="62%"><stop offset="0" stop-color="#93653F"/><stop offset=".6" stop-color="#5A3A22"/><stop offset="1" stop-color="#2B1A0E"/></radialGradient>
+<radialGradient id="girl1blush" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#F28C7C" stop-opacity=".5"/><stop offset="1" stop-color="#F28C7C" stop-opacity="0"/></radialGradient>
+<filter id="girl1soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="2.2"/></filter>
+<clipPath id="girl1eyeL"><path d="M72 99 C76.5 91 90.5 91 95 99 C90.5 105.4 76.5 105.4 72 99 Z"/></clipPath>
+<clipPath id="girl1eyeR"><path d="M105 99 C109.5 91 123.5 91 128 99 C123.5 105.4 109.5 105.4 105 99 Z"/></clipPath>
+<clipPath id="girl1headClip"><path d="M65 94 C65 65 80 50 100 50 C120 50 135 65 135 94 C135 107 133 118 128 126 C122 135 112 142 100 142 C88 142 78 135 72 126 C67 118 65 107 65 94 Z"/></clipPath>
+</defs><path d="M58 100 C54 66 74 46 100 46 C126 46 146 66 142 100 C143 126 146 150 150 170 C130 178 70 178 50 170 C54 150 57 126 58 100 Z" fill="url(#girl1hair)"/>
+<path d="M14 214 C16 172 44 152 100 150 C156 152 184 172 186 214 Z" fill="url(#girl1cloth)"/>
+<path d="M46 182 C52 194 54 204 54 214 M154 182 C148 194 146 204 146 214" stroke="#141418" stroke-width="2" fill="none" opacity=".7"/>
+<path d="M30 182 C38 172 50 166 62 163 M170 182 C162 172 150 166 138 163" stroke="#3F3F49" stroke-width="2.2" fill="none" opacity=".7" stroke-linecap="round"/>
+<path d="M54 160 C60 144 78 136 100 136 C122 136 140 144 146 160 C136 176 118 182 100 182 C82 182 64 176 54 160 Z" fill="url(#girl1collar)"/>
+<path d="M72 156 C80 149 90 146 100 146 C110 146 120 149 128 156 C120 163 110 166 100 166 C90 166 80 163 72 156 Z" fill="#A33210"/>
+<path d="M86 124 L114 124 L116 162 C110 168 90 168 84 162 Z" fill="url(#girl1neck)"/>
+<ellipse cx="100" cy="140" rx="17" ry="7" fill="#000" opacity=".22" filter="url(#girl1soft)"/>
+<path d="M68 158 C78 167 89 170 100 170 C111 170 122 167 132 158 C126 172 113 178 100 178 C87 178 74 172 68 158 Z" fill="url(#girl1collar)"/>
+<path d="M62 162 C72 173 85 178 100 178" stroke="#FF9A6A" stroke-width="2" fill="none" opacity=".75" stroke-linecap="round"/>
+<path d="M92 174 C91 183 92 190 91 198 M108 174 C109 183 108 190 109 198" stroke="#F4F4F4" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+<rect x="88.6" y="196" width="4.8" height="8" rx="1.6" fill="#B9B9C2"/><rect x="106.6" y="196" width="4.8" height="8" rx="1.6" fill="#B9B9C2"/>
+<path d="M60 104 C56 130 54 150 48 172 C56 176 64 176 70 172 C70 152 70 128 72 108 Z M140 104 C144 130 146 150 152 172 C144 176 136 176 130 172 C130 152 130 128 128 108 Z" fill="url(#girl1hair)"/>
+<path d="M60 120 C58 140 56 156 52 168 M140 120 C142 140 144 156 148 168" stroke="#62626F" stroke-width="1.4" fill="none" opacity=".45" stroke-linecap="round"/>
+<path d="M66 96 C58 92 55 100 57 107 C59 114 64 117 69 114 Z" fill="url(#girl1ear)"/>
+<path d="M65 100 C61 99 60 104 62 108 C63 111 66 111 67 109" stroke="#C98563" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+<path d="M134 96 C142 92 145 100 143 107 C141 114 136 117 131 114 Z" fill="#F4C6A4"/>
+<path d="M135 100 C139 99 140 104 138 108 C137 111 134 111 133 109" stroke="#C98563" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+<path d="M65 94 C65 65 80 50 100 50 C120 50 135 65 135 94 C135 107 133 118 128 126 C122 135 112 142 100 142 C88 142 78 135 72 126 C67 118 65 107 65 94 Z" fill="url(#girl1face)"/>
+<g clip-path="url(#girl1headClip)">
+<path d="M70 118 C76 132 88 140 100 140 C112 140 124 132 130 118 L132 150 L68 150 Z" fill="#C98563" opacity=".3"/>
+<ellipse cx="80" cy="108" rx="7" ry="4" fill="#fff" opacity=".14" filter="url(#girl1soft)"/>
+<ellipse cx="120" cy="108" rx="7" ry="4" fill="#fff" opacity=".1" filter="url(#girl1soft)"/>
+</g>
+<g clip-path="url(#girl1headClip)"><path d="M62 104 C58 74 72 45 100 44 C127 44 143 66 139 100 C135 86 129 76 119 70 C112 76 98 80 86 80 C80 80 74 84 70 92 C67 96 64 100 62 104 Z" fill="#000" opacity=".2" filter="url(#girl1soft)" transform="translate(0 3)"/></g>
+<path d="M62 104 C58 74 72 45 100 44 C127 44 143 66 139 100 C135 86 129 76 119 70 C112 76 98 80 86 80 C80 80 74 84 70 92 C67 96 64 100 62 104 Z" fill="url(#girl1hair)"/>
+<path d="M112 58 C104 62 96 70 88 78" stroke="#17171C" stroke-width="1.6" fill="none" opacity=".8" stroke-linecap="round"/>
+<path d="M72 76 C80 66 92 60 104 58 M118 62 C126 66 132 74 135 84" stroke="#62626F" stroke-width="1.5" fill="none" opacity=".5" stroke-linecap="round"/>
+<g transform="translate(0 -2.2)">
+<path d="M73 90 C78 86.2 87 85.6 94 87.6 C88 87.4 79 88.4 73.4 91.6 Z" fill="#17171C"/>
+<path d="M127 90 C122 86.2 113 85.6 106 87.6 C112 87.4 121 88.4 126.6 91.6 Z" fill="#17171C"/></g>
+<path d="M72 99 C76.5 91 90.5 91 95 99 C90.5 105.4 76.5 105.4 72 99 Z" fill="#FBFAF8"/>
+<g clip-path="url(#girl1eyeL)">
+<circle cx="83.9" cy="98.6" r="6.1" fill="url(#girl1iris)"/>
+<circle cx="83.9" cy="98.6" r="6.1" fill="none" stroke="#24150E" stroke-width=".8" opacity=".6"/>
+<circle cx="83.9" cy="98.6" r="2.9" fill="#0E0B09"/>
+<circle cx="86.1" cy="96.4" r="1.8" fill="#fff"/>
+<circle cx="81.9" cy="101" r=".9" fill="#fff" opacity=".7"/>
+<path d="M70.5 94 C77.5 90 89.5 90 96.5 94 L96.5 96.6 C89.5 93.4 77.5 93.4 70.5 96.6 Z" fill="#C98563" opacity=".3"/>
+</g>
+<path d="M74 91 C79.5 87.4 87.5 87.4 93 90.6" stroke="#C98563" stroke-width="1.1" fill="none" opacity=".5" stroke-linecap="round"/>
+<path d="M71.4 99.4 C76.5 90.6 90.5 90.6 95.6 99.2" stroke="#1F120B" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+<path d="M75.5 104.4 C80.5 106.4 86.5 106.4 91.5 104.4" stroke="#C98563" stroke-width="1" fill="none" opacity=".55" stroke-linecap="round"/>
+<path d="M105 99 C109.5 91 123.5 91 128 99 C123.5 105.4 109.5 105.4 105 99 Z" fill="#FBFAF8"/>
+<g clip-path="url(#girl1eyeR)">
+<circle cx="116.9" cy="98.6" r="6.1" fill="url(#girl1iris)"/>
+<circle cx="116.9" cy="98.6" r="6.1" fill="none" stroke="#24150E" stroke-width=".8" opacity=".6"/>
+<circle cx="116.9" cy="98.6" r="2.9" fill="#0E0B09"/>
+<circle cx="119.1" cy="96.4" r="1.8" fill="#fff"/>
+<circle cx="114.9" cy="101" r=".9" fill="#fff" opacity=".7"/>
+<path d="M103.5 94 C110.5 90 122.5 90 129.5 94 L129.5 96.6 C122.5 93.4 110.5 93.4 103.5 96.6 Z" fill="#C98563" opacity=".3"/>
+</g>
+<path d="M107 91 C112.5 87.4 120.5 87.4 126 90.6" stroke="#C98563" stroke-width="1.1" fill="none" opacity=".5" stroke-linecap="round"/>
+<path d="M104.4 99.4 C109.5 90.6 123.5 90.6 128.6 99.2" stroke="#1F120B" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+<path d="M108.5 104.4 C113.5 106.4 119.5 106.4 124.5 104.4" stroke="#C98563" stroke-width="1" fill="none" opacity=".55" stroke-linecap="round"/>
+<path d="M72 98.6 l-3.8 -2.8 M128 98.6 l3.8 -2.8" stroke="#1F120B" stroke-width="2" stroke-linecap="round"/>
+<path d="M100.5 100 C99.4 105 97.8 109.5 96.8 112" stroke="#C98563" stroke-width="1.5" fill="none" opacity=".55" stroke-linecap="round"/>
+<path d="M95.5 113.4 C97.5 115.6 102.5 115.6 104.5 113.4" stroke="#C98563" stroke-width="1.7" fill="none" stroke-linecap="round"/>
+<ellipse cx="97.6" cy="113.6" rx="1.5" ry=".9" fill="#C98563" opacity=".85"/><ellipse cx="102.4" cy="113.6" rx="1.5" ry=".9" fill="#C98563" opacity=".85"/>
+<path d="M101.2 102 C101 106 100.8 108 101 110" stroke="#fff" stroke-width="1.4" opacity=".32" fill="none" stroke-linecap="round"/>
+<ellipse cx="100.6" cy="111.2" rx="1.6" ry="1.1" fill="#fff" opacity=".28"/><ellipse cx="78" cy="114" rx="9" ry="6" fill="url(#girl1blush)"/><ellipse cx="122" cy="114" rx="9" ry="6" fill="url(#girl1blush)"/>
+<path d="M89 121.8 C94.6 124.2 105.4 124.2 111 121.8 C108.6 128.6 91.4 128.6 89 121.8 Z" fill="#6F271F"/>
+<path d="M90.6 122.5 C95.6 124.6 104.4 124.6 109.4 122.5 L109 123.8 C104.2 125.6 95.8 125.6 91 123.8 Z" fill="#FFFFFF"/>
+<path d="M94 126.4 C97.6 127.6 102.4 127.6 106 126.4 C104 128 96 128 94 126.4 Z" fill="#D9706A" opacity=".8"/>
+<path d="M87.2 121.2 C93.6 120 97.6 120.6 100 121.4 C102.4 120.6 106.4 120 112.8 121.2 C106 122.8 94 122.8 87.2 121.2 Z" fill="#A9574A" opacity="1"/>
+<path d="M91 128.2 C96 131.6 104 131.6 109 128.2 C104 130 96 130 91 128.2 Z" fill="#C9705B" opacity="1"/>
+<path d="M86.6 120.4 C87.6 121.4 87.8 122.2 87.4 123.2 M113.4 120.4 C112.4 121.4 112.2 122.2 112.6 123.2" stroke="#C98563" stroke-width="1.2" fill="none" stroke-linecap="round" opacity=".7"/></svg>

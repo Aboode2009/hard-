@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { ChevronRight, Star } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { ProgressFill } from "@/components/ui/progress-fill";
 
 interface PathCardProps {
   id: string;
@@ -97,10 +98,7 @@ export const PathCard = ({
       {/* Progress Bar */}
       {progress > 0 && (
         <div className="mt-4 h-1.5 bg-muted rounded-full overflow-hidden">
-          <div 
-            className="h-full bg-primary rounded-full transition-all duration-500"
-            style={{ width: `${progress}%` }}
-          />
+          <ProgressFill value={progress} className="bg-primary rounded-full" duration={0.5} />
         </div>
       )}
     </div>

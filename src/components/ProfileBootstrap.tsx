@@ -1,82 +1,92 @@
 import { useEffect, useRef } from "react";
-import { useAuth, useUser } from "@clerk/react";
+import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { ensureMyProfile } from "@/lib/ensure-profile";
 
 /**
- * With Supabase Auth, a database trigger (`handle_new_user`) created the
- * `profiles` and `challenge_progress` rows whenever a user was inserted into
- * `auth.users`. Clerk sign-ups never touch `auth.users`, so that trigger no
- * longer fires. This component reproduces it on the client: the first time a
- * signed-in Clerk user is seen, it makes sure their profile + challenge
- * progress rows exist. It is idempotent (safe to run on every load).
+ * Makes sure the signed-in user has their Supabase rows.
+ *
+ * Supabase owns authentication, and the database is storage. So nothing here
+ * may ever block the user from entering the app — if this fails, the user is
+ * still signed in and the next launch tries again.
+ *
+ * All of the work is done by one server-side function, `ensure_my_profile`,
+ * which is idempotent, derives a unique username on collision, and always
+ * creates the `challenge_progress` row.
  */
+
+/** Backoff between attempts. Three tries total. */
+const RETRY_DELAYS_MS = [800, 2400];
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 export function ProfileBootstrap() {
-  const { isLoaded, isSignedIn } = useAuth();
-  const { user } = useUser();
-  const done = useRef<string | null>(null);
+  /** Guards against concurrent runs for the same user, not against retries. */
+  const running = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!isLoaded || !isSignedIn || !user) return;
-    if (done.current === user.id) return;
-    done.current = user.id;
+    let cancelled = false;
 
-    const bootstrap = async () => {
-      const username =
-        user.username ||
-        user.firstName ||
-        user.primaryEmailAddress?.emailAddress?.split("@")[0] ||
-        `user_${user.id.slice(-6)}`;
+    const bootstrap = async (session: Session) => {
+      if (running.current === session.user.id) return;
+      running.current = session.user.id;
 
-      // Onboarding values captured before sign-up (mirrors the old flow).
-      const pendingCompanyCode = (localStorage.getItem("pendingCompanyCode") || "").toUpperCase() || null;
-
-      // Create the profile row if it doesn't exist yet.
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .upsert(
-          {
-            id: user.id,
-            username,
-            ...(pendingCompanyCode ? { company_code: pendingCompanyCode } : {}),
-          },
-          { onConflict: "id", ignoreDuplicates: true }
-        );
-
-      if (profileError) {
-        // Non-fatal: a unique-username clash just means the profile already exists.
-        console.warn("ProfileBootstrap: profile upsert", profileError.message);
-      }
-
-      // Start challenge progress if it isn't started yet.
-      const { error: progressError } = await supabase
-        .from("challenge_progress")
-        .upsert(
-          { user_id: user.id, start_date: new Date().toISOString().slice(0, 10) },
-          { onConflict: "user_id", ignoreDuplicates: true }
-        );
-
-      if (progressError) {
-        console.warn("ProfileBootstrap: progress upsert", progressError.message);
-      }
-
-      // Process a pending referral once, if present.
-      const referralCode = localStorage.getItem("pendingReferralCode");
-      if (referralCode) {
+      for (let attempt = 0; attempt <= RETRY_DELAYS_MS.length; attempt++) {
+        if (cancelled) return;
         try {
-          await supabase.rpc("process_referral", {
-            p_new_user_id: user.id,
-            p_referral_code: referralCode,
-          });
-        } catch (e) {
-          console.warn("ProfileBootstrap: referral", e);
+          await ensureMyProfile(session);
+          if (cancelled) return;
+          await processPendingReferral(session.user.id);
+          return;
+        } catch (err) {
+          // Deliberately console-only: the user is already signed in and using
+          // the app, and a storage hiccup is not their problem to solve.
+          console.warn(`ensure_my_profile attempt ${attempt + 1} failed:`, err);
+          if (attempt < RETRY_DELAYS_MS.length) await sleep(RETRY_DELAYS_MS[attempt]);
         }
-        localStorage.removeItem("pendingReferralCode");
       }
-      localStorage.removeItem("pendingCompanyCode");
+
+      // Every attempt failed — release the guard so a later sign-in event or
+      // launch gets a fresh set of tries.
+      if (!cancelled) running.current = null;
     };
 
-    bootstrap();
-  }, [isLoaded, isSignedIn, user]);
+    // Covers a session restored from storage on a cold start.
+    void supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!cancelled && session) void bootstrap(session);
+    });
+
+    // ...and every later sign-in, including the OAuth deep-link return.
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session && (event === "SIGNED_IN" || event === "TOKEN_REFRESHED")) {
+        void bootstrap(session);
+      }
+      if (event === "SIGNED_OUT") running.current = null;
+    });
+
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
+  }, []);
 
   return null;
+}
+
+/** Redeems a referral code captured before sign-up. Failure is not fatal. */
+async function processPendingReferral(userId: string) {
+  const referralCode = localStorage.getItem("pendingReferralCode");
+  if (!referralCode) return;
+
+  try {
+    await supabase.rpc("process_referral", {
+      p_new_user_id: userId,
+      p_referral_code: referralCode,
+    });
+  } catch (err) {
+    console.warn("process_referral failed:", err);
+  }
+  localStorage.removeItem("pendingReferralCode");
 }

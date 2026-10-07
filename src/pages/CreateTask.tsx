@@ -3,7 +3,6 @@ import { bi } from "@/i18n/bi";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
-import { clerkAuth } from "@/lib/clerk-auth";
 import {
   ChevronLeft, ChevronRight, Plus, Flame, Heart, Dumbbell, Brain, Ban,
   Footprints, BedDouble, Droplets, Activity, PersonStanding, Bike, BookOpen,
@@ -11,6 +10,9 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { haptic } from "@/lib/haptics";
+import { usePremium } from "@/hooks/usePremium";
+import { PremiumGate } from "@/components/PremiumGate";
+import { isPremiumRequiredError } from "@/lib/premium";
 
 // The stored emoji stays in `description` (the home task card uses it as the
 // task icon); this page itself renders colorful icons instead.
@@ -46,28 +48,64 @@ const CreateTask = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState("all");
+
+  // Adding tasks — ready-made or custom — is for subscribers only. The server
+  // enforces it too (a trigger on custom_tasks); this keeps free users from
+  // seeing a list they cannot use.
+  const { isPremium, loading: premiumLoading } = usePremium();
   const [saving, setSaving] = useState(false);
 
   const filteredHabits = selectedCategory === "all"
     ? PRESET_HABITS
     : PRESET_HABITS.filter(h => h.category === selectedCategory);
 
+  const errorToast = (error: { message: string }) =>
+    isPremiumRequiredError(error)
+      ? {
+          title: bi("للمشتركين فقط", "Subscribers only"),
+          description: bi("إضافة المهام متاحة لمشتركي بريميوم.", "Adding tasks is available with Premium."),
+          variant: "destructive" as const,
+        }
+      : { title: t("common.error", "Error"), description: error.message, variant: "destructive" as const };
+
   const handleAddHabit = async (habitKey: string, emoji: string) => {
-    const { data: { user } } = await clerkAuth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      toast({ title: t("common.error", "Error"), description: "Please login first", variant: "destructive" });
+      toast({ title: t("common.error", "Error"), description: bi("سجّل دخولك أولاً", "Please login first"), variant: "destructive" });
       return;
     }
 
     setSaving(true);
 
-    // Check if habit already exists
-    const { data: existing } = await supabase
+    // Deleting a task only sets is_active = false, so a deleted preset still
+    // has its row. Counting that row as "already exists" meant a habit could
+    // never be added back once removed; bring it back instead.
+    const { data: rows } = await supabase
       .from("custom_tasks")
-      .select("id")
+      .select("id, is_active")
       .eq("user_id", user.id)
-      .eq("title", habitKey)
-      .maybeSingle();
+      .eq("title", habitKey);
+    const existing = rows?.find((r) => r.is_active);
+    const removed = rows?.find((r) => !r.is_active);
+
+    if (!existing && removed) {
+      const { error: restoreError } = await supabase
+        .from("custom_tasks")
+        .update({ is_active: true })
+        .eq("id", removed.id)
+        .eq("user_id", user.id);
+      setSaving(false);
+      if (restoreError) {
+        toast(errorToast(restoreError));
+        return;
+      }
+      haptic("light");
+      toast({
+        title: t("createTask.added", "Habit Added!"),
+        description: t("createTask.habitAddedDesc", "The habit has been added to your daily tasks"),
+      });
+      return;
+    }
 
     if (existing) {
       toast({
@@ -90,7 +128,7 @@ const CreateTask = () => {
     setSaving(false);
 
     if (error) {
-      toast({ title: t("common.error", "Error"), description: error.message, variant: "destructive" });
+      toast(errorToast(error));
       return;
     }
 
@@ -103,8 +141,49 @@ const CreateTask = () => {
 
   const activeCat = CATEGORIES.find(c => c.key === selectedCategory) || CATEGORIES[0];
 
+  if (premiumLoading || !isPremium) {
+    return (
+      <div className="duo-page min-h-screen bg-background pb-24" dir={bi("rtl", "ltr")}>
+        <div className="max-w-lg mx-auto px-4 pt-5">
+          <div className="flex items-center justify-between mb-6">
+            <button
+              onClick={() => navigate("/")}
+              className="duo-card duo-press w-11 h-11 flex items-center justify-center"
+              style={{ borderRadius: "1rem" }}
+              aria-label={bi("رجوع", "Back")}
+            >
+              {isArabic
+                ? <ChevronRight className="w-6 h-6" style={{ color: "hsl(var(--duo-text))" }} strokeWidth={2.5} />
+                : <ChevronLeft className="w-6 h-6" style={{ color: "hsl(var(--duo-text))" }} strokeWidth={2.5} />}
+            </button>
+            <h1 className="text-2xl font-extrabold" style={{ color: "hsl(var(--duo-text))" }}>
+              {t("createTask.title", "New Habit")}
+            </h1>
+            <div className="w-11" />
+          </div>
+          {premiumLoading ? (
+            <div className="h-56 rounded-2xl animate-pulse" style={{ background: "hsl(var(--duo-border))" }} />
+          ) : (
+            <PremiumGate
+              title={bi("إضافة المهام للمشتركين", "Adding tasks is for subscribers")}
+              message={bi(
+                "اشترك في بريميوم لتضيف مهاماً جاهزة أو تبتكر مهامك الخاصة إلى تحدّيك اليومي.",
+                "Subscribe to Premium to add ready-made habits or create your own tasks for your daily challenge.",
+              )}
+            />
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="duo-page min-h-screen bg-background" dir={bi("rtl", "ltr")}>
+    <div
+      className="duo-page min-h-screen bg-background"
+      dir={bi("rtl", "ltr")}
+      // The last presets scroll out from under the floating button.
+      style={{ paddingBottom: "calc(6rem + env(safe-area-inset-bottom, 0px))" }}
+    >
       <div className="max-w-lg mx-auto px-4 pt-5 pb-28">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -200,7 +279,11 @@ const CreateTask = () => {
       </div>
 
       {/* Custom Habit button */}
-      <div className="fixed bottom-6 inset-x-0 flex justify-center px-4">
+      <div
+        className="fixed inset-x-0 flex justify-center px-4"
+        // Clear of the gesture bar, which drew over it at a flat bottom-6.
+        style={{ bottom: "calc(1rem + env(safe-area-inset-bottom, 0px))" }}
+      >
         <button
           onClick={() => navigate("/custom-habit")}
           className="duo-press h-12 px-8 rounded-2xl flex items-center gap-2 font-extrabold text-white tracking-wide"

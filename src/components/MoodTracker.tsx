@@ -5,8 +5,9 @@ import { Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { queryClient } from "@/lib/query-client";
 import { supabase } from "@/integrations/supabase/client";
-import { clerkAuth } from "@/lib/clerk-auth";
+import { readCache, writeCache, homeKeys } from "@/lib/home-cache";
 
 export const MOODS = [
   { key: "excellent", emoji: "😄", color: "bg-amber-400" },
@@ -37,8 +38,17 @@ export const MoodTracker = () => {
 
   const fetchTodaysMood = async () => {
     try {
-      const { data: { user } } = await clerkAuth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
+
+      // Today's mood is per-user and per-day, and the cache is stamped with
+      // the Baghdad date — so it expires exactly when the entry it describes
+      // stops being "today". Saving a mood rewrites it below.
+      const cached = readCache<string | null>(homeKeys.mood(user.id));
+      if (cached !== undefined) {
+        if (cached) setSelectedMood(cached);
+        return;
+      }
 
       const today = new Date().toISOString().split('T')[0];
       const { data } = await supabase
@@ -48,6 +58,7 @@ export const MoodTracker = () => {
         .eq("entry_date", today)
         .maybeSingle();
 
+      writeCache<string | null>(homeKeys.mood(user.id), data?.mood ?? null);
       if (data) {
         setSelectedMood(data.mood);
       }
@@ -62,7 +73,7 @@ export const MoodTracker = () => {
   };
 
   const handleSave = async () => {
-    const { data: { user } } = await clerkAuth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user || !pendingMood) return;
 
     setSaving(true);
@@ -98,6 +109,8 @@ export const MoodTracker = () => {
     }
 
     setSaving(false);
+    // The stats calendar shows moods per month from the query cache.
+    if (!error) void queryClient.invalidateQueries({ queryKey: ["mood-month"] });
 
     if (error) {
       toast({
@@ -108,6 +121,8 @@ export const MoodTracker = () => {
       return;
     }
 
+    // Confirmed by the server, so the cache can carry it forward.
+    writeCache<string | null>(homeKeys.mood(user.id), pendingMood);
     setSelectedMood(pendingMood);
     setIsOpen(false);
     setStep("select");

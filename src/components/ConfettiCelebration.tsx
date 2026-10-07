@@ -11,8 +11,11 @@ export const ConfettiCelebration = ({ trigger }: ConfettiCelebrationProps) => {
 
     const duration = 2500;
     const end = Date.now() + duration;
+    let rafId = 0;
+    let cancelled = false;
 
     const frame = () => {
+      if (cancelled) return;
       confetti({
         particleCount: 3,
         angle: 60,
@@ -31,7 +34,7 @@ export const ConfettiCelebration = ({ trigger }: ConfettiCelebrationProps) => {
       });
 
       if (Date.now() < end) {
-        requestAnimationFrame(frame);
+        rafId = requestAnimationFrame(frame);
       }
     };
 
@@ -44,7 +47,14 @@ export const ConfettiCelebration = ({ trigger }: ConfettiCelebrationProps) => {
       zIndex: 9999,
     });
 
-    requestAnimationFrame(frame);
+    rafId = requestAnimationFrame(frame);
+
+    // The loop outlived the component before this: navigating away mid-burst
+    // left it firing confetti for the full 2.5s against a dead tree.
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(rafId);
+    };
   }, [trigger]);
 
   return null;

@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { clerkAuth } from "@/lib/clerk-auth";
 import { BottomNav } from "@/components/BottomNav";
 import { ProgressionMap } from "@/components/paths/ProgressionMap";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import { Flame, Target, Brain, ChevronDown } from "lucide-react";
+import { Flame, Target, Brain, ChevronDown, Lock } from "lucide-react";
+import { bi } from "@/i18n/bi";
+import { canAdvanceToNextPath } from "@/lib/premium";
+import { PremiumGate } from "@/components/PremiumGate";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -56,7 +58,12 @@ const Paths = () => {
   const [currentPath, setCurrentPath] = useState<PathConfig>(pathConfigs[0]);
   const [currentDay, setCurrentDay] = useState(1);
   const [completedDays, setCompletedDays] = useState<number[]>([]);
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [avatar, setAvatar] = useState<{ avatarId: string | null; gender: string | null; userId: string } | null>(null);
+
+  // The first path is free. Moving to any later one is server-gated by
+  // can_advance_to_next_path; `null` means "not checked yet".
+  const [canAdvance, setCanAdvance] = useState<boolean | null>(null);
+  const [lockedPath, setLockedPath] = useState<PathConfig | null>(null);
 
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -69,22 +76,22 @@ const Paths = () => {
     try {
       const {
         data: { session },
-      } = await clerkAuth.getSession();
+      } = await supabase.auth.getSession();
 
       if (!session) {
         navigate("/auth");
         return;
       }
 
-      // Get user profile for avatar
+      // The avatar on the map marker
       const { data: profile } = await supabase
         .from("profiles")
-        .select("avatar_url")
+        .select("avatar_id, gender")
         .eq("id", session.user.id)
         .single();
 
       if (profile) {
-        setAvatarUrl(profile.avatar_url);
+        setAvatar({ avatarId: profile.avatar_id, gender: profile.gender, userId: session.user.id });
       }
 
       // Check if user has an active challenge (must filter by user id —
@@ -129,6 +136,9 @@ const Paths = () => {
         }
       }
 
+      // Read once up front so the dropdown can show padlocks immediately.
+      setCanAdvance(await canAdvanceToNextPath());
+
       setLoading(false);
     } catch (error) {
       console.error("Error checking auth:", error);
@@ -136,7 +146,22 @@ const Paths = () => {
     }
   };
 
-  const handlePathChange = (path: PathConfig) => {
+  const handlePathChange = async (path: PathConfig) => {
+    // Staying on (or returning to) the free first path never needs a check.
+    if (path.stageLevel <= 1) {
+      setCurrentPath(path);
+      return;
+    }
+
+    // Re-check on the click rather than trusting the value loaded at mount —
+    // the user may have subscribed in another tab since then.
+    const allowed = await canAdvanceToNextPath();
+    setCanAdvance(allowed);
+
+    if (!allowed) {
+      setLockedPath(path);
+      return;
+    }
     setCurrentPath(path);
   };
 
@@ -154,10 +179,39 @@ const Paths = () => {
     );
   }
 
+  // "Subscribe to continue" — shown instead of the map when the user tried to
+  // move past the free path without an active subscription.
+  if (lockedPath) {
+    return (
+      <div className="duo-page min-h-screen bg-background pb-20" dir={bi("rtl", "ltr")}>
+        <div className="max-w-lg mx-auto px-4 pt-8">
+          <PremiumGate
+            title={bi("اشترك لمتابعة المسارات", "Subscribe to continue your paths")}
+            message={bi(
+              `المسار الأول مجاني. للانتقال إلى "${t(lockedPath.titleKey)}" وبقية المسارات تحتاج اشتراك بريميوم.`,
+              `The first path is free. Continuing to "${t(lockedPath.titleKey)}" and the rest needs a Premium subscription.`,
+            )}
+          />
+
+          <button
+            type="button"
+            onClick={() => setLockedPath(null)}
+            className="duo-press mx-auto mt-4 block h-12 px-6 rounded-2xl font-extrabold"
+            style={{ color: "hsl(var(--duo-muted))" }}
+          >
+            {bi("رجوع", "Back")}
+          </button>
+        </div>
+
+        <BottomNav />
+      </div>
+    );
+  }
+
   return (
     <div className="duo-page min-h-screen bg-background pb-20 overflow-hidden">
       {/* Header with Path Selector — Duolingo-style unit banner */}
-      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b-2" style={{ borderColor: "hsl(var(--duo-border))" }}>
+      <div className="sticky top-0 z-40 bg-background border-b-2" style={{ borderColor: "hsl(var(--duo-border))" }}>
         <div className="container max-w-lg mx-auto px-4 py-3">
           <div
             className="rounded-2xl p-4 flex items-center justify-between"
@@ -188,7 +242,7 @@ const Paths = () => {
                 {pathConfigs.map((path) => (
                   <DropdownMenuItem
                     key={path.id}
-                    onClick={() => handlePathChange(path)}
+                    onClick={() => void handlePathChange(path)}
                     className="gap-2 cursor-pointer"
                   >
                     <div
@@ -197,8 +251,13 @@ const Paths = () => {
                     >
                       {path.icon}
                     </div>
-                    <div>
-                      <p className="font-bold">{t(path.titleKey)}</p>
+                    <div className="flex-1">
+                      <p className="font-bold flex items-center gap-1.5">
+                        {t(path.titleKey)}
+                        {path.stageLevel > 1 && canAdvance === false && (
+                          <Lock className="w-3.5 h-3.5 text-muted-foreground" strokeWidth={2.5} />
+                        )}
+                      </p>
                       <p className="text-xs text-muted-foreground">
                         {path.totalDays} days
                       </p>
@@ -216,7 +275,9 @@ const Paths = () => {
         totalDays={currentPath.totalDays}
         currentDay={currentDay}
         completedDays={completedDays}
-        avatarUrl={avatarUrl}
+        avatarId={avatar?.avatarId}
+        gender={avatar?.gender}
+        userId={avatar?.userId}
         pathId={currentPath.id}
       />
 

@@ -1,5 +1,6 @@
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { supabase } from '@/integrations/supabase/client';
+import { bi } from '@/i18n/bi';
 
 export interface TaskReminder {
   id: string;
@@ -90,11 +91,14 @@ export const notificationService = {
 
         return {
           id: index + 1,
-          title: 'تذكير المهمة',
-          body: `حان وقت: ${taskNames[reminder.task_id]}`,
+          title: bi('تذكير المهمة', 'Task reminder'),
+          body: bi(`حان وقت: ${taskNames[reminder.task_id]}`, `Time for: ${taskNames[reminder.task_id]}`),
+          // `at` + `every` fires ONCE on Android: the plugin only repeats
+          // an `at` schedule when `repeats` is set, and ignores `every`
+          // beside it. `on` is its daily cron — re-armed after each firing.
           schedule: {
-            at: scheduledTime,
-            every: 'day' as const
+            on: { hour: scheduledTime.getHours(), minute: scheduledTime.getMinutes() },
+            allowWhileIdle: true,
           },
           smallIcon: 'ic_stat_icon_config_sample',
           sound: 'beep.wav',
@@ -155,9 +159,10 @@ export const notificationService = {
         id: END_OF_DAY_REMINDER_ID,
         title,
         body,
+        // Daily via `on` — see scheduleTaskReminders: `at` + `every` fired once.
         schedule: {
-          at: scheduledTime,
-          every: 'day' as const
+          on: { hour: scheduledTime.getHours(), minute: scheduledTime.getMinutes() },
+          allowWhileIdle: true,
         },
         smallIcon: 'ic_stat_icon_config_sample',
         sound: 'beep.wav',
@@ -244,9 +249,10 @@ export const notificationService = {
         id: reminder.id,
         title: reminder.title,
         body: reminder.body,
+        // Daily via `on` — see scheduleTaskReminders: `at` + `every` fired once.
         schedule: {
-          at: scheduledTime,
-          every: 'day' as const
+          on: { hour: scheduledTime.getHours(), minute: scheduledTime.getMinutes() },
+          allowWhileIdle: true,
         },
         smallIcon: 'ic_stat_icon_config_sample',
         sound: 'beep.wav',
@@ -336,9 +342,10 @@ export const notificationService = {
         id: MOTIVATIONAL_REMINDER_ID,
         title,
         body: randomQuote,
+        // Daily via `on` — see scheduleTaskReminders: `at` + `every` fired once.
         schedule: {
-          at: scheduledTime,
-          every: 'day' as const
+          on: { hour: scheduledTime.getHours(), minute: scheduledTime.getMinutes() },
+          allowWhileIdle: true,
         },
         smallIcon: 'ic_stat_icon_config_sample',
         sound: 'beep.wav',

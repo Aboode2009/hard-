@@ -3,7 +3,6 @@ import { bi } from "@/i18n/bi";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
-import { clerkAuth } from "@/lib/clerk-auth";
 import { ChevronLeft, ChevronRight, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +13,9 @@ import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { EmojiPicker } from "@/components/EmojiPicker";
+import { usePremium } from "@/hooks/usePremium";
+import { PremiumGate } from "@/components/PremiumGate";
+import { isPremiumRequiredError } from "@/lib/premium";
 
 const PRESET_COLORS = [
   "#14b8a6", // teal (primary from screenshots)
@@ -39,6 +41,10 @@ const CustomHabit = () => {
   const isArabic = i18n.language === 'ar';
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Building your own tasks is a subscriber feature; the server is the source
+  // of truth via is_premium_active.
+  const { isPremium, loading: premiumLoading } = usePremium();
 
   const [title, setTitle] = useState("");
   const [selectedEmoji, setSelectedEmoji] = useState("⭐");
@@ -66,7 +72,7 @@ const CustomHabit = () => {
       return;
     }
 
-    const { data: { user } } = await clerkAuth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       toast({ 
         title: bi("خطأ", "Error"), 
@@ -126,10 +132,15 @@ const CustomHabit = () => {
       navigate(-1);
     } catch (error) {
       console.error('Error:', error);
-      toast({
-        variant: "destructive",
-        title: bi("خطأ", "Error"),
-      });
+      toast(
+        isPremiumRequiredError(error)
+          ? {
+              variant: "destructive",
+              title: bi("للمشتركين فقط", "Subscribers only"),
+              description: bi("إضافة المهام متاحة لمشتركي بريميوم.", "Adding tasks is available with Premium."),
+            }
+          : { variant: "destructive", title: bi("خطأ", "Error") },
+      );
     } finally {
       setSaving(false);
     }
@@ -151,8 +162,64 @@ const CustomHabit = () => {
     boxShadow: "0 3px 0 hsl(var(--duo-edge))",
   };
 
+  // Shared header so the back button still works in every state below.
+  const header = (
+    <div
+      className="sticky top-0 z-10 bg-background border-b-2 px-4 py-4 flex items-center justify-between"
+      style={{ borderColor: "hsl(var(--duo-border))" }}
+    >
+      <button
+        onClick={() => navigate("/create-task")}
+        className="duo-card duo-press w-11 h-11 flex items-center justify-center"
+        style={{ borderRadius: "1rem" }}
+      >
+        {isArabic
+          ? <ChevronRight className="w-6 h-6" style={{ color: "hsl(var(--duo-text))" }} strokeWidth={2.5} />
+          : <ChevronLeft className="w-6 h-6" style={{ color: "hsl(var(--duo-text))" }} strokeWidth={2.5} />}
+      </button>
+      <h1 className="text-2xl font-extrabold flex items-center gap-2" style={{ color: "hsl(var(--duo-text))" }}>
+        <span className="text-2xl">🌟</span>
+        {bi("مهمة مخصصة", "Custom Task")}
+      </h1>
+      <div className="w-11" />
+    </div>
+  );
+
+  if (premiumLoading) {
+    return (
+      <div className="duo-page min-h-screen bg-background pb-24">
+        {header}
+        <div className="max-w-lg mx-auto px-4 pt-8">
+          <div className="h-56 rounded-2xl animate-pulse" style={{ background: "hsl(var(--duo-border))" }} />
+        </div>
+      </div>
+    );
+  }
+
+  if (!isPremium) {
+    return (
+      <div className="duo-page min-h-screen bg-background pb-24">
+        {header}
+        <div className="px-4 pt-8">
+          <PremiumGate
+            title={bi("هذه الميزة للمشتركين", "This feature is for subscribers")}
+            message={bi(
+              "اشترك في بريميوم لإنشاء مهامك الخاصة بأسمائها وألوانها وأوقاتها.",
+              "Subscribe to Premium to build your own tasks, with your own names, colors and schedules.",
+            )}
+          />
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="duo-page min-h-screen bg-background pb-24">
+    <div
+      className="duo-page min-h-screen bg-background"
+      // Room for the fixed Save bar plus the gesture bar, so the last rows
+      // (reminders) can scroll out from under it.
+      style={{ paddingBottom: "calc(8.5rem + env(safe-area-inset-bottom, 0px))" }}
+    >
       {/* Header */}
       <div
         className="sticky top-0 z-10 bg-background border-b-2 px-4 py-4 flex items-center justify-between"
@@ -468,7 +535,11 @@ const CustomHabit = () => {
       </div>
 
       {/* Save Button */}
-      <div className="fixed bottom-6 left-4 right-4">
+      <div
+        className="fixed left-4 right-4"
+        // Above the gesture bar: at a flat bottom-6 the pill sat on the button.
+        style={{ bottom: "calc(1rem + env(safe-area-inset-bottom, 0px))" }}
+      >
         <Button
           onClick={handleSave}
           disabled={saving || !title.trim()}

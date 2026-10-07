@@ -10,10 +10,148 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "13.0.5"
+    PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
+      _auth_migration_backup: {
+        Row: {
+          detail: Json
+          id: number
+          kind: string
+          object_name: string | null
+          schema_name: string | null
+          taken_at: string
+        }
+        Insert: {
+          detail: Json
+          id?: number
+          kind: string
+          object_name?: string | null
+          schema_name?: string | null
+          taken_at?: string
+        }
+        Update: {
+          detail?: Json
+          id?: number
+          kind?: string
+          object_name?: string | null
+          schema_name?: string | null
+          taken_at?: string
+        }
+        Relationships: []
+      }
+      _company_mode_backup: {
+        Row: {
+          company_code: string | null
+          id: number
+          taken_at: string
+          user_id: string
+        }
+        Insert: {
+          company_code?: string | null
+          id?: number
+          taken_at?: string
+          user_id: string
+        }
+        Update: {
+          company_code?: string | null
+          id?: number
+          taken_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ad_reward_log: {
+        Row: {
+          id: string
+          reward_date: string
+          reward_points: number
+          rewarded_at: string
+          source: string | null
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          reward_date?: string
+          reward_points: number
+          rewarded_at?: string
+          source?: string | null
+          user_id?: string
+        }
+        Update: {
+          id?: string
+          reward_date?: string
+          reward_points?: number
+          rewarded_at?: string
+          source?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      attendance_config: {
+        Row: {
+          company_code: string
+          created_at: string
+          display_time: string
+          qr_value: string
+          timezone: string
+          updated_at: string
+          window_end: string
+          window_start: string
+        }
+        Insert: {
+          company_code: string
+          created_at?: string
+          display_time?: string
+          qr_value: string
+          timezone?: string
+          updated_at?: string
+          window_end?: string
+          window_start?: string
+        }
+        Update: {
+          company_code?: string
+          created_at?: string
+          display_time?: string
+          qr_value?: string
+          timezone?: string
+          updated_at?: string
+          window_end?: string
+          window_start?: string
+        }
+        Relationships: []
+      }
+      attendance_records: {
+        Row: {
+          check_in_at: string
+          company_code: string | null
+          created_at: string
+          entry_date: string
+          id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          check_in_at?: string
+          company_code?: string | null
+          created_at?: string
+          entry_date?: string
+          id?: string
+          status: string
+          user_id?: string
+        }
+        Update: {
+          check_in_at?: string
+          company_code?: string | null
+          created_at?: string
+          entry_date?: string
+          id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       backups: {
         Row: {
           backup_data: Json
@@ -58,7 +196,7 @@ export type Database = {
           damage_dealt?: number
           id?: string
           updated_at?: string
-          user_id: string
+          user_id?: string
         }
         Update: {
           attacks_count?: number
@@ -155,7 +293,7 @@ export type Database = {
           tasks_state?: Json
           total_points?: number
           updated_at?: string
-          user_id: string
+          user_id?: string
           weekly_points?: number
         }
         Update: {
@@ -199,7 +337,7 @@ export type Database = {
           created_at?: string
           id?: string
           role: string
-          user_id: string
+          user_id?: string
         }
         Update: {
           content?: string
@@ -265,7 +403,7 @@ export type Database = {
           points?: number
           tag_id?: string | null
           title: string
-          user_id: string
+          user_id?: string
         }
         Update: {
           created_at?: string
@@ -304,7 +442,7 @@ export type Database = {
           id?: string
           name: string
           name_ar?: string | null
-          user_id: string
+          user_id?: string
         }
         Update: {
           color?: string | null
@@ -339,7 +477,7 @@ export type Database = {
           points_earned?: number | null
           started_at: string
           task_id?: string | null
-          user_id: string
+          user_id?: string
           was_completed?: boolean | null
         }
         Update: {
@@ -398,7 +536,7 @@ export type Database = {
           strict_mode?: boolean | null
           strict_mode_timeout?: number | null
           updated_at?: string
-          user_id: string
+          user_id?: string
         }
         Update: {
           auto_start_breaks?: boolean | null
@@ -475,7 +613,7 @@ export type Database = {
           priority?: string | null
           title: string
           updated_at?: string
-          user_id: string
+          user_id?: string
         }
         Update: {
           category_id?: string | null
@@ -500,6 +638,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      level_up_reward_claims: {
+        Row: {
+          claimed_at: string
+          level: number
+          user_id: string
+        }
+        Insert: {
+          claimed_at?: string
+          level: number
+          user_id: string
+        }
+        Update: {
+          claimed_at?: string
+          level?: number
+          user_id?: string
+        }
+        Relationships: []
       }
       life_area_tags: {
         Row: {
@@ -543,7 +699,7 @@ export type Database = {
           id?: string
           mood: string
           reason?: string | null
-          user_id: string
+          user_id?: string
         }
         Update: {
           created_at?: string
@@ -551,6 +707,42 @@ export type Database = {
           id?: string
           mood?: string
           reason?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      nass_progress: {
+        Row: {
+          best_streak: number
+          completed_days: Json
+          created_at: string
+          current_day: number
+          current_streak: number
+          start_date: string
+          tasks_state: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          best_streak?: number
+          completed_days?: Json
+          created_at?: string
+          current_day?: number
+          current_streak?: number
+          start_date?: string
+          tasks_state?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          best_streak?: number
+          completed_days?: Json
+          created_at?: string
+          current_day?: number
+          current_streak?: number
+          start_date?: string
+          tasks_state?: Json
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -588,6 +780,7 @@ export type Database = {
       profiles: {
         Row: {
           age: number | null
+          avatar_id: string | null
           avatar_url: string | null
           company_code: string | null
           created_at: string
@@ -596,9 +789,13 @@ export type Database = {
           equipped_theme_id: string | null
           gender: string | null
           id: string
+          is_lifetime: boolean
+          is_premium: boolean
           last_loot_box_streak: number
           level: number
           loot_boxes: number
+          onboarding_completed_at: string | null
+          premium_until: string | null
           referral_code: string | null
           referred_by: string | null
           total_referrals: number | null
@@ -607,6 +804,7 @@ export type Database = {
         }
         Insert: {
           age?: number | null
+          avatar_id?: string | null
           avatar_url?: string | null
           company_code?: string | null
           created_at?: string
@@ -615,9 +813,13 @@ export type Database = {
           equipped_theme_id?: string | null
           gender?: string | null
           id: string
+          is_lifetime?: boolean
+          is_premium?: boolean
           last_loot_box_streak?: number
           level?: number
           loot_boxes?: number
+          onboarding_completed_at?: string | null
+          premium_until?: string | null
           referral_code?: string | null
           referred_by?: string | null
           total_referrals?: number | null
@@ -626,6 +828,7 @@ export type Database = {
         }
         Update: {
           age?: number | null
+          avatar_id?: string | null
           avatar_url?: string | null
           company_code?: string | null
           created_at?: string
@@ -634,9 +837,13 @@ export type Database = {
           equipped_theme_id?: string | null
           gender?: string | null
           id?: string
+          is_lifetime?: boolean
+          is_premium?: boolean
           last_loot_box_streak?: number
           level?: number
           loot_boxes?: number
+          onboarding_completed_at?: string | null
+          premium_until?: string | null
           referral_code?: string | null
           referred_by?: string | null
           total_referrals?: number | null
@@ -667,29 +874,41 @@ export type Database = {
           },
         ]
       }
-      progress_photos: {
+      purchases: {
         Row: {
-          caption: string | null
+          amount_paid: string | null
+          coins_granted: number | null
           created_at: string
-          day_number: number
           id: string
-          photo_url: string
+          kind: string
+          premium_days: number | null
+          provider: string
+          provider_ref: string | null
+          status: string
           user_id: string
         }
         Insert: {
-          caption?: string | null
+          amount_paid?: string | null
+          coins_granted?: number | null
           created_at?: string
-          day_number: number
           id?: string
-          photo_url: string
+          kind: string
+          premium_days?: number | null
+          provider?: string
+          provider_ref?: string | null
+          status?: string
           user_id: string
         }
         Update: {
-          caption?: string | null
+          amount_paid?: string | null
+          coins_granted?: number | null
           created_at?: string
-          day_number?: number
           id?: string
-          photo_url?: string
+          kind?: string
+          premium_days?: number | null
+          provider?: string
+          provider_ref?: string | null
+          status?: string
           user_id?: string
         }
         Relationships: []
@@ -781,7 +1000,7 @@ export type Database = {
           points_earned?: number
           tag_id?: string | null
           task_key: string
-          user_id: string
+          user_id?: string
         }
         Update: {
           completed_at?: string
@@ -818,7 +1037,7 @@ export type Database = {
           reminder_time: string
           task_id: number
           updated_at?: string
-          user_id: string
+          user_id?: string
         }
         Update: {
           created_at?: string
@@ -881,7 +1100,7 @@ export type Database = {
           id?: string
           item_id: string
           obtained_at?: string
-          user_id: string
+          user_id?: string
         }
         Update: {
           id?: string
@@ -910,7 +1129,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           role: Database["public"]["Enums"]["app_role"]
-          user_id: string
+          user_id?: string
         }
         Update: {
           created_at?: string | null
@@ -933,7 +1152,7 @@ export type Database = {
           is_active?: boolean
           purchased_at?: string
           theme_id: string
-          user_id: string
+          user_id?: string
         }
         Update: {
           id?: string
@@ -952,6 +1171,27 @@ export type Database = {
           },
         ]
       }
+      weekly_boss_claims: {
+        Row: {
+          claim_date: string
+          created_at: string
+          outcome: string
+          user_id: string
+        }
+        Insert: {
+          claim_date: string
+          created_at?: string
+          outcome: string
+          user_id: string
+        }
+        Update: {
+          claim_date?: string
+          created_at?: string
+          outcome?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       weekly_champions: {
         Row: {
           created_at: string
@@ -967,7 +1207,7 @@ export type Database = {
           featured_until: string
           id?: string
           total_points?: number
-          user_id: string
+          user_id?: string
           week_end: string
           week_start: string
         }
@@ -987,6 +1227,74 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      _challenge_max_days: {
+        Args: { p_mode: string; p_stage: number }
+        Returns: number
+      }
+      _check_loot_box_streak: {
+        Args: { p_mode: string; p_uid: string }
+        Returns: boolean
+      }
+      _check_mode: {
+        Args: { p_mode: string; p_uid: string }
+        Returns: undefined
+      }
+      _cosmetic_json: {
+        Args: { v: Database["public"]["Tables"]["cosmetic_items"]["Row"] }
+        Returns: Json
+      }
+      _evaluate_progress: {
+        Args: { p_mode: string; p_uid: string }
+        Returns: Json
+      }
+      _grant_xp: { Args: { p_amount: number; p_uid: string }; Returns: Json }
+      _pick_cosmetic: {
+        Args: {
+          p_allow_owned?: boolean
+          p_rarity?: string
+          p_types?: string[]
+          p_uid: string
+          p_weighted?: boolean
+        }
+        Returns: {
+          asset_url: string | null
+          created_at: string
+          css_class: string | null
+          id: string
+          is_active: boolean
+          name: string
+          name_ar: string
+          rarity: Database["public"]["Enums"]["cosmetic_rarity"]
+          type: Database["public"]["Enums"]["cosmetic_type"]
+        }
+        SetofOptions: {
+          from: "*"
+          to: "cosmetic_items"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      _progress_json: { Args: { p_mode: string; p_uid: string }; Returns: Json }
+      _require_uid: { Args: never; Returns: string }
+      _required_tasks: {
+        Args: { p_mode: string; p_stage: number }
+        Returns: Json
+      }
+      _streak_bonus: { Args: { p_streak: number }; Returns: number }
+      _task_life_area: { Args: { p_title: string }; Returns: string }
+      activate_lifetime: {
+        Args: { p_amount?: string; p_provider_ref: string; p_user_id: string }
+        Returns: boolean
+      }
+      activate_premium: {
+        Args: {
+          p_amount?: string
+          p_days: number
+          p_provider_ref: string
+          p_user_id: string
+        }
+        Returns: boolean
+      }
       add_xp: {
         Args: { p_amount: number; p_user_id: string }
         Returns: {
@@ -995,7 +1303,32 @@ export type Database = {
           new_xp: number
         }[]
       }
+      apply_weekly_boss_penalty: { Args: never; Returns: Json }
+      baghdad_today: { Args: never; Returns: string }
+      buy_streak_freeze: { Args: never; Returns: Json }
+      buy_theme: { Args: { p_theme_id: string }; Returns: Json }
       calculate_weekly_champion: { Args: never; Returns: undefined }
+      can_advance_to_next_path: { Args: never; Returns: boolean }
+      challenge_day_for: {
+        Args: { p_max: number; p_start: string }
+        Returns: number
+      }
+      challenge_stage_days: { Args: { p_stage: number }; Returns: number }
+      claim_level_up_reward: { Args: { p_level: number }; Returns: Json }
+      claim_weekly_boss_chest: { Args: never; Returns: Json }
+      complete_custom_task: {
+        Args: { p_mode?: string; p_task_id: string }
+        Returns: Json
+      }
+      complete_day: { Args: { p_mode?: string }; Returns: Json }
+      complete_onboarding: {
+        Args: { p_age: number; p_gender: string }
+        Returns: string
+      }
+      complete_task: {
+        Args: { p_mode?: string; p_task_id: number }
+        Returns: Json
+      }
       deal_boss_damage: {
         Args: { p_damage: number; p_user_id: string }
         Returns: {
@@ -1004,13 +1337,37 @@ export type Database = {
           xp_earned: number
         }[]
       }
-      get_current_champion: {
+      ensure_my_profile: {
+        Args: {
+          p_avatar_url?: string
+          p_company_code?: string
+          p_username?: string
+        }
+        Returns: {
+          is_new: boolean
+          profile_id: string
+          profile_username: string
+        }[]
+      }
+      evaluate_missed_days: { Args: { p_mode?: string }; Returns: Json }
+      get_attendance_window: {
         Args: never
+        Returns: {
+          display_time: string
+          timezone: string
+          window_end: string
+          window_start: string
+        }[]
+      }
+      get_current_champion: {
+        Args: { p_board?: string }
         Returns: {
           featured_until: string
           total_points: number
           user_id: string
           username: string
+          avatar_id: string | null
+          gender: string | null
         }[]
       }
       get_leaderboard: {
@@ -1019,11 +1376,14 @@ export type Database = {
           best_streak: number
           current_day: number
           current_streak: number
+          is_premium: boolean
           stage_level: number
           total_points: number
           user_id: string
           username: string
           weekly_points: number
+          avatar_id: string | null
+          gender: string | null
         }[]
       }
       get_or_create_weekly_boss: { Args: never; Returns: string }
@@ -1037,6 +1397,25 @@ export type Database = {
           username: string
         }[]
       }
+      grant_ad_reward: {
+        Args: { p_source?: string }
+        Returns: {
+          message: string
+          remaining_today: number
+          reward: number
+          success: boolean
+        }[]
+      }
+      grant_coins: {
+        Args: {
+          p_amount?: string
+          p_coins: number
+          p_provider_ref: string
+          p_user_id: string
+        }
+        Returns: boolean
+      }
+      has_company_access: { Args: { p_user_id?: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1045,10 +1424,25 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: never; Returns: boolean }
+      is_premium_active: { Args: { p_user_id?: string }; Returns: boolean }
+      open_chest: { Args: never; Returns: Json }
+      open_loot_box: { Args: never; Returns: Json }
       process_referral: {
         Args: { p_new_user_id: string; p_referral_code: string }
         Returns: undefined
       }
+      record_attendance: {
+        Args: { p_scanned_value: string }
+        Returns: {
+          checked_in_at: string
+          message: string
+          status: string
+          success: boolean
+        }[]
+      }
+      redeem_nass_reward: { Args: { p_reward_id: string }; Returns: Json }
+      requesting_user_id: { Args: never; Returns: string }
+      set_company_code: { Args: { p_code: string }; Returns: string }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
@@ -1069,12 +1463,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1098,11 +1492,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1123,11 +1517,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1148,11 +1542,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1165,11 +1559,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }

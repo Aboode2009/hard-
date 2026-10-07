@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from "react";
 import { bi } from "@/i18n/bi";
 import { useNavigate, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { clerkAuth } from "@/lib/clerk-auth";
 import { BottomNav } from "@/components/BottomNav";
 import { useTranslation } from "react-i18next";
 import { ChevronLeft, ChevronRight, Lock, CalendarDays, ListChecks } from "lucide-react";
@@ -141,7 +140,7 @@ const PathTasks = () => {
 
   const checkAuth = useCallback(async () => {
     try {
-      const { data: { session } } = await clerkAuth.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
 
       if (!session) {
         navigate("/auth");
@@ -188,7 +187,7 @@ const PathTasks = () => {
   if (!pathConfig) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-xl text-foreground">Path not found</div>
+        <div className="text-xl text-foreground">{bi("المسار غير موجود", "Path not found")}</div>
       </div>
     );
   }

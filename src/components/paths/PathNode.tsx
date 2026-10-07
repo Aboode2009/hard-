@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useTimers } from "@/hooks/useTimers";
 import { cn } from "@/lib/utils";
 import { Lock, Check, Star, Gift } from "lucide-react";
 import { useState } from "react";
@@ -25,11 +26,13 @@ export const PathNode = ({
   onClick,
 }: PathNodeProps) => {
   const [showTooltip, setShowTooltip] = useState(false);
+  /** Auto-cleared on unmount. */
+  const after = useTimers();
 
   const handleClick = () => {
     if (status === "locked") {
       setShowTooltip(true);
-      setTimeout(() => setShowTooltip(false), 2000);
+      after(() => setShowTooltip(false), 2000);
     }
     onClick();
   };

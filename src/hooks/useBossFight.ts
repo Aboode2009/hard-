@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { invalidateProgress } from "@/lib/query-client";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -117,6 +118,7 @@ export const useBossFight = (userId: string | null) => {
       if (error) throw error;
 
       const result = data?.[0] || { new_hp: boss.current_hp - damage, is_defeated: false, xp_earned: 0 };
+      invalidateProgress();
 
       // Update local state immediately for responsiveness
       setBoss(prev => prev ? { ...prev, current_hp: result.new_hp, is_defeated: result.is_defeated } : null);

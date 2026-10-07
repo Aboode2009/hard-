@@ -1,15 +1,25 @@
 import { useState, useEffect, useCallback } from "react";
 import { bi } from "@/i18n/bi";
+import { useRewardedAd } from "@/hooks/useRewardedAd";
+import { PointPacks } from "@/components/PointPacks";
+import { onBalanceChange } from "@/lib/premium";
+import { REWARDED_POINTS_HINT } from "@/config/ads";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
-import { clerkAuth } from "@/lib/clerk-auth";
-import { ChevronLeft, ChevronRight, Plus, Trash2, Edit, X, Upload, Package } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Trash2, Edit, X, Upload, Package, Play } from "lucide-react";
 import { DuoFreeze, DuoGem } from "@/components/icons/DuolingoIcons";
 import { ChestIcon } from "@/components/nav-icons";
 import { StoreChestAnimation, type StoreChestReward } from "@/components/cosmetics/StoreChestAnimation";
 import type { CosmeticItem, CosmeticRarity, CosmeticType } from "@/components/cosmetics/types";
 import { BottomNav } from "@/components/BottomNav";
+import { useQuery } from "@tanstack/react-query";
+import { useSessionUserId } from "@/lib/session-user";
+import { isAdminQuery, progressQuery, storeProductsQuery } from "@/lib/queries";
+import { invalidateProgress } from "@/lib/query-client";
+import { challengeRpc, rpcErrorText } from "@/lib/challenge-rpc";
+import { ProductTour } from "@/components/ProductTour";
+import { storeTourSteps, usePageTour } from "@/lib/page-tours";
 import { haptic } from "@/lib/haptics";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,37 +53,8 @@ const FREEZE_MAX = 2;
 
 const CHEST_PRICE = 50;
 
-// Guaranteed coin drop: bigger amounts are rarer (weights sum to 100)
-const COIN_TIERS: { amount: number; weight: number }[] = [
-  { amount: 10, weight: 30 },
-  { amount: 20, weight: 25 },
-  { amount: 30, weight: 18 },
-  { amount: 40, weight: 12 },
-  { amount: 50, weight: 8 },
-  { amount: 75, weight: 5 },
-  { amount: 100, weight: 2 },
-];
-
-const rollCoins = (): number => {
-  const roll = Math.random() * 100;
-  let cumulative = 0;
-  for (const tier of COIN_TIERS) {
-    cumulative += tier.weight;
-    if (roll < cumulative) return tier.amount;
-  }
-  return COIN_TIERS[0].amount;
-};
-
-// Bonus cosmetic drop (themes & badges only, NOT guaranteed)
-const BONUS_ITEM_CHANCE = 0.25;
-
-const rollRarity = (): CosmeticRarity => {
-  const roll = Math.random();
-  if (roll < 0.55) return "common";
-  if (roll < 0.82) return "rare";
-  if (roll < 0.95) return "epic";
-  return "legendary";
-};
+// Chest odds (coins 10–100, 25% cosmetic drop) live on the server in
+// open_chest(); the client only shows the result.
 
 const Store = () => {
   const { i18n } = useTranslation();
@@ -81,16 +62,37 @@ const Store = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const uid = useSessionUserId();
+  // Cached across visits; a revisit shows the balance and items at once and
+  // refreshes them in the background. The three reads run in parallel.
+  const progressQ = useQuery(progressQuery(uid));
+  const adminQ = useQuery(isAdminQuery(uid));
+  const productsQ = useQuery(storeProductsQuery());
+  const isAdmin = adminQ.data === true;
+  const products: Product[] = productsQ.data ?? [];
+  const loading = productsQ.isPending;
+  // First visit only, once the store's content is on screen.
+  const tour = usePageTour("store", !progressQ.isPending);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [uploading, setUploading] = useState(false);
 
   // Power-ups state
-  const [totalPoints, setTotalPoints] = useState(0);
-  const [streakFreezes, setStreakFreezes] = useState(0);
+  const [totalPoints, setTotalPoints] = useState(() => progressQ.data?.total_points ?? 0);
+  // A purchase is credited server-side by the WAYL webhook, so when the app
+  // comes back to the foreground EntitlementsRefresher re-reads the balance
+  // and broadcasts it here — otherwise this screen would keep showing the
+  // pre-purchase total until the user navigated away and back.
+  useEffect(() => onBalanceChange(setTotalPoints), []);
+
+  const [streakFreezes, setStreakFreezes] = useState(() => progressQ.data?.streak_freezes ?? 0);
+
+  // Follow the server row whenever it (re)loads.
+  useEffect(() => {
+    if (!progressQ.data) return;
+    setTotalPoints(progressQ.data.total_points || 0);
+    setStreakFreezes(progressQ.data.streak_freezes ?? 0);
+  }, [progressQ.data]);
   const [buying, setBuying] = useState(false);
 
   // Treasure chest state
@@ -112,47 +114,20 @@ const Store = () => {
     stock: 0,
   });
 
-  const fetchBalance = useCallback(async () => {
-    const { data: { user } } = await clerkAuth.getUser();
-    if (!user) return;
-
-    const { data } = await supabase
-      .from("challenge_progress")
-      .select("*")
-      .eq("user_id", user.id)
-      .maybeSingle();
-
-    if (data) {
-      setTotalPoints(data.total_points || 0);
-      setStreakFreezes(data.streak_freezes ?? 0);
-    }
+  const fetchBalance = useCallback(() => {
+    invalidateProgress();
   }, []);
 
-  useEffect(() => {
-    checkAdminStatus();
-    fetchProducts();
-    fetchBalance();
-  }, [fetchBalance]);
+  // "Watch an ad for points" — grant_ad_reward runs server-side; we only
+  // refresh the balance. Hidden on web, where AdMob has no implementation.
+  const { watchAd, watching, canWatchAds } = useRewardedAd("store_page", () => {
+    void fetchBalance();
+  });
 
-  const checkAdminStatus = async () => {
-    const { data: { user } } = await clerkAuth.getUser();
-    if (!user) return;
-
-    const { data } = await supabase.rpc("is_admin");
-    setIsAdmin(data === true);
+  const fetchProducts = () => {
+    void productsQ.refetch();
   };
 
-  const fetchProducts = async () => {
-    const { data, error } = await supabase
-      .from("store_products")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    if (!error && data) {
-      setProducts(data);
-    }
-    setLoading(false);
-  };
 
   const handleBuyFreeze = async () => {
     if (buying || streakFreezes >= FREEZE_MAX) return;
@@ -169,36 +144,28 @@ const Store = () => {
     }
 
     setBuying(true);
-    const { data: { user } } = await clerkAuth.getUser();
-    if (!user) {
-      setBuying(false);
-      return;
-    }
-
-    const { error } = await supabase
-      .from("challenge_progress")
-      .update({
-        total_points: totalPoints - FREEZE_PRICE,
-        streak_freezes: streakFreezes + 1,
-      })
-      .eq("user_id", user.id);
-
-    if (error) {
-      toast({
-        variant: "destructive",
-        title: bi("فشل الشراء", "Purchase failed"),
-        description: error.message,
-      });
-    } else {
-      setTotalPoints((p) => p - FREEZE_PRICE);
-      setStreakFreezes((n) => n + 1);
+    try {
+      // Price, cap and balance are all checked by the server.
+      const result = await challengeRpc.buyStreakFreeze();
+      setTotalPoints(result.total_points);
+      setStreakFreezes(result.streak_freezes);
+      invalidateProgress();
       haptic("medium");
       toast({
         title: bi("تم تجهيز درع التجميد", "Streak Freeze equipped"),
         description: bi("سيحمي ستريكك تلقائيًا عند تفويت يوم", "It will automatically protect your streak if you miss a day"),
       });
+    } catch (err) {
+      const [ar, en] = rpcErrorText(err);
+      toast({
+        variant: "destructive",
+        title: bi("فشل الشراء", "Purchase failed"),
+        description: bi(ar, en),
+      });
+      invalidateProgress();
+    } finally {
+      setBuying(false);
     }
-    setBuying(false);
   };
 
   const handleBuyChest = async () => {
@@ -207,79 +174,47 @@ const Store = () => {
     if (totalPoints < CHEST_PRICE) {
       toast({
         variant: "destructive",
-        title: bi("عملات غير كافية", "Not enough coins"),
+        title: bi("نقاط غير كافية", "Not enough points"),
         description: isArabic
-          ? `تحتاج ${CHEST_PRICE} عملة لشراء الصندوق`
-          : `You need ${CHEST_PRICE} coins to buy the chest`,
+          ? `تحتاج ${CHEST_PRICE} نقطة لشراء الصندوق`
+          : `You need ${CHEST_PRICE} points to buy the chest`,
       });
       return;
     }
 
     setOpeningChest(true);
-    const { data: { user } } = await clerkAuth.getUser();
-    if (!user) {
-      setOpeningChest(false);
-      return;
-    }
 
-    // Guaranteed coins (weighted — big wins are rare)
-    const coins = rollCoins();
+    // Every await below can throw (auth, network, RLS). Without a try/finally
+    // a single rejection left `openingChest` stuck true and the chest button
+    // permanently dead, which read to users as the app freezing.
+    try {
+      // The server charges the chest, rolls the coins and the optional
+      // cosmetic, and returns what was won.
+      const result = await challengeRpc.openChest();
+      const item: CosmeticItem | null = result.item
+        ? {
+            ...result.item,
+            type: result.item.type as CosmeticType,
+            rarity: result.item.rarity as CosmeticRarity,
+          }
+        : null;
 
-    // Bonus theme/badge drop (luck only)
-    let item: CosmeticItem | null = null;
-    if (Math.random() < BONUS_ITEM_CHANCE) {
-      const rarity = rollRarity();
-      const { data: items } = await supabase
-        .from("cosmetic_items")
-        .select("*")
-        .eq("rarity", rarity)
-        .eq("is_active", true)
-        .in("type", ["theme", "badge"]);
-
-      if (items && items.length > 0) {
-        const { data: inv } = await supabase
-          .from("user_inventory")
-          .select("item_id")
-          .eq("user_id", user.id);
-        const owned = new Set(inv?.map((i) => i.item_id) || []);
-        let pool = items.filter((i) => !owned.has(i.id));
-        if (pool.length === 0) pool = items;
-        const selected = pool[Math.floor(Math.random() * pool.length)];
-
-        const { error: invError } = await supabase
-          .from("user_inventory")
-          .insert({ user_id: user.id, item_id: selected.id });
-
-        if (!invError) {
-          item = {
-            ...selected,
-            type: selected.type as CosmeticType,
-            rarity: selected.rarity as CosmeticRarity,
-          };
-        }
-      }
-    }
-
-    // Pay for the chest and bank the won coins in one update
-    const { error } = await supabase
-      .from("challenge_progress")
-      .update({ total_points: totalPoints - CHEST_PRICE + coins })
-      .eq("user_id", user.id);
-
-    if (error) {
+      setTotalPoints(result.total_points);
+      invalidateProgress();
+      setChestReward({ coins: result.coins, item });
+      setShowChestAnim(true);
+    } catch (err) {
+      console.error("Chest purchase failed:", err);
+      const [ar, en] = rpcErrorText(err);
       toast({
         variant: "destructive",
         title: bi("فشل الشراء", "Purchase failed"),
-        description: error.message,
+        description: bi(ar, en),
       });
+    } finally {
+      // Always released, so the button can never be left disabled.
       setOpeningChest(false);
-      return;
     }
-
-    setTotalPoints((p) => p - CHEST_PRICE + coins);
-    setChestReward({ coins, item });
-    setShowChestAnim(true);
-    setOpeningChest(false);
   };
 
   const resetForm = () => {
@@ -458,16 +393,43 @@ const Store = () => {
             {bi("المتجر", "Store")}
           </h1>
 
-          {/* Points balance */}
-          <div
-            className="duo-card flex items-center gap-1.5 px-3 h-11"
-            style={{ borderRadius: "1rem" }}
-          >
-            <DuoGem className="w-5 h-5" />
-            <span className="font-extrabold text-base" style={{ color: "#1CB0F6" }}>
-              {totalPoints}
-            </span>
+          {/* Balance — the app has exactly one currency. */}
+          <div className="flex items-center gap-2">
+            <div
+              className="duo-card flex items-center gap-1.5 px-2.5 h-11"
+              style={{ borderRadius: "1rem" }}
+              data-tour="store-balance"
+            >
+              <DuoGem className="w-5 h-5" />
+              <span className="font-extrabold text-sm" style={{ color: "#1CB0F6" }}>
+                {totalPoints}
+              </span>
+            </div>
           </div>
+        </div>
+
+        {/* Rewarded ad — native only; the server decides the actual reward */}
+        {canWatchAds && (
+          <button
+            type="button"
+            onClick={watchAd}
+            disabled={watching}
+            className="duo-press mb-8 flex h-14 w-full items-center justify-center gap-2 rounded-2xl text-base font-extrabold text-white disabled:opacity-60"
+            style={{ background: "#FFC800", boxShadow: "0 4px 0 #D9A800" }}
+          >
+            <Play className="h-5 w-5" strokeWidth={3} />
+            {watching
+              ? bi("جارٍ تشغيل الإعلان…", "Playing ad…")
+              : bi(
+                  `شاهد إعلان واحصل على ${REWARDED_POINTS_HINT} نقطة`,
+                  `Watch an ad for ${REWARDED_POINTS_HINT} points`,
+                )}
+          </button>
+        )}
+
+        {/* ===== Buy points (WAYL checkout) ===== */}
+        <div data-tour="store-packs">
+          <PointPacks className="mb-8" />
         </div>
 
         {/* ===== Power-Ups (Duolingo style) ===== */}
@@ -478,7 +440,7 @@ const Store = () => {
           <div className="h-0.5 mt-3 mb-5 rounded-full" style={{ background: "hsl(var(--duo-border))" }} />
 
           {/* Streak Freeze item */}
-          <div className="flex items-start gap-4">
+          <div className="flex items-start gap-4" data-tour="store-freeze">
             <DuoFreeze className="w-20 h-20 flex-shrink-0" />
 
             <div className="flex-1 min-w-0">
@@ -498,7 +460,7 @@ const Store = () => {
                     color: "hsl(var(--duo-muted))",
                   }}
                 >
-                  {streakFreezes} / {FREEZE_MAX} {bi("مُجَهَّز", "EQUIPPED")}
+                  <span dir="ltr">{streakFreezes} / {FREEZE_MAX}</span> {bi("مُجَهَّز", "EQUIPPED")}
                 </span>
               </div>
 
@@ -529,7 +491,7 @@ const Store = () => {
           </div>
 
           {/* Treasure Chest item */}
-          <div className="flex items-start gap-4 mt-7">
+          <div className="flex items-start gap-4 mt-7" data-tour="store-chest">
             <ChestIcon className="w-20 h-20 flex-shrink-0" />
 
             <div className="flex-1 min-w-0">
@@ -537,7 +499,7 @@ const Store = () => {
                 {bi("صندوق الكنز", "Treasure Chest")}
               </h3>
               <p className="text-sm font-medium mt-1 leading-relaxed" style={{ color: "hsl(var(--duo-muted))" }}>
-                {bi("عملات مضمونة من 10 إلى 100 — وكلما كبر المبلغ قلّ حظه، مع فرصة للفوز بثيمات وشارات نادرة.", "Guaranteed 10–100 coins — bigger wins are rarer, plus a chance at rare themes and badges.")}
+                {bi("نقاط مضمونة من 10 إلى 100 — وكلما كبر المبلغ قلّ حظه، مع فرصة للفوز بثيمات وشارات نادرة.", "Guaranteed 10–100 points — bigger wins are rarer, plus a chance at rare themes and badges.")}
               </p>
 
               <button
@@ -849,6 +811,8 @@ const Store = () => {
       />
 
       <BottomNav />
+
+      <ProductTour steps={storeTourSteps()} run={tour.run} onDone={tour.onDone} />
     </div>
   );
 };

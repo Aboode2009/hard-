@@ -109,7 +109,7 @@ export const NeedsAssessment = ({ onComplete, onSkip }: NeedsAssessmentProps) =>
         </div>
 
         {/* Question Card */}
-        <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+        <Card className="bg-white/15 border-white/20">
           <CardContent className="p-6 space-y-6">
             {/* Icon */}
             <div className="flex justify-center">

@@ -1,7 +1,5 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { ClerkProvider } from "@clerk/react";
-import { arSA } from "@clerk/localizations";
 import App from "./App.tsx";
 import { ErrorBoundary } from "./components/ErrorBoundary.tsx";
 import { ProfileBootstrap } from "./components/ProfileBootstrap.tsx";
@@ -13,30 +11,28 @@ import "@fontsource/baloo-bhaijaan-2/700.css";
 import "@fontsource/baloo-bhaijaan-2/800.css";
 import "./index.css";
 import "./i18n/config";
+import {
+  installCompanyModeSignOutCleanup,
+  redirectToCompanyBeforeFirstPaint,
+} from "./lib/company-mode";
 
-const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+/**
+ * Authentication is Supabase's, end to end. There is no auth provider to wrap
+ * the tree in: the Supabase client owns the session, persists it, refreshes it
+ * and exposes it through `supabase.auth`, so components just ask it directly.
+ */
+console.info("[boot] origin=%s", window.location.origin);
 
-if (!PUBLISHABLE_KEY) {
-  // Surfaces a clear message instead of a cryptic Clerk runtime error.
-  throw new Error("Missing VITE_CLERK_PUBLISHABLE_KEY. Add it to your .env file.");
-}
-
-// Clerk's prebuilt forms ship their own strings; use the Arabic pack when the
-// app language is Arabic. Language switches trigger a full reload, so a static
-// read here stays in sync (mirrors the detection in i18n/config).
-const isArabic = (localStorage.getItem("language") || navigator.language || "en").startsWith("ar");
+// Company users open straight into company mode: the URL is corrected before
+// React renders anything, so the personal challenge never flashes first.
+redirectToCompanyBeforeFirstPaint();
+installCompanyModeSignOutCleanup();
 
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <ErrorBoundary>
-      <ClerkProvider
-        publishableKey={PUBLISHABLE_KEY}
-        afterSignOutUrl="/auth"
-        localization={isArabic ? arSA : undefined}
-      >
-        <ProfileBootstrap />
-        <App />
-      </ClerkProvider>
+      <ProfileBootstrap />
+      <App />
     </ErrorBoundary>
   </React.StrictMode>
 );

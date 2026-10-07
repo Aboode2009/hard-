@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>العودة إلى التطبيق…</title>
+    <style>
+      :root { color-scheme: light dark; }
+      body {
+        margin: 0;
+        min-height: 100dvh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        padding: 1.5rem;
+        text-align: center;
+        font-family: 'SF Arabic', 'IBM Plex Sans Arabic', -apple-system,
+          BlinkMacSystemFont, system-ui, sans-serif;
+        background: #ffffff;
+        color: #1a1a1a;
+      }
+      @media (prefers-color-scheme: dark) {
+        body { background: #10161a; color: #f5f5f5; }
+      }
+      .spinner {
+        width: 2.25rem;
+        height: 2.25rem;
+        border: 3px solid rgba(128, 128, 128, 0.3);
+        border-top-color: #1cb0f6;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      @media (prefers-reduced-motion: reduce) {
+        .spinner { animation: none; }
+      }
+      p { margin: 0; font-weight: 600; }
+      .hint { font-size: 0.875rem; opacity: 0.7; font-weight: 500; }
+      a {
+        margin-top: 0.5rem;
+        color: #1cb0f6;
+        font-weight: 700;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!--
+      OAuth bridge for the native app -- a FALLBACK, not the default path.
+
+      Native sign-in normally redirects straight to capacitor://localhost and
+      Android hands it to the app. If some device's browser refuses to follow a
+      redirect into a custom scheme, point `redirectTo` at OAUTH_BRIDGE_URL
+      (src/config/auth.ts) instead: Supabase then returns the browser to this
+      https page, which forwards the same parameters into the same deep link.
+
+      Deliberately a static file with no framework and no Supabase SDK: if the
+      SDK booted here it would try to exchange the PKCE code in the browser,
+      where the verifier does not exist, and the app would be left with nothing.
+    -->
+    <div class="spinner" role="status" aria-label="جارٍ التحويل"></div>
+    <p>جارٍ العودة إلى التطبيق…</p>
+    <p class="hint">إذا لم يفتح التطبيق تلقائياً، اضغط الزر بالأسفل.</p>
+    <a id="manual" href="#">فتح التطبيق</a>
+
+    <script>
+      (function () {
+        var DEEP_LINK = "capacitor://localhost";
+        // Forward both halves of the URL untouched. The PKCE flow puts `code`
+        // in the query string; errors and any implicit-flow tokens arrive in
+        // the fragment. The app parses them, not this page.
+        var target = DEEP_LINK + (window.location.search || "") + (window.location.hash || "");
+
+        document.getElementById("manual").href = target;
+
+        // `replace` so the browser's back button does not land the user on a
+        // spent callback URL.
+        window.location.replace(target);
+      })();
+    </script>
+  </body>
+</html>

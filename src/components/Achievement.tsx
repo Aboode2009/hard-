@@ -1,6 +1,7 @@
 import { LucideIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { ProgressFill } from "@/components/ui/progress-fill";
 
 interface AchievementProps {
   icon: LucideIcon;
@@ -77,12 +78,11 @@ export const Achievement = ({
                   <span>{progress}%</span>
                 </div>
                 <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                  <div
-                    className="h-full transition-all duration-500 rounded-full"
-                    style={{
-                      width: `${progress}%`,
-                      background: `linear-gradient(90deg, ${color}, ${color}dd)`,
-                    }}
+                  <ProgressFill
+                    value={progress}
+                    className="rounded-full"
+                    duration={0.5}
+                    style={{ background: `linear-gradient(90deg, ${color}, ${color}dd)` }}
                   />
                 </div>
               </div>

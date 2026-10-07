@@ -1,5 +1,6 @@
 import { Trophy, Flame } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { ProgressFill } from "@/components/ui/progress-fill";
 
 interface ChallengeHeaderProps {
   currentDay: number;
@@ -26,10 +27,7 @@ export const ChallengeHeader = ({ currentDay, totalDays }: ChallengeHeaderProps)
         {/* Progress Bar */}
         <div className="w-full max-w-md space-y-3">
           <div className="relative h-2 bg-muted rounded-full overflow-hidden">
-            <div 
-              className="absolute inset-y-0 left-0 bg-primary rounded-full transition-all duration-1000 ease-out"
-              style={{ width: `${progress}%` }}
-            />
+            <ProgressFill value={progress} className="bg-primary rounded-full" duration={1} />
           </div>
           
           <div className="text-sm text-muted-foreground font-medium">

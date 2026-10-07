@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useSessionUserId } from "@/lib/session-user";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
-import { clerkAuth } from "@/lib/clerk-auth";
 import { 
   RadarChart, 
   PolarGrid, 
@@ -31,8 +32,6 @@ type TimePeriod = 7 | 30 | 90;
 export const WheelOfLife = ({ userId }: WheelOfLifeProps) => {
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === 'ar';
-  const [data, setData] = useState<LifeAreaData[]>([]);
-  const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState<TimePeriod>(30);
 
   const lifeAreas = [
@@ -46,67 +45,44 @@ export const WheelOfLife = ({ userId }: WheelOfLifeProps) => {
     { name: 'skills', nameAr: 'مهارة', color: '#06b6d4' },
   ];
 
-  useEffect(() => {
-    fetchData();
-  }, [userId, period]);
+  const sessionUid = useSessionUserId();
+  const targetUserId = userId || sessionUid;
 
-  const fetchData = async () => {
-    setLoading(true);
-    
-    try {
-      const { data: { session } } = await clerkAuth.getSession();
-      const targetUserId = userId || session?.user?.id;
-      
-      if (!targetUserId) {
-        setLoading(false);
-        return;
-      }
-
-      // Calculate date range
+  // Completions per life area, cached per user and period. Only the counts are
+  // cached; labels are applied below, so a language switch needs no refetch.
+  const { data: areaCount, isPending: loading } = useQuery({
+    queryKey: ["wheel", targetUserId, period],
+    enabled: !!targetUserId,
+    queryFn: async (): Promise<Record<string, number>> => {
       const endDate = new Date();
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - period);
 
-      // Fetch task completions for the period
-      const { data: completions } = await supabase
+      const { data: completions, error } = await supabase
         .from('task_completions')
-        .select('*, life_area_tags(name)')
-        .eq('user_id', targetUserId)
+        .select('life_area_tags(name)')
+        .eq('user_id', targetUserId!)
         .gte('completed_at', startDate.toISOString())
         .lte('completed_at', endDate.toISOString());
+      if (error) throw error;
 
-      // Count completions per area
-      const areaCount: Record<string, number> = {};
-      lifeAreas.forEach(area => {
-        areaCount[area.name] = 0;
+      const counts: Record<string, number> = {};
+      (completions as { life_area_tags: { name: string } | null }[] | null)?.forEach((c) => {
+        const areaName = c.life_area_tags?.name;
+        if (areaName) counts[areaName] = (counts[areaName] ?? 0) + 1;
       });
+      return counts;
+    },
+  });
 
-      completions?.forEach((completion: any) => {
-        const areaName = completion.life_area_tags?.name;
-        if (areaName && areaCount[areaName] !== undefined) {
-          areaCount[areaName]++;
-        }
-      });
-
-      // Calculate max possible (assuming 1 task per area per day)
-      const maxPossible = period;
-
-      // Convert to chart data
-      const chartData: LifeAreaData[] = lifeAreas.map(area => ({
-        area: isArabic ? area.nameAr : area.name,
-        areaAr: area.nameAr,
-        value: Math.min(100, Math.round((areaCount[area.name] / maxPossible) * 100)),
-        fullMark: 100,
-        color: area.color,
-      }));
-
-      setData(chartData);
-    } catch (error) {
-      console.error('Error fetching wheel data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Max possible assumes one task per area per day.
+  const data: LifeAreaData[] = lifeAreas.map((area) => ({
+    area: isArabic ? area.nameAr : area.name,
+    areaAr: area.nameAr,
+    value: Math.min(100, Math.round(((areaCount?.[area.name] ?? 0) / period) * 100)),
+    fullMark: 100,
+    color: area.color,
+  }));
 
   if (loading) {
     return (

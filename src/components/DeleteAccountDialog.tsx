@@ -3,7 +3,6 @@ import { bi } from "@/i18n/bi";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { clerkAuth } from "@/lib/clerk-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -36,7 +35,7 @@ export const DeleteAccountDialog = () => {
 
     setLoading(true);
     try {
-      const { data: { session } } = await clerkAuth.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error("Not authenticated");
 
       // Call edge function to properly delete the account (including auth.users)
@@ -55,7 +54,7 @@ export const DeleteAccountDialog = () => {
       }
 
       // Sign out locally
-      await clerkAuth.signOut();
+      await supabase.auth.signOut();
 
       toast({
         title: bi("تم حذف الحساب", "Account Deleted"),

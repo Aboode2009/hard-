@@ -150,7 +150,7 @@ export const SimpleWeekCalendar = ({
                 isTodayDate
                   ? "border-2 border-[#1CB0F6] bg-[#1CB0F61e] text-[#1CB0F6] shadow-[0_3px_0_hsl(var(--duo-edge))]"
                   : isCompleted
-                    ? "bg-[#58CC02] text-white shadow-[0_3px_0_#45A302]"
+                    ? "bg-[hsl(var(--duo-accent))] text-white shadow-[0_3px_0_hsl(var(--duo-accent-edge))]"
                     : isSelected
                       ? "border-2 border-[#1CB0F6] bg-[hsl(var(--duo-surface))] text-[#1CB0F6] shadow-[0_3px_0_hsl(var(--duo-edge))]"
                       : "border-2 border-[hsl(var(--duo-border))] bg-[hsl(var(--duo-surface))] text-[hsl(var(--duo-text))] shadow-[0_3px_0_hsl(var(--duo-edge))]"

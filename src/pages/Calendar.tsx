@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { clerkAuth } from "@/lib/clerk-auth";
 import { Navbar } from "@/components/Navbar";
 import { BottomNav } from "@/components/BottomNav";
 import { WheelOfLife } from "@/components/WheelOfLife";
@@ -40,7 +39,7 @@ const Calendar = () => {
 
   const checkAuth = async () => {
     try {
-      const { data: { session } } = await clerkAuth.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
 
       if (!session) {
         navigate("/auth");

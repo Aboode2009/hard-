@@ -1,131 +1,80 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useSessionUserId } from "@/lib/session-user";
+import { companyCodeQuery, nassChampionQuery, nassLeaderboardQuery } from "@/lib/queries";
 import { bi } from "@/i18n/bi";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { clerkAuth } from "@/lib/clerk-auth";
-import { Flame, Crown, Star, Building2, ChevronLeft, ChevronRight } from "lucide-react";
+import { clearCompanyMode } from "@/lib/company-mode";
+import { motion } from "framer-motion";
+import { Building2, CheckCircle2, ChevronLeft, ChevronRight, Crown, Heart, PhoneOff, Target, TrendingUp } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { NassBottomNav } from "@/components/NassBottomNav";
+import { RankChangeMessage, useRankChange } from "@/components/RankChangeCelebration";
+import { ChampionBanner, EarnRows, LeaderboardRow, LeagueHeader } from "@/components/LeaderboardParts";
 
-interface LeaderboardEntry {
-  rank: number;
-  username: string;
-  user_id: string;
-  current_streak: number;
-  best_streak: number;
-  current_day: number;
-  total_points: number;
-  weekly_points: number;
-}
-
-// Solid Duolingo-palette rank badges (gold / silver / bronze) with a small ledge.
-const RANK_BADGE: Record<number, { face: string; edge: string }> = {
-  1: { face: "#FFC800", edge: "#D9A800" },
-  2: { face: "#93A8B4", edge: "#76909F" },
-  3: { face: "#FF9600", edge: "#CC7800" },
-};
-
+/**
+ * The NASS company board. Same look and rules as the public leaderboard
+ * (components/LeaderboardParts.tsx): leagues by weekly points, last week's
+ * champion with the crown and the champion frame (run_weekly_rollover crowns
+ * one per board), the promotion zone and the weekly reset — only NASS
+ * employees on it.
+ */
 const NassLeaderboard = () => {
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const navigate = useNavigate();
   const { i18n } = useTranslation();
-  const isArabic = i18n.language === 'ar';
+  const isArabic = i18n.language === "ar";
+  const currentUserId = useSessionUserId();
+
+  // Cached: a revisit paints the last board at once and refreshes it behind.
+  // The membership check runs alongside it rather than before it.
+  const boardQ = useQuery(nassLeaderboardQuery());
+  const championQ = useQuery(nassChampionQuery());
+  const codeQ = useQuery(companyCodeQuery(currentUserId));
+  const leaderboard = boardQ.data ?? [];
+  const champion = championQ.data ?? null;
+  const loading = boardQ.isPending;
 
   useEffect(() => {
-    checkAuth();
-    fetchNassLeaderboard();
-  }, []);
+    if (!currentUserId) navigate("/auth");
+  }, [currentUserId, navigate]);
 
-  const checkAuth = async () => {
-    try {
-      const { data: { user } } = await clerkAuth.getUser();
-      if (!user) {
-        navigate("/auth");
-        return;
-      }
-      setCurrentUserId(user.id);
+  // Only a definite non-NASS answer sends the user back (a failed read proves
+  // nothing), and it forgets company mode on this device first.
+  useEffect(() => {
+    if (!currentUserId || !codeQ.isSuccess || codeQ.data === "NASS") return;
+    clearCompanyMode(currentUserId);
+    navigate("/");
+  }, [currentUserId, codeQ.isSuccess, codeQ.data, navigate]);
 
-      // Check if user is NASS employee
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("company_code")
-        .eq("id", user.id)
-        .maybeSingle();
+  // Climb / slip since the last visit to the company board, on fresh data only.
+  const rankChange = useRankChange(
+    "company",
+    currentUserId,
+    leaderboard,
+    boardQ.isSuccess && !boardQ.isFetching,
+    false,
+  );
 
-      if (profile?.company_code !== "NASS") {
-        navigate("/");
-        return;
-      }
-    } catch (error) {
-      console.error("Error checking auth:", error);
-    }
-  };
+  const myWeekly = leaderboard.find((e) => e.user_id === currentUserId)?.weekly_points ?? 0;
 
-  const fetchNassLeaderboard = async () => {
-    try {
-      // First get all NASS users
-      const { data: nassProfiles, error: profilesError } = await supabase
-        .from("profiles")
-        .select("id, username")
-        .eq("company_code", "NASS");
-
-      if (profilesError) throw profilesError;
-
-      if (!nassProfiles || nassProfiles.length === 0) {
-        setLeaderboard([]);
-        setLoading(false);
-        return;
-      }
-
-      const nassUserIds = nassProfiles.map(p => p.id);
-
-      // Get challenge progress for NASS users
-      const { data: progressData, error: progressError } = await supabase
-        .from("challenge_progress")
-        .select("user_id, current_streak, best_streak, current_day, total_points, weekly_points")
-        .in("user_id", nassUserIds);
-
-      if (progressError) throw progressError;
-
-      // Combine data
-      const leaderboardData = (progressData || [])
-        .map((progress) => {
-          const profile = nassProfiles.find(p => p.id === progress.user_id);
-          return {
-            user_id: progress.user_id,
-            username: profile?.username || "Anonymous",
-            current_streak: progress.current_streak,
-            best_streak: progress.best_streak,
-            current_day: progress.current_day,
-            total_points: progress.total_points,
-            weekly_points: progress.weekly_points,
-          };
-        })
-        .sort((a, b) => b.weekly_points - a.weekly_points)
-        .map((entry, index) => ({
-          ...entry,
-          rank: index + 1,
-        }));
-
-      setLeaderboard(leaderboardData);
-    } catch (error) {
-      console.error("Error fetching NASS leaderboard:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const topUser = leaderboard.length > 0 ? leaderboard[0] : null;
+  const earnRows = [
+    { icon: CheckCircle2, color: "#58CC02", text: bi("أكمل مهمة = نقطة واحدة", "Complete a task = 1 point") },
+    { icon: Heart, color: "#FF4B4B", text: bi("كلمة طيبة لزميل", "A kind word to a colleague") },
+    { icon: Target, color: "#CE82FF", text: bi("التركيز 45 دقيقة × 3", "Focus 45 min × 3") },
+    { icon: PhoneOff, color: "#FF9600", text: bi("بدون وسائل تواصل", "No social media") },
+    { icon: Crown, color: "#FFC800", text: bi("أعلى نقاط الأسبوع يحصل على إطار البطل", "Highest weekly points wins the champion frame") },
+    { icon: TrendingUp, color: "#1CB0F6", text: bi("تُصفَّر النقاط الأسبوعية كل أسبوع", "Weekly points reset every week") },
+  ];
 
   return (
-    <div className="duo-page min-h-screen bg-background pb-24" dir={bi("rtl", "ltr")}>
-      <div className="max-w-2xl mx-auto px-4 pt-5">
+    <div className="duo-page min-h-screen bg-background pb-28" dir={bi("rtl", "ltr")}>
+      <div className="max-w-lg mx-auto px-4 pt-5">
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
           <button
+            type="button"
             onClick={() => navigate("/nass")}
+            aria-label={bi("رجوع", "Back")}
             className="duo-card duo-press w-11 h-11 flex items-center justify-center"
             style={{ borderRadius: "1rem" }}
           >
@@ -133,159 +82,75 @@ const NassLeaderboard = () => {
               ? <ChevronRight className="w-6 h-6" style={{ color: "hsl(var(--duo-text))" }} strokeWidth={2.5} />
               : <ChevronLeft className="w-6 h-6" style={{ color: "hsl(var(--duo-text))" }} strokeWidth={2.5} />}
           </button>
-          <div className="flex items-center gap-2">
-            <Building2 className="w-6 h-6" style={{ color: "#1CB0F6" }} strokeWidth={2.5} />
-            <h1 className="text-xl font-extrabold" style={{ color: "hsl(var(--duo-text))" }}>
-              {bi("لوحة صدارة NASS", "NASS Leaderboard")}
-            </h1>
-          </div>
+          <h1 className="text-2xl font-extrabold" style={{ color: "hsl(var(--duo-text))" }}>
+            {bi("المتصدرين", "Leaderboard")}
+          </h1>
           <div className="w-11" />
         </div>
 
-        <div className="space-y-6">
-          {/* Champion Banner */}
-          {topUser && topUser.weekly_points > 0 && (
-            <div
-              className="rounded-2xl p-4 flex items-center gap-4"
-              style={{ background: "#1CB0F6", boxShadow: "0 4px 0 #0F8ED9" }}
-            >
-              {/* Crown Icon */}
-              <div className="relative flex-shrink-0">
-                <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "rgba(255,255,255,0.3)" }}>
-                  <Crown className="w-8 h-8 text-white" strokeWidth={2.5} />
-                </div>
-                <div
-                  className="absolute -top-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center"
-                  style={{ background: "#FFC800", boxShadow: "0 2px 0 #D9A800" }}
-                >
-                  <span className="text-xs font-extrabold text-white">1</span>
-                </div>
-              </div>
-
-              {/* Champion Info */}
-              <div className="flex-1 min-w-0">
-                <p className="text-[11px] font-extrabold tracking-wider text-white/90 uppercase">
-                  {bi("🏆 نجم الأسبوع", "🏆 Star of the Week")}
-                </p>
-                <h3 className="text-xl font-extrabold text-white leading-tight truncate">
-                  {topUser.username}
-                </h3>
-                <div className="flex items-center gap-1.5 mt-1">
-                  <Star className="w-4 h-4 text-white fill-white" />
-                  <span className="text-sm font-extrabold text-white">
-                    {topUser.weekly_points} {bi("نقطة", "points")}
-                  </span>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {loading ? (
-            <div className="text-center py-12 font-bold" style={{ color: "hsl(var(--duo-muted))" }}>
-              {bi("جاري التحميل...", "Loading...")}
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {leaderboard.map((entry) => {
-                const isCurrentUser = entry.user_id === currentUserId;
-                const isTop = entry.rank === 1 && entry.weekly_points > 0;
-                const badge = RANK_BADGE[entry.rank];
-
-                return (
-                  <div
-                    key={entry.rank}
-                    className="duo-card p-4"
-                    style={isCurrentUser ? { background: "#1CB0F60D", borderColor: "#1CB0F650" } : undefined}
-                  >
-                    <div className="flex items-center gap-4">
-                      {/* Rank Badge */}
-                      <div
-                        className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center font-extrabold"
-                        style={badge
-                          ? { background: badge.face, boxShadow: `0 3px 0 ${badge.edge}`, color: "#fff" }
-                          : { background: "hsl(var(--duo-border))", color: "hsl(var(--duo-muted))" }}
-                      >
-                        {isTop ? (
-                          <Crown className="w-5 h-5" strokeWidth={2.5} />
-                        ) : (
-                          entry.rank
-                        )}
-                      </div>
-
-                      {/* User Info */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span
-                            className="font-extrabold text-base truncate"
-                            style={{ color: isTop ? "#1CB0F6" : "hsl(var(--duo-text))" }}
-                          >
-                            {entry.username}
-                          </span>
-                          {isCurrentUser && (
-                            <span
-                              className="text-[10px] font-extrabold text-white px-2 py-0.5 rounded-full flex-shrink-0"
-                              style={{ background: "#1CB0F6" }}
-                            >
-                              {bi("أنت", "You")}
-                            </span>
-                          )}
-                          {isTop && (
-                            <Crown className="w-4 h-4 flex-shrink-0" style={{ color: "#FFC800" }} strokeWidth={2.5} />
-                          )}
-                        </div>
-                        <div className="text-sm font-semibold" style={{ color: "hsl(var(--duo-muted))" }}>
-                          {isArabic ? `اليوم ${entry.current_day}` : `Day ${entry.current_day}`}
-                        </div>
-                      </div>
-
-                      {/* Points & Stats */}
-                      <div className="text-right space-y-1">
-                        <div className="flex items-center gap-1.5 justify-end">
-                          <Star className="w-4 h-4" style={{ color: "#1CB0F6", fill: "#1CB0F6" }} />
-                          <span className="font-extrabold text-lg" style={{ color: "#1CB0F6" }}>
-                            {entry.weekly_points}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1 text-xs font-semibold justify-end" style={{ color: "hsl(var(--duo-muted))" }}>
-                          <Flame className="w-3 h-3" style={{ color: "#FF9600" }} strokeWidth={2.5} />
-                          <span>{entry.current_streak}</span>
-                          <span className="mx-1">|</span>
-                          <span>{bi("الإجمالي:", "Total:")} {entry.total_points}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-          {!loading && leaderboard.length === 0 && (
-            <div className="duo-card p-8 flex flex-col items-center text-center">
-              <Building2 className="w-12 h-12 mx-auto mb-3" style={{ color: "hsl(var(--duo-muted))" }} strokeWidth={2} />
-              <p className="font-bold" style={{ color: "hsl(var(--duo-muted))" }}>
-                {bi("لا يوجد موظفين نشطين بعد", "No active employees yet")}
-              </p>
-            </div>
-          )}
-
-          {/* Points Info */}
-          <div className="duo-card p-4">
-            <h3 className="font-extrabold mb-2 flex items-center gap-2" style={{ color: "hsl(var(--duo-text))" }}>
-              <Star className="w-4 h-4" style={{ color: "#FFC800", fill: "#FFC800" }} />
-              {bi("كيف تكسب النقاط؟", "How to earn points?")}
-            </h3>
-            <ul className="text-sm font-semibold space-y-1" style={{ color: "hsl(var(--duo-muted))" }}>
-              <li>• {bi("أكمل مهمة = نقطة واحدة", "Complete a task = 1 point")}</li>
-              <li>• {bi("كلمة طيبة لزميل ✓", "Kind word to colleague ✓")}</li>
-              <li>• {bi("التركيز 45 دقيقة × 3 ✓", "Focus 45 min × 3 ✓")}</li>
-              <li>• {bi("بدون وسائل تواصل ✓", "No social media ✓")}</li>
-            </ul>
-          </div>
+        {/* Which board this is */}
+        <div className="flex justify-center -mt-2 mb-4">
+          <span
+            className="inline-flex items-center gap-1.5 h-[30px] px-3 rounded-full text-[13px] font-extrabold"
+            style={{ background: "#1CB0F61f", color: "#1899D6" }}
+          >
+            <Building2 className="w-4 h-4" strokeWidth={2.6} />
+            {bi("لوحة موظفي ناس", "NASS employees")}
+          </span>
         </div>
+
+        <LeagueHeader weeklyPoints={myWeekly} isArabic={isArabic} />
+
+        {champion && <ChampionBanner champion={champion} />}
+
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-16 gap-3">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full"
+            />
+            <span className="font-bold" style={{ color: "hsl(var(--duo-muted))" }}>
+              {bi("جاري التحميل...", "Loading...")}
+            </span>
+          </div>
+        ) : (
+          <div>
+            {leaderboard.map((entry, index) => (
+              <LeaderboardRow
+                key={entry.user_id}
+                entry={entry}
+                index={index}
+                isCurrentUser={entry.user_id === currentUserId}
+                isArabic={isArabic}
+                showPromotion={entry.rank === 3 && leaderboard.length > 3}
+              />
+            ))}
+          </div>
+        )}
+
+        {!loading && boardQ.isError && (
+          <div className="rounded-xl border-2 border-destructive/40 bg-destructive/10 p-4 text-sm">
+            <p className="font-bold text-destructive">
+              {bi("تعذّر تحميل المتصدرين", "Failed to load leaderboard")}
+            </p>
+          </div>
+        )}
+
+        {!loading && !boardQ.isError && leaderboard.length === 0 && (
+          <div className="duo-card p-8 flex flex-col items-center text-center mt-2">
+            <Building2 className="w-10 h-10 mb-3" style={{ color: "hsl(var(--duo-muted))" }} strokeWidth={2} />
+            <p className="font-bold" style={{ color: "hsl(var(--duo-muted))" }}>
+              {bi("لا يوجد موظفين نشطين بعد", "No active employees yet")}
+            </p>
+          </div>
+        )}
+
+        <EarnRows rows={earnRows} />
       </div>
 
       <NassBottomNav />
+      <RankChangeMessage message={rankChange.message} onDismiss={rankChange.dismiss} />
     </div>
   );
 };

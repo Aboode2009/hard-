@@ -1,0 +1,96 @@
+import { motion } from "framer-motion";
+import type { BossArtProps } from "./types";
+
+/**
+ * BossDragon artwork.
+ *
+ * GENERATED from src/assets/boss-dragon.svg by scripts/generate-boss-art.cjs.
+ * Edit the SVG and re-run the script rather than editing this file.
+ *
+ * Named groups are `motion.g` elements so the shared controller in
+ * BossCreature.tsx can animate body, head, tail, wings, eyes and shadow
+ * independently. All four bosses expose the same group names.
+ */
+export const BossDragon = ({ groups = {} }: BossArtProps) => (
+  <>
+    <defs>
+        <linearGradient id="drScale" x1="0.3" y1="0" x2="0.7" y2="1">
+          <stop offset="0%" stopColor="#3E1020"/><stop offset="55%" stopColor="#24070F"/><stop offset="100%" stopColor="#120307"/>
+        </linearGradient>
+        <linearGradient id="drHead" x1="0.2" y1="0" x2="0.8" y2="1">
+          <stop offset="0%" stopColor="#4A1327"/><stop offset="60%" stopColor="#2A0812"/><stop offset="100%" stopColor="#160409"/>
+        </linearGradient>
+        <linearGradient id="drHorn" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#C9BCA8"/><stop offset="100%" stopColor="#6B5B47"/>
+        </linearGradient>
+        <linearGradient id="drWing" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#2A0812"/><stop offset="100%" stopColor="#0C0206"/>
+        </linearGradient>
+        <radialGradient id="drEyeGlow" cx="0.5" cy="0.5" r="0.5">
+          <stop offset="0%" stopColor="#FF3B30" stopOpacity="0.95"/><stop offset="60%" stopColor="#FF3B30" stopOpacity="0.28"/><stop offset="100%" stopColor="#FF3B30" stopOpacity="0"/>
+        </radialGradient>
+        <radialGradient id="drShadow" cx="0.5" cy="0.5" r="0.5">
+          <stop offset="0%" stopColor="#000" stopOpacity="0.55"/><stop offset="100%" stopColor="#000" stopOpacity="0"/>
+        </radialGradient>
+      </defs>
+
+      <motion.ellipse id="bsGroundShadow" {...(groups.shadow ?? {})} cx="200" cy="392" rx="118" ry="20" fill="url(#drShadow)"/>
+
+      <motion.g id="bsTail" {...(groups.tail ?? {})}>
+        <path d="M268 316 C 322 330, 366 302, 366 258 C 366 226, 342 208, 320 217 C 302 224, 300 246, 313 254"
+              fill="none" stroke="#24070F" strokeWidth="26" strokeLinecap="round"/>
+        <path d="M313 254 l 26 -20 l -6 22 l 22 -6 l -18 22 Z" fill="url(#drHorn)"/>
+      </motion.g>
+
+      <motion.g id="bsWings" {...(groups.wings ?? {})}>
+        <motion.g id="bsWingLeft" {...(groups.wingLeft ?? {})}>
+          <path d="M138 226 C 84 176, 40 174, 30 208 C 20 244, 52 288, 112 282 C 132 280, 142 266, 138 250 Z" fill="url(#drWing)"/>
+          <path d="M136 234 C 100 208, 66 202, 44 212 M136 254 C 98 250, 70 258, 54 274" fill="none" stroke="#5A1024" strokeWidth="3" strokeLinecap="round" opacity="0.7"/>
+          <path d="M44 212 l -14 -12 M54 274 l -16 6" stroke="url(#drHorn)" strokeWidth="5" strokeLinecap="round"/>
+        </motion.g>
+        <motion.g id="bsWingRight" {...(groups.wingRight ?? {})}>
+          <path d="M262 226 C 316 176, 360 174, 370 208 C 380 244, 348 288, 288 282 C 268 280, 258 266, 262 250 Z" fill="url(#drWing)"/>
+          <path d="M264 234 C 300 208, 334 202, 356 212 M264 254 C 302 250, 330 258, 346 274" fill="none" stroke="#5A1024" strokeWidth="3" strokeLinecap="round" opacity="0.7"/>
+          <path d="M356 212 l 14 -12 M346 274 l 16 6" stroke="url(#drHorn)" strokeWidth="5" strokeLinecap="round"/>
+        </motion.g>
+      </motion.g>
+
+      <motion.g id="bsBody" {...(groups.body ?? {})}>
+        <path d="M200 206 C 152 206, 124 250, 128 300 C 132 348, 162 374, 200 374 C 238 374, 268 348, 272 300 C 276 250, 248 206, 200 206 Z" fill="url(#drScale)"/>
+        <path d="M200 240 L 232 288 L 216 344 L 184 344 L 168 288 Z" fill="#3E1020" opacity="0.85"/>
+        <path d="M200 252 L 222 290 L 210 332 L 190 332 L 178 290 Z" fill="#5E1A2F" opacity="0.6"/>
+        <path d="M130 258 l -20 -16 l 24 -6 Z M126 300 l -22 -10 l 22 -16 Z" fill="url(#drHorn)"/>
+        <path d="M270 258 l 20 -16 l -24 -6 Z M274 300 l 22 -10 l -22 -16 Z" fill="url(#drHorn)"/>
+        <path d="M138 274 C 112 290, 110 318, 128 330 C 142 339, 158 328, 156 312" fill="none" stroke="#24070F" strokeWidth="24" strokeLinecap="round"/>
+        <path d="M262 274 C 288 290, 290 318, 272 330 C 258 339, 242 328, 244 312" fill="none" stroke="#24070F" strokeWidth="24" strokeLinecap="round"/>
+        <path d="M120 332 l -12 10 M128 340 l -8 14 M140 344 l -2 16" stroke="url(#drHorn)" strokeWidth="5" strokeLinecap="round"/>
+        <path d="M280 332 l 12 10 M272 340 l 8 14 M260 344 l 2 16" stroke="url(#drHorn)" strokeWidth="5" strokeLinecap="round"/>
+        <path d="M158 370 l -10 -12 M172 374 l -2 -14 M186 370 l 8 -12" stroke="url(#drHorn)" strokeWidth="6" strokeLinecap="round"/>
+        <path d="M242 370 l 10 -12 M228 374 l 2 -14 M214 370 l -8 -12" stroke="url(#drHorn)" strokeWidth="6" strokeLinecap="round"/>
+      </motion.g>
+
+      <motion.g id="bsHead" {...(groups.head ?? {})}>
+        <path id="bsHornLeft"  d="M150 96 C 128 62, 104 40, 74 26 C 92 60, 106 78, 128 116 Z" fill="url(#drHorn)"/>
+        <path id="bsHornRight" d="M250 96 C 272 62, 296 40, 326 26 C 308 60, 294 78, 272 116 Z" fill="url(#drHorn)"/>
+        <path d="M126 148 C 96 132, 76 144, 80 164 C 84 182, 110 188, 128 176 Z" fill="#24070F"/>
+        <path d="M274 148 C 304 132, 324 144, 320 164 C 316 182, 290 188, 272 176 Z" fill="#24070F"/>
+        <path d="M200 66 C 152 66, 120 104, 122 150 C 124 190, 148 214, 176 224 L 224 224 C 252 214, 276 190, 278 150 C 280 104, 248 66, 200 66 Z" fill="url(#drHead)"/>
+        <path d="M136 122 L 194 140 L 190 152 L 134 140 Z" fill="#0C0206"/>
+        <path d="M264 122 L 206 140 L 210 152 L 266 140 Z" fill="#0C0206"/>
+        <motion.g id="bsEyes" {...(groups.eyes ?? {})}>
+          <motion.ellipse id="bsGlowLeft" {...(groups.glowLeft ?? {})}  cx="166" cy="152" rx="30" ry="24" fill="url(#drEyeGlow)"/>
+          <motion.ellipse id="bsGlowRight" {...(groups.glowRight ?? {})} cx="234" cy="152" rx="30" ry="24" fill="url(#drEyeGlow)"/>
+          <path id="bsEyeLeft"  d="M144 152 L 176 142 L 188 154 L 156 164 Z" fill="#FF3B30"/>
+          <path id="bsEyeRight" d="M256 152 L 224 142 L 212 154 L 244 164 Z" fill="#FF3B30"/>
+          <motion.path id="bsPupilLeft" {...(groups.pupilLeft ?? {})}  d="M160 150 L 168 148 L 170 158 L 162 160 Z" fill="#1A0004"/>
+          <motion.path id="bsPupilRight" {...(groups.pupilRight ?? {})} d="M240 150 L 232 148 L 230 158 L 238 160 Z" fill="#1A0004"/>
+        </motion.g>
+        <path d="M200 178 L 246 194 C 246 214, 226 228, 200 228 C 174 228, 154 214, 154 194 Z" fill="#1B050B"/>
+        <ellipse cx="186" cy="188" rx="5" ry="7" fill="#000"/>
+        <ellipse cx="214" cy="188" rx="5" ry="7" fill="#000"/>
+        <motion.path id="bsMouth" {...(groups.mouth ?? {})} d="M160 206 C 178 220, 222 220, 240 206" fill="none" stroke="#000" strokeWidth="7" strokeLinecap="round"/>
+        <path d="M170 208 l 6 16 l 7 -14 Z M190 212 l 6 16 l 7 -15 Z M212 211 l 6 16 l 7 -15 Z M232 206 l 5 15 l 8 -13 Z" fill="#E8E0D0"/>
+        <path d="M176 200 l -5 -12 l 10 2 Z M224 200 l 5 -12 l -10 2 Z" fill="#E8E0D0"/>
+      </motion.g>
+  </>
+);

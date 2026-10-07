@@ -1,0 +1,50 @@
+# Codemagic — builds the iOS app on a cloud Mac and produces Hard21.ipa,
+# signed with the publisher's App Store certificate, ready for them to upload
+# with Transporter. No Mac needed on our side. Steps: IOS_RELEASE.md.
+#
+# One-time setup in Codemagic (by hand — these are the publisher's signing
+# files): codemagic.yaml settings → Code signing identities →
+#   • iOS certificates: upload the Apple Distribution .p12 + its password
+#   • iOS provisioning profiles: upload the App Store .mobileprovision for
+#     com.hardchallenge.app (made AFTER enabling Sign in with Apple on the App ID)
+# `ios_signing` below then picks both up by bundle ID.
+
+workflows:
+  ios-ipa:
+    name: Hard 21 — iOS IPA
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.hardchallenge.app
+      node: 22
+      xcode: latest
+      cocoapods: default
+      vars:
+        # Public values (the publishable key ships inside every copy of the
+        # app anyway); real secrets never go here.
+        VITE_SUPABASE_URL: "https://zmkgbotvmfpsrvvgztxn.supabase.co"
+        VITE_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_-KtGdG60667cJk8el4-DQw_MWlsNQaO"
+        VITE_PUBLIC_WEB_URL: "https://merry-dragon-9e3add.netlify.app"
+        # Google sign-in on iPhone; empty hides the button (see IOS_RELEASE.md §5).
+        VITE_GOOGLE_IOS_CLIENT_ID: ""
+    scripts:
+      - name: Install dependencies
+        script: npm ci
+      - name: Build the web app
+        script: npm run build
+      - name: Sync Capacitor + CocoaPods
+        script: npx cap sync ios
+      - name: Apply the signing profile
+        script: xcode-project use-profiles
+      - name: Build number (must rise with every upload)
+        script: |
+          cd ios/App
+          agvtool new-version -all $((BUILD_NUMBER + 1))
+      - name: Build the IPA
+        script: |
+          xcode-project build-ipa             --workspace ios/App/App.xcworkspace             --scheme App
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log

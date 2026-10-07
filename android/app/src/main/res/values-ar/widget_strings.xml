@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Arabic widget text. See values/widget_strings.xml for how it's chosen. -->
+<resources>
+    <string name="widget_streak_label">السلسلة</string>
+    <string name="widget_streak_description">سلسلتك وتقدّمك في التحدي</string>
+    <string name="widget_tasks_label">مهام اليوم</string>
+    <string name="widget_tasks_description">مهام اليوم وكم تبقّى منها</string>
+    <string name="widget_week_label">هذا الأسبوع</string>
+    <string name="widget_week_description">الأيام التي أنجزتها هذا الأسبوع</string>
+
+    <string name="widget_day_of">اليوم %1$s من %2$s</string>
+    <string name="widget_tasks_title">مهام اليوم</string>
+    <string name="widget_done_of">%1$s من %2$s</string>
+    <string name="widget_open">افتح</string>
+    <string name="widget_sign_in">سجّل دخولك لبدء التحدي</string>
+    <string name="widget_stale">افتح التطبيق لتحديث تقدّمك</string>
+    <string name="widget_separator">" — "</string>
+
+    <string name="widget_finish_day">أنهِ يومك الآن</string>
+    <string name="widget_day_complete">أحسنت! أنجزت يومك</string>
+    <string name="widget_all_done_today">أنجزت مهام اليوم</string>
+    <string name="widget_finish_to_keep">أنهِ يومك للحفاظ عليها</string>
+    <string name="widget_finish_to_start">أنهِ يومك لبدء سلسلتك</string>
+    <string name="widget_streak_day_done">أنجزت يومك</string>
+
+    <!-- السبت أولاً -->
+    <string-array name="widget_week_letters">
+        <item>س</item>
+        <item>ح</item>
+        <item>ن</item>
+        <item>ث</item>
+        <item>ر</item>
+        <item>خ</item>
+        <item>ج</item>
+    </string-array>
+
+    <plurals name="widget_cta_tasks_left">
+        <item quantity="zero">لا مهام متبقية</item>
+        <item quantity="one">تبقّت مهمة واحدة — أكملها</item>
+        <item quantity="two">تبقّت مهمتان — أكملهما</item>
+        <item quantity="few">تبقّت %s مهام — أكملها</item>
+        <item quantity="many">تبقّت %s مهمة — أكملها</item>
+        <item quantity="other">تبقّت %s مهمة — أكملها</item>
+    </plurals>
+
+    <plurals name="widget_streak_unit">
+        <item quantity="zero">أيام متواصلة</item>
+        <item quantity="one">يوم متواصل</item>
+        <item quantity="two">يومان متواصلان</item>
+        <item quantity="few">أيام متواصلة</item>
+        <item quantity="many">يومًا متواصلًا</item>
+        <item quantity="other">يوم متواصل</item>
+    </plurals>
+
+    <plurals name="widget_day_unit">
+        <item quantity="zero">أيام</item>
+        <item quantity="one">يوم</item>
+        <item quantity="two">يومان</item>
+        <item quantity="few">أيام</item>
+        <item quantity="many">يومًا</item>
+        <item quantity="other">يوم</item>
+    </plurals>
+
+    <plurals name="widget_streak_prefix">
+        <item quantity="zero">سلسلة %s أيام</item>
+        <item quantity="one">سلسلة يوم واحد</item>
+        <item quantity="two">سلسلة يومين</item>
+        <item quantity="few">سلسلة %s أيام</item>
+        <item quantity="many">سلسلة %s يومًا</item>
+        <item quantity="other">سلسلة %s يوم</item>
+    </plurals>
+
+    <plurals name="widget_keep_tasks_left">
+        <item quantity="zero">أنهِ يومك للحفاظ عليها</item>
+        <item quantity="one">تبقّت مهمة واحدة للحفاظ عليها</item>
+        <item quantity="two">تبقّت مهمتان للحفاظ عليها</item>
+        <item quantity="few">تبقّت %s مهام للحفاظ عليها</item>
+        <item quantity="many">تبقّت %s مهمة للحفاظ عليها</item>
+        <item quantity="other">تبقّت %s مهمة للحفاظ عليها</item>
+    </plurals>
+
+    <plurals name="widget_start_tasks_left">
+        <item quantity="zero">أنهِ يومك لبدء سلسلتك</item>
+        <item quantity="one">تبقّت مهمة واحدة لبدء سلسلتك</item>
+        <item quantity="two">تبقّت مهمتان لبدء سلسلتك</item>
+        <item quantity="few">تبقّت %s مهام لبدء سلسلتك</item>
+        <item quantity="many">تبقّت %s مهمة لبدء سلسلتك</item>
+        <item quantity="other">تبقّت %s مهمة لبدء سلسلتك</item>
+    </plurals>
+
+    <plurals name="widget_tasks_left_today">
+        <item quantity="zero">لا مهام متبقية اليوم</item>
+        <item quantity="one">تبقّت مهمة واحدة اليوم</item>
+        <item quantity="two">تبقّت مهمتان اليوم</item>
+        <item quantity="few">تبقّت %s مهام اليوم</item>
+        <item quantity="many">تبقّت %s مهمة اليوم</item>
+        <item quantity="other">تبقّت %s مهمة اليوم</item>
+    </plurals>
+</resources>

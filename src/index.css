@@ -4,6 +4,44 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Display cutouts and the gesture bar.
+ *
+ * The app targets SDK 36, and from Android 15 edge-to-edge is mandatory: the
+ * WebView is laid out behind the status bar and the navigation bar rather than
+ * between them. Without this every page's first row — headers, back buttons,
+ * the streak counter — sits under the status bar, and on a curved-edge phone
+ * it is clipped by the corner radius.
+ *
+ * Padding the root once covers every page. `fixed` elements are positioned
+ * against the viewport, not this box, so anything pinned to an edge still has
+ * to add the inset itself (NativeTabBar does, for the gesture bar).
+ *
+ * `100dvh` rather than `100vh`: with box-sizing: border-box the padding is
+ * inside the height, so a page's own `min-h-screen` cannot push the layout
+ * taller than the screen and invent a scrollbar.
+ */
+#root {
+  min-height: 100dvh;
+  padding-top: env(safe-area-inset-top, 0px);
+  /* Decorative oversized circles are positioned outside their parent on the
+     auth and splash screens; without this they widen the page at 360px. */
+  overflow-x: hidden;
+}
+
+/* The padding above scrolls away with the page, after which content slid
+   under the transparent status bar (clock and icons drawn over the calendar).
+   This strip stays put and paints the page background behind the bar. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: env(safe-area-inset-top, 0px);
+  background: hsl(var(--background));
+  z-index: 60;
+  pointer-events: none;
+}
+
 @layer base {
   :root {
     /* Clean Light Theme with Pink Accents */
@@ -132,9 +170,32 @@
     system-ui, sans-serif !important;
   letter-spacing: 0 !important;
 }
+
+/* The weekly-boss screen opts back out of the Duolingo font and onto the app's
+   own stack from the `body` rules below. It renders inside .duo-page (the home
+   screen), whose `.duo-page *` rule is !important, so undoing it needs the same
+   weight. Delete this block to let the boss screen inherit Baloo again. */
+.boss-screen,
+.boss-screen * {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display',
+    'Inter', 'Helvetica Neue', system-ui, sans-serif !important;
+  letter-spacing: -0.022em !important;
+}
+[dir="rtl"] .boss-screen,
+[dir="rtl"] .boss-screen * {
+  font-family: 'SF Arabic', 'IBM Plex Sans Arabic', 'Dubai', -apple-system,
+    BlinkMacSystemFont, system-ui, sans-serif !important;
+  letter-spacing: 0 !important;
+}
+
 /* duo tokens are global so .duo-card works on any page (e.g. WheelOfLife
-   inside Calendar); .duo-page itself only opts a page into the Duolingo font. */
+   inside Calendar); .duo-page itself only opts a page into the Duolingo font.
+   --duo-accent is the "done / go" colour (finished tasks, completed days, the
+   complete-day button): green by default, the theme's primary when a theme
+   is applied (lib/theme-css.ts). */
 :root {
+  --duo-accent: 95 98% 40%;
+  --duo-accent-edge: 93 98% 32%;
   --duo-surface: 0 0% 100%;
   --duo-border: 0 0% 89%;
   --duo-edge: 0 0% 84%;
@@ -149,6 +210,36 @@
   --duo-muted: 200 10% 62%;
 }
 /* Solid card that sits on a 3D ledge (Duolingo's signature look). */
+/* ── Welcome-board slide text ──────────────────────────────────────────────
+   The whiteboard is sized `min(84vw, 360px, 46dvh * 0.8)`, so which constraint
+   wins depends on the device. The text used a fixed 10/12px, which overflowed
+   the board on narrow phones and looked lost on wide ones.
+
+   `cqw` is 1% of the board's ACTUAL rendered width, so the text tracks the
+   board no matter which of those three constraints applied. The vw rule above
+   it is the fallback for WebViews without container queries — it is correct
+   while the board is width-constrained, which covers 320–430px phones. */
+.board-text {
+  font-size: clamp(9px, 3.05vw, 13px);
+  /* Hard stop: nothing can ever spill outside the drawn board. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 6;
+  overflow: hidden;
+}
+.board-text--long {
+  font-size: clamp(8px, 2.6vw, 11px);
+  -webkit-line-clamp: 7;
+}
+@supports (font-size: 1cqw) {
+  .board-text {
+    font-size: clamp(8px, 3.6cqw, 13.5px);
+  }
+  .board-text--long {
+    font-size: clamp(7px, 3cqw, 11.5px);
+  }
+}
+
 .duo-card {
   background: hsl(var(--duo-surface));
   border: 2px solid hsl(var(--duo-border));
@@ -162,14 +253,6 @@
 .duo-press:active {
   transform: translateY(3px);
   box-shadow: 0 1px 0 hsl(var(--duo-edge)) !important;
-}
-
-/* Hide Clerk's "Secured by Clerk" branding / dev badge as a fallback in case
-   the appearance `footer: hidden` option leaves any residual element. */
-.cl-footer,
-.cl-internal-branded,
-.cl-badge {
-  display: none !important;
 }
 
 @layer base {

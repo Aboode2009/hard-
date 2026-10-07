@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { ProgressFill } from "@/components/ui/progress-fill";
 import { bi } from "@/i18n/bi";
 import { motion } from "framer-motion";
 import { Zap } from "lucide-react";
@@ -25,15 +26,9 @@ const Bar = ({ height, progress }: { height: string; progress: number }) => (
     className={cn("relative rounded-full overflow-hidden", height)}
     style={{ background: "hsl(var(--duo-border) / 0.6)" }}
   >
-    <motion.div
-      initial={{ width: 0 }}
-      animate={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
-      transition={{ duration: 0.7, ease: "easeOut" }}
-      className="absolute inset-y-0 start-0 rounded-full"
-      style={{ background: GOLD }}
-    >
+    <ProgressFill value={progress} className="rounded-full" style={{ background: GOLD }}>
       <div className="absolute inset-x-2 top-[3px] h-1 rounded-full bg-white/40" />
-    </motion.div>
+    </ProgressFill>
   </div>
 );
 

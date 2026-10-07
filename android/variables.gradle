@@ -1,7 +1,7 @@
 ext {
-    minSdkVersion = 23
-    compileSdkVersion = 35
-    targetSdkVersion = 35
+    minSdkVersion = 24
+    compileSdkVersion = 36
+    targetSdkVersion = 36
     androidxActivityVersion = '1.9.2'
     androidxAppCompatVersion = '1.7.0'
     androidxCoordinatorLayoutVersion = '1.2.0'
@@ -13,4 +13,16 @@ ext {
     androidxJunitVersion = '1.2.1'
     androidxEspressoCoreVersion = '3.6.1'
     cordovaAndroidVersion = '10.1.1'
+
+    // ── 16 KB page-size support (required by Google Play) ──────────────────
+    // @capacitor-mlkit/barcode-scanning defaults to CameraX 1.1.0 when the app
+    // does not pin these, and that release's libimage_processing_util_jni.so is
+    // built for 4 KB pages only, which Play now rejects. CameraX 1.4.2 ships
+    // 16 KB-aligned binaries.
+    androidxCameraCamera2Version = '1.4.2'
+    androidxCameraCoreVersion = '1.4.2'
+    androidxCameraLifecycleVersion = '1.4.2'
+    androidxCameraViewVersion = '1.4.2'
+    mlkitBarcodeScanningVersion = '17.3.0'
+    playServicesCodeScannerVersion = '16.1.0'
 }

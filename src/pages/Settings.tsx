@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { bi } from "@/i18n/bi";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { clerkAuth } from "@/lib/clerk-auth";
 import { useTranslation } from "react-i18next";
 import { BottomNav } from "@/components/BottomNav";
 import { useToast } from "@/hooks/use-toast";
@@ -10,8 +9,8 @@ import { ChevronLeft, ChevronRight, Check } from "lucide-react";
 import { FlagIcon } from "@/components/FlagIcon";
 import {
   GlobeIcon, ThemeIcon, PaletteIcon, CalendarIcon, GiftIcon, MedalIcon,
-  TrophyIcon, TrailIcon, HomeIcon, AddTaskIcon, BellIcon,
-  BuildingIcon, KeyIcon, AdminShieldIcon, DatabaseIcon, TrashIcon,
+  TrophyIcon, TrailIcon, HomeIcon, AddTaskIcon, TargetIcon,
+  BuildingIcon, KeyIcon, AdminShieldIcon, DatabaseIcon, TrashIcon, PrivacyIcon,
 } from "@/components/nav-icons";
 import { Input } from "@/components/ui/input";
 import { DeleteAccountDialog } from "@/components/DeleteAccountDialog";
@@ -24,6 +23,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { languages } from "@/i18n/config";
+import { usePremium } from "@/hooks/usePremium";
+import { resetAllTours } from "@/lib/page-tours";
+import { clearCompanyMode, companyModeForStoredUser, saveCompanyMode } from "@/lib/company-mode";
+import { invalidateProfile, qk, queryClient } from "@/lib/query-client";
+import { useQuery } from "@tanstack/react-query";
+import { useSessionUserId } from "@/lib/session-user";
+import { companyCodeQuery, isAdminQuery } from "@/lib/queries";
 
 interface SettingsItemProps {
   icon: React.ReactNode;
@@ -93,12 +99,18 @@ const Settings = () => {
   const isRTL = i18n.language === 'ar';
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const uid = useSessionUserId();
+  // Cached across visits and read in parallel (they used to run in turn,
+  // behind an extra round trip to the auth server).
+  const companyCodeQ = useQuery(companyCodeQuery(uid));
+  const adminQ = useQuery(isAdminQuery(uid));
+  const isAdmin = adminQ.data === true;
+  const loading = !!uid && companyCodeQ.isPending;
   const [showLanguageDialog, setShowLanguageDialog] = useState(false);
   const [showCompanyCodeDialog, setShowCompanyCodeDialog] = useState(false);
   const [companyCode, setCompanyCode] = useState("");
-  const [currentCompanyCode, setCurrentCompanyCode] = useState<string | null>(null);
+  const currentCompanyCode = companyCodeQ.data ?? null;
+  const setCurrentCompanyCode = (code: string) => queryClient.setQueryData(qk.companyCode(uid), code);
   const [savingCompanyCode, setSavingCompanyCode] = useState(false);
   const [theme, setTheme] = useState<string>(() => {
     return localStorage.getItem('theme') || 'system';
@@ -107,60 +119,52 @@ const Settings = () => {
   const currentLanguage = languages.find(l => l.code === i18n.language) || languages[0];
 
   useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
-    try {
-      const { data: { user } } = await clerkAuth.getUser();
-      
-      if (!user) {
-        navigate("/auth");
-        return;
-      }
-
-      // Fetch user's company code
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("company_code")
-        .eq("id", user.id)
-        .single();
-      
-      if (profile?.company_code) {
-        setCurrentCompanyCode(profile.company_code);
-      }
-
-      const { data: isAdminData } = await supabase.rpc('is_admin');
-      if (isAdminData) {
-        setIsAdmin(true);
-      }
-    } catch (error) {
-      console.error("Error checking auth:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    if (!uid) navigate("/auth");
+  }, [uid, navigate]);
 
   const handleSaveCompanyCode = async () => {
     if (!companyCode.trim()) return;
     
     setSavingCompanyCode(true);
     try {
-      const { data: { user } } = await clerkAuth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const upperCode = companyCode.toUpperCase();
-      
-      const { error } = await supabase
-        .from("profiles")
-        .update({ company_code: upperCode })
-        .eq("id", user.id);
+      // The premium rule is enforced by set_company_code() on the server
+      // ("TASK" — back to the personal challenge — is always allowed). The
+      // client no longer writes profiles.company_code directly.
+      const { data: savedCode, error } = await supabase.rpc("set_company_code", {
+        p_code: companyCode,
+      });
 
+      if (error?.message === "premium_required") {
+        toast({
+          variant: "destructive",
+          title: bi("وضع الشركة للمشتركين فقط", "Company mode is for subscribers"),
+          description: bi(
+            "اشترك أولاً لتتمكّن من ربط حسابك بشركة واستخدام تسجيل الحضور.",
+            "Subscribe first to link your account to a company and use attendance.",
+          ),
+        });
+        setShowCompanyCodeDialog(false);
+        setCompanyCode("");
+        navigate("/premium");
+        return;
+      }
       if (error) throw error;
+
+      const upperCode = savedCode ?? companyCode.trim().toUpperCase();
 
       setCurrentCompanyCode(upperCode);
       setShowCompanyCodeDialog(false);
       setCompanyCode("");
+
+      // Remember the mode on this device so the next launch opens straight
+      // into it, and make the company screens re-ask the server.
+      if (upperCode === "NASS") saveCompanyMode(user.id, upperCode);
+      else clearCompanyMode(user.id);
+      void queryClient.invalidateQueries({ queryKey: qk.companyAccess(user.id) });
+      invalidateProfile();
 
       toast({
         title: bi("تم الحفظ", "Saved"),
@@ -236,6 +240,8 @@ const Settings = () => {
 
   const getThemeIcon = () => <ThemeIcon className="w-6 h-6" />;
 
+  const { isPremium, isLifetime } = usePremium();
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -268,6 +274,23 @@ const Settings = () => {
       </div>
 
       <div className="max-w-lg mx-auto px-4 space-y-5">
+        {/* Premium Section */}
+        <SettingsSection title={bi("الاشتراك", "SUBSCRIPTION")}>
+          <SettingsItem
+            icon={<span className="text-xl leading-none">👑</span>}
+            color="#FFC800"
+            label={bi("بريميوم", "Premium")}
+            value={
+              isLifetime
+                ? bi("مدى الحياة", "Lifetime")
+                : isPremium
+                  ? bi("فعّال", "Active")
+                  : undefined
+            }
+            onClick={() => navigate("/premium")}
+          />
+        </SettingsSection>
+
         {/* Preferences Section */}
         <SettingsSection title={bi("التفضيلات", "PREFERENCES")}>
           <SettingsItem
@@ -340,11 +363,30 @@ const Settings = () => {
             label={bi("إضافة مهمة", "Add Task")}
             onClick={() => navigate("/create-task")}
           />
+          {/*
+            Replays the tours. Every screen's flag is cleared: the home tour
+            starts now (navigating there is what runs it, because it highlights
+            that page's real elements), and the leaderboard, My Home, store and
+            stats tours show again the next time the user opens each of them.
+          */}
           <SettingsItem
-            icon={<BellIcon className="w-6 h-6" />}
-            color="#FFC800"
-            label={bi("التذكيرات", "Reminders")}
-            onClick={() => navigate("/reminders")}
+            icon={<TargetIcon className="w-6 h-6" />}
+            color="#CE82FF"
+            label={bi("إعادة عرض الجولة التعريفية", "Replay the tour")}
+            onClick={() => {
+              resetAllTours();
+              // No toast: it landed on top of the tour's first highlight (the
+              // XP bar), and the tour starting is its own confirmation.
+              // A company user's "/" opens company mode; ?from=nass is the
+              // deliberate switch to the personal home, where the tour lives.
+              navigate(companyModeForStoredUser() ? "/?from=nass" : "/");
+              // The home page arms the tour on mount; this covers the case
+              // where it is already mounted and simply re-shown.
+              setTimeout(
+                () => window.dispatchEvent(new Event("hard21:replay-home-tour")),
+                700,
+              );
+            }}
           />
         </SettingsSection>
 
@@ -398,6 +440,16 @@ const Settings = () => {
             />
           </SettingsSection>
         )}
+
+        {/* About Section */}
+        <SettingsSection title={bi("حول", "ABOUT")}>
+          <SettingsItem
+            icon={<PrivacyIcon className="w-6 h-6" />}
+            color="#1CB0F6"
+            label={bi("سياسة الخصوصية", "Privacy Policy")}
+            onClick={() => navigate("/privacy")}
+          />
+        </SettingsSection>
 
         {/* Danger Zone */}
         <SettingsSection>

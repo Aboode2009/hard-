@@ -269,3 +269,13 @@ export const ChestIcon = ({ className }: IconProps) => (
     <circle cx="12" cy="13.4" r="1.1" fill={C.brownDark} />
   </svg>
 );
+
+/** Privacy policy — a blue shield with a padlock. */
+export const PrivacyIcon = ({ className }: IconProps) => (
+  <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+    <path d="M12 2l8 3v7c0 5.2-3.4 8.3-8 10-4.6-1.7-8-4.8-8-10V5z" fill={C.blue} />
+    <path d="M12 2l8 3v7c0 5.2-3.4 8.3-8 10z" fill="#0F7AC0" opacity="0.55" />
+    <path d="M9.9 10.6V9.3a2.1 2.1 0 0 1 4.2 0v1.3" stroke={C.white} strokeWidth="1.6" strokeLinecap="round" fill="none" />
+    <rect x="8.8" y="10.5" width="6.4" height="5.3" rx="1.3" fill={C.white} />
+  </svg>
+);

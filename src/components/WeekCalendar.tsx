@@ -76,7 +76,7 @@ export const WeekCalendar = ({
             className={cn(
               "flex-1 flex flex-col items-center gap-1 py-2 px-1 rounded-xl transition-all",
               day.isCurrent && "bg-[#1CB0F61e]",
-              day.isCompleted && !day.isCurrent && "bg-[#58CC021e]",
+              day.isCompleted && !day.isCurrent && "bg-[hsl(var(--duo-accent)/0.12)]",
               day.isPast && !day.isCompleted && "bg-[#FF4B4B1e]",
               day.isFuture && "opacity-50",
               !day.isFuture && "hover:bg-[hsl(var(--duo-border)/0.4)] cursor-pointer"
@@ -91,7 +91,7 @@ export const WeekCalendar = ({
             <div className={cn(
               "w-8 h-8 rounded-xl flex items-center justify-center text-sm font-bold transition-colors",
               day.isCurrent && "border-2 border-[#1CB0F6] bg-[hsl(var(--duo-surface))] text-[#1CB0F6]",
-              day.isCompleted && !day.isCurrent && "bg-[#58CC02] text-white shadow-[0_3px_0_#45A302]",
+              day.isCompleted && !day.isCurrent && "bg-[hsl(var(--duo-accent))] text-white shadow-[0_3px_0_hsl(var(--duo-accent-edge))]",
               day.isPast && !day.isCompleted && "bg-[#FF4B4B1e] text-[#FF4B4B]",
               day.isFuture && "border-2 border-[hsl(var(--duo-border))] bg-[hsl(var(--duo-surface))] text-[hsl(var(--duo-muted))]"
             )}>

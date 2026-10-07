@@ -1,6 +1,7 @@
 import { useEffect, useRef, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Star, Trophy, User } from "lucide-react";
+import { Star, Trophy } from "lucide-react";
+import { UserAvatar } from "@/components/UserAvatar";
 import { DuoThickCheck } from "@/components/icons/DuolingoIcons";
 import { ChestIcon } from "@/components/nav-icons";
 import { LevelSummaryModal } from "./LevelSummaryModal";
@@ -23,7 +24,10 @@ interface ProgressionMapProps {
   totalDays: number;
   currentDay: number;
   completedDays: number[];
-  avatarUrl?: string | null;
+  /** The user's built-in avatar (`profiles.avatar_id`) and gender default. */
+  avatarId?: string | null;
+  gender?: string | null;
+  userId?: string | null;
   pathId: string;
 }
 
@@ -43,7 +47,9 @@ export const ProgressionMap = ({
   totalDays,
   currentDay,
   completedDays,
-  avatarUrl,
+  avatarId,
+  gender,
+  userId,
   pathId,
 }: ProgressionMapProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -232,16 +238,12 @@ export const ProgressionMap = ({
                     transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
                     className="absolute -top-[52px] left-1/2 -translate-x-1/2 z-10 flex flex-col items-center pointer-events-none"
                   >
-                    <div
-                      className="w-11 h-11 rounded-full overflow-hidden flex items-center justify-center border-[3px] border-white shadow-lg"
-                      style={{ background: GREEN }}
-                    >
-                      {avatarUrl ? (
-                        <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
-                      ) : (
-                        <User className="w-6 h-6 text-white" strokeWidth={2.5} />
-                      )}
-                    </div>
+                    <UserAvatar
+                      avatarId={avatarId}
+                      gender={gender}
+                      seed={userId}
+                      className="w-11 h-11 border-[3px] border-white shadow-lg"
+                    />
                     {/* Pointer tip */}
                     <div
                       className="w-0 h-0 -mt-[2px]"

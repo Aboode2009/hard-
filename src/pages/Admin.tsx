@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { clerkAuth } from "@/lib/clerk-auth";
 import { useTranslation } from "react-i18next";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
@@ -157,7 +156,7 @@ const Admin = () => {
 
   const checkAdminStatus = async () => {
     try {
-      const { data: { user } } = await clerkAuth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
 
       if (!user) {
         navigate("/auth");

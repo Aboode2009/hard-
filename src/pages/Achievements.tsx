@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { bi } from "@/i18n/bi";
+import { ProgressFill } from "@/components/ui/progress-fill";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { clerkAuth } from "@/lib/clerk-auth";
 import { ChevronLeft, ChevronRight, Flame, Shield, Trophy, Gem, type LucideIcon } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -81,11 +81,17 @@ const Achievements = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchStreakData();
+    // Guarded at the call site: a rejected fetch would otherwise skip the
+    // setLoading(false) inside and leave the page spinning forever.
+    fetchStreakData().catch((err) => {
+      console.error("fetchStreakData failed:", err);
+      setLoading(false);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchStreakData = async () => {
-    const { data: { user } } = await clerkAuth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setLoading(false); return; }
 
     const { data: progress } = await supabase
@@ -146,7 +152,7 @@ const Achievements = () => {
             className="px-3 py-1.5 rounded-full text-xs font-extrabold tracking-wider"
             style={{ background: "hsl(var(--duo-border) / 0.6)", color: "hsl(var(--duo-muted))" }}
           >
-            {unlockedCount} / {badges.length} {bi("مفتوح", "UNLOCKED")}
+            <span dir="ltr">{unlockedCount} / {badges.length}</span> {bi("مفتوح", "UNLOCKED")}
           </span>
         </motion.div>
 
@@ -207,15 +213,14 @@ const Achievements = () => {
                       className="relative h-4 rounded-full overflow-hidden mt-2.5"
                       style={{ background: "hsl(var(--duo-border) / 0.6)" }}
                     >
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${progress}%` }}
-                        transition={{ duration: 0.9, delay: 0.2 + index * 0.1, ease: "easeOut" }}
-                        className="absolute inset-y-0 start-0 rounded-full"
+                      <ProgressFill
+                        value={progress}
+                        duration={0.9}
+                        className="rounded-full"
                         style={{ background: "#FFC800" }}
                       >
                         <div className="absolute inset-x-2.5 top-[3px] h-[5px] rounded-full bg-white/40" />
-                      </motion.div>
+                      </ProgressFill>
                     </div>
 
                     <p className="text-sm font-semibold mt-2.5" style={{ color: "hsl(var(--duo-muted))" }}>

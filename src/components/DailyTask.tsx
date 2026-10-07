@@ -188,7 +188,7 @@ export const DailyTask = ({
           customColor
             ? "text-white"
             : completed
-              ? "bg-[hsl(var(--duo-surface))] border-[#58cc02] border-b-[#46a302]"
+              ? "bg-[hsl(var(--duo-surface))] border-[hsl(var(--duo-accent))] border-b-[hsl(var(--duo-accent-edge))]"
               : "bg-[hsl(var(--duo-surface))] border-[hsl(var(--duo-border))] border-b-[hsl(var(--duo-edge))]"
         )}
         style={{
@@ -266,10 +266,10 @@ export const DailyTask = ({
                   completed
                     ? customColor
                       ? "bg-white/30 border-white/40"
-                      : "bg-[#58cc02] border-[#58cc02]"
+                      : "bg-[hsl(var(--duo-accent))] border-[hsl(var(--duo-accent))]"
                     : customColor
                       ? "border-white/50"
-                      : "border-muted-foreground/30 group-hover:border-[#58cc02]"
+                      : "border-muted-foreground/30 group-hover:border-[hsl(var(--duo-accent))]"
                 )}
               >
                 <AnimatePresence mode="wait">

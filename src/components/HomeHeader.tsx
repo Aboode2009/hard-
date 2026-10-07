@@ -1,9 +1,11 @@
 import { useTranslation } from "react-i18next";
 import { bi } from "@/i18n/bi";
 import { useNavigate } from "react-router-dom";
-import { ChevronDown, ChevronRight, Gift, ArrowRightLeft } from "lucide-react";
+import { ChevronDown, ChevronRight, ArrowRightLeft } from "lucide-react";
+import { ChestIcon } from "@/components/nav-icons";
 import { AvatarWithFrame } from "@/components/cosmetics/AvatarWithFrame";
 import { UserLevelBadge } from "@/components/rpg/UserLevelBadge";
+import { memo } from "react";
 import { motion } from "framer-motion";
 import {
   DropdownMenu,
@@ -13,7 +15,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 interface HomeHeaderProps {
-  avatarUrl?: string | null;
+  /** Built-in avatar (`profiles.avatar_id`); NULL → the gender default. */
+  avatarId?: string | null;
+  gender?: string | null;
+  /** The user id — fixes the avatar's circle colour. */
+  userId?: string | null;
   username?: string;
   selectedFilter?: string;
   totalPoints?: number;
@@ -30,8 +36,15 @@ interface HomeHeaderProps {
   switchTitle?: string;
 }
 
-export const HomeHeader = ({
-  avatarUrl,
+/**
+ * Memoized: the home screen holds a lot of state and re-renders often, but the
+ * header only depends on the handful of props below. All of them are
+ * primitives except the two callbacks, which the parent keeps stable.
+ */
+const HomeHeaderComponent = ({
+  avatarId,
+  gender,
+  userId,
   username = "User",
   selectedFilter = "all",
   totalPoints = 0,
@@ -134,7 +147,9 @@ export const HomeHeader = ({
           className="relative"
         >
           <AvatarWithFrame
-            avatarUrl={avatarUrl}
+            avatarId={avatarId}
+            gender={gender}
+            seed={userId}
             username={username}
             frameClass={frameClass}
             badgeEmoji={badgeEmoji}
@@ -148,13 +163,15 @@ export const HomeHeader = ({
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 500 }}
-              className="absolute -top-1 -left-1 w-5 h-5 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center"
+              className="absolute -top-1.5 -left-1.5 w-6 h-6 rounded-full flex items-center justify-center"
+              style={{ background: "hsl(var(--duo-surface))", border: "2px solid #FFC800" }}
             >
               <motion.div
-                animate={{ y: [0, -3, 0] }}
+                animate={{ y: [0, -2, 0] }}
                 transition={{ duration: 0.6, repeat: Infinity }}
               >
-                <Gift className="w-3 h-3 text-white" />
+                {/* Same chest as everywhere else in the app. */}
+                <ChestIcon className="w-4 h-4" />
               </motion.div>
             </motion.div>
           )}
@@ -163,3 +180,5 @@ export const HomeHeader = ({
     </motion.header>
   );
 };
+
+export const HomeHeader = memo(HomeHeaderComponent);

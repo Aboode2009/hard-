@@ -1,9 +1,13 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef, lazy, Suspense } from "react";
 import { bi } from "@/i18n/bi";
 import { useNavigate } from "react-router-dom";
 import { format, addDays } from "date-fns";
+import { clearCompanyMode } from "@/lib/company-mode";
+import { invalidateProgress } from "@/lib/query-client";
 import { supabase } from "@/integrations/supabase/client";
-import { clerkAuth } from "@/lib/clerk-auth";
+import { showInterstitial } from "@/lib/ads";
+import { createSerializer } from "@/lib/serialize";
+import { AttendanceErrorBoundary } from "@/components/AttendanceErrorBoundary";
 import { NassBottomNav } from "@/components/NassBottomNav";
 import { SimpleWeekCalendar } from "@/components/SimpleWeekCalendar";
 import { HostageVault, getStreakBonus } from "@/components/HostageVault";
@@ -22,17 +26,24 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Heart, Clock, Smartphone, CheckCircle2, CheckSquare, QrCode } from "lucide-react";
-import { AttendanceScannerDialog } from "@/components/AttendanceScannerDialog";
+// Lazily loaded: it pulls in the ML Kit / zxing camera stack, which is large
+// and only ever needed once the user actually opens the scanner.
+const AttendanceScannerDialog = lazy(() =>
+  import("@/components/AttendanceScannerDialog").then((m) => ({
+    default: m.AttendanceScannerDialog,
+  })),
+);
 import { DuoMoon } from "@/components/icons/DuolingoIcons";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
-import type { CompatSession } from "@/lib/clerk-auth";
+import type { Session } from "@supabase/supabase-js";
 import { useXP } from "@/hooks/useXP";
 import { useUserCosmetics } from "@/hooks/useUserCosmetics";
 import { useWeeklyBoss } from "@/hooks/useWeeklyBoss";
 import { useLootBoxReward } from "@/hooks/useLootBoxReward";
 import { useLevelUpReward } from "@/hooks/useLevelUpReward";
+import { challengeRpc, rpcErrorText } from "@/lib/challenge-rpc";
 import { notificationService, TaskReminder } from "@/lib/notifications";
 import confetti from 'canvas-confetti';
 
@@ -44,7 +55,7 @@ const ATTENDANCE_TASK_ID = 4;
 const TOTAL_DAYS = 30;
 
 const NassChallenge = () => {
-  const [session, setSession] = useState<CompatSession>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentDay, setCurrentDay] = useState(1);
   const [currentStreak, setCurrentStreak] = useState(0);
@@ -53,7 +64,7 @@ const NassChallenge = () => {
   const [totalPoints, setTotalPoints] = useState(0);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [viewingDay, setViewingDay] = useState<number | null>(null);
-  const [userProfile, setUserProfile] = useState<{avatar_url: string | null; username: string} | null>(null);
+  const [userProfile, setUserProfile] = useState<{ avatar_id: string | null; gender: string | null; username: string } | null>(null);
   const [countdownToMidnight, setCountdownToMidnight] = useState<string>("");
   const [taskColors, setTaskColors] = useState<Record<number, string>>({});
   const [taskNotes, setTaskNotes] = useState<Record<number, string>>({});
@@ -122,7 +133,7 @@ const NassChallenge = () => {
   const isArabic = i18n.language === 'ar';
 
   // XP & Cosmetics hooks
-  const { xp, level, xpProgress, xpForCurrentLevel, xpForNextLevel, addXP, refetch: refetchXP } = useXP(session?.user?.id || null);
+  const { xp, level, xpProgress, xpForCurrentLevel, xpForNextLevel, applyServerXP, refetch: refetchXP } = useXP(session?.user?.id || null);
   const { equippedFrame, equippedBadge, lootBoxes, refetch: refetchCosmetics } = useUserCosmetics(session?.user?.id || null);
   
   // Level up reward hook
@@ -155,15 +166,8 @@ const NassChallenge = () => {
     refetch: refetchWeeklyBoss 
   } = useWeeklyBoss(session?.user?.id || null);
 
-  // Loot box reward hook
-  useLootBoxReward({
-    userId: session?.user?.id || null,
-    completedDays,
-    currentDay,
-    tasks,
-    customTasks,
-    isArabic,
-  });
+  // Loot boxes are awarded server-side; this only announces them.
+  const announceLootBox = useLootBoxReward();
 
   // Countdown timer to midnight
   useEffect(() => {
@@ -195,7 +199,7 @@ const NassChallenge = () => {
   }, [completedDays, currentDay]);
 
   useEffect(() => {
-    clerkAuth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       if (!session) {
         navigate("/auth");
@@ -226,7 +230,7 @@ const NassChallenge = () => {
       setLoading(false);
     });
 
-    const { data: { subscription } } = clerkAuth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       if (!session) {
         navigate("/auth");
@@ -251,19 +255,24 @@ const NassChallenge = () => {
       .eq("id", userId)
       .single();
 
-    if (error || data?.company_code !== "NASS") {
+    // A failed read proves nothing — leaving on it would bounce a company
+    // user between "/" and "/nass" while offline. Only a definite non-NASS
+    // profile sends them back, and forgets company mode on this device first.
+    if (error) return;
+    if (data?.company_code !== "NASS") {
+      clearCompanyMode(userId);
       navigate("/");
     }
   };
 
   const fetchUserProfile = async () => {
     try {
-      const { data: { session } } = await clerkAuth.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
       const { data, error } = await supabase
         .from("profiles")
-        .select("avatar_url, username")
+        .select("avatar_id, gender, username")
         .eq("id", session.user.id)
         .single();
 
@@ -305,7 +314,7 @@ const NassChallenge = () => {
 
   const fetchCustomTasks = async () => {
     try {
-      const { data: { session } } = await clerkAuth.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
       // Fetch tags first
@@ -327,9 +336,9 @@ const NassChallenge = () => {
 
       if (error) throw error;
 
-      // Get today's completion status from tasks_state
+      // Today's ticks in the company challenge (its own progress, not the main one)
       const { data: progressData } = await supabase
-        .from("challenge_progress")
+        .from("nass_progress")
         .select("tasks_state")
         .eq("user_id", session.user.id)
         .maybeSingle();
@@ -357,150 +366,77 @@ const NassChallenge = () => {
 
   const fetchProgress = async () => {
     try {
-      const { data: { session: currentSession } } = await clerkAuth.getSession();
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
       if (!currentSession?.user?.id) return;
 
-      const { data, error } = await supabase
-        .from("challenge_progress")
-        .select("*")
-        .eq("user_id", currentSession.user.id)
-        .single();
-
-      if (error) throw error;
+      // Day, missed-day reset and points all come from the server
+      // (Asia/Baghdad time); the client writes none of these columns.
+      const data = await challengeRpc.evaluate("nass");
 
       if (data) {
-        const start = new Date(data.start_date);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        start.setHours(0, 0, 0, 0);
-        
-        const diffTime = today.getTime() - start.getTime();
-        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-        const calculatedDay = Math.min(diffDays + 1, TOTAL_DAYS);
-        
-        const completedDaysArray = (data.completed_days || []) as number[];
-        const completedDaysSet = new Set(completedDaysArray);
-        
-        let shouldReset = false;
-        
-        if (calculatedDay > 1) {
-          for (let day = 1; day < calculatedDay; day++) {
-            if (!completedDaysSet.has(day)) {
-              shouldReset = true;
-              break;
-            }
-          }
-        }
-        
-        if (shouldReset) {
-          const { error: resetError } = await supabase
-            .from("challenge_progress")
-            .update({
-              current_day: 1,
-              current_streak: 0,
-              completed_days: [],
-              start_date: new Date().toISOString().split('T')[0],
-              tasks_state: {},
-            })
-            .eq("user_id", currentSession.user.id);
-
-          if (resetError) throw resetError;
-
+        if (data.was_reset) {
           toast({
             variant: "destructive",
             title: bi("تم إعادة التحدي", "Challenge Reset"),
             description: bi("لم تكمل مهام الأيام السابقة، تم إرجاعك لليوم الأول", "You missed previous days, reset to Day 1"),
           });
-
-          setCurrentDay(1);
-          setCurrentStreak(0);
-          setCompletedDays(new Set());
-          setStartDate(new Date());
-          setTasks(nassTasks.map(task => ({ ...task, completed: false })));
-        } else {
-          setCurrentDay(calculatedDay);
-          setCurrentStreak(data.current_streak);
-          setCompletedDays(completedDaysSet);
-          setStartDate(new Date(data.start_date));
-          setTotalPoints(data.total_points || 0);
-          
-          const tasksState = (data.tasks_state || {}) as Record<string, Record<number, boolean>>;
-          const todayKey = `day_${calculatedDay}`;
-          const todayTasks = tasksState[todayKey] || {};
-          
-          setTasks(nassTasks.map(task => ({
-            ...task,
-            completed: todayTasks[task.id] || false
-          })));
         }
+
+        const todayTasks = data.today_tasks || {};
+        setCurrentDay(data.current_day);
+        setCurrentStreak(data.current_streak);
+        setCompletedDays(new Set<number>(data.completed_days || []));
+        setStartDate(new Date(data.start_date));
+        setTotalPoints(data.total_points || 0);
+        setTasks(nassTasks.map(task => ({
+          ...task,
+          completed: !!todayTasks[task.id]
+        })));
       }
     } catch (error) {
       console.error("Error fetching progress:", error);
     }
   };
 
+  /**
+   * Serializes every write to `challenge_progress` — see the same guard in
+   * Index.tsx. Without it two quick taps both read the pre-change row and the
+   * second write erases the first.
+   */
+  const saveQueue = useRef(createSerializer()).current;
+
   const toggleTask = async (taskId: number) => {
     const task = tasks.find(t => t.id === taskId);
-    const wasCompleted = task?.completed;
-    
-    const updatedTasks = tasks.map(task =>
-      task.id === taskId ? { ...task, completed: !task.completed } : task
+    // Completions are final — the server never un-awards a task.
+    if (task?.completed) return;
+
+    const updatedTasks = tasks.map(t =>
+      t.id === taskId ? { ...t, completed: true } : t
     );
     setTasks(updatedTasks);
 
+    await saveQueue(async () => {
     try {
-      const { data, error: fetchError } = await supabase
-        .from("challenge_progress")
-        .select("tasks_state, weekly_points, total_points")
-        .eq("user_id", session?.user?.id)
-        .single();
-
-      if (fetchError) throw fetchError;
-
-      const tasksState = (data?.tasks_state || {}) as Record<string, Record<number, boolean>>;
-      const todayKey = `day_${currentDay}`;
-      
-      if (!tasksState[todayKey]) {
-        tasksState[todayKey] = {};
+      // The server checks the task (and, for attendance, today's check-in),
+      // computes the streak-scaled points and grants the XP.
+      const result = await challengeRpc.completeTask(taskId, "nass");
+      setTotalPoints(result.total_points);
+      if (result.awarded) {
+        applyServerXP(result.xp, isArabic, handleLevelUp);
       }
-      tasksState[todayKey][taskId] = !wasCompleted;
-
-      const currentWeeklyPoints = data?.weekly_points || 0;
-      const currentTotalPoints = data?.total_points || 0;
-      const streakBonus = getStreakBonus(currentStreak);
-      const pointChange = !wasCompleted ? Math.ceil(POINTS_PER_TASK * streakBonus) : -Math.ceil(POINTS_PER_TASK * streakBonus);
-
-      const { error: updateError } = await supabase
-        .from("challenge_progress")
-        .update({ 
-          tasks_state: tasksState,
-          weekly_points: currentWeeklyPoints + pointChange,
-          total_points: currentTotalPoints + pointChange,
-        })
-        .eq("user_id", session?.user?.id);
-
-      if (updateError) throw updateError;
-
-      if (!wasCompleted) {
-        setTotalPoints(prev => prev + Math.ceil(POINTS_PER_TASK * streakBonus));
-        
-        // Add XP for completing task (with level up reward callback)
-        addXP(10, isArabic, handleLevelUp);
-        
-        await supabase
-          .from("task_completions")
-          .insert({
-            user_id: session?.user?.id,
-            task_key: `nass_${nassTasks.find(t => t.id === taskId)?.title}`,
-            points_earned: Math.ceil(POINTS_PER_TASK * streakBonus),
-          });
-      } else {
-        setTotalPoints(prev => prev - Math.ceil(POINTS_PER_TASK * streakBonus));
+      if (result.loot_box_awarded) {
+        announceLootBox(isArabic);
+        refetchCosmetics();
       }
+      // Covers attendance too: a recorded check-in completes this task.
+      invalidateProgress();
     } catch (error) {
       console.error("Error saving task state:", error);
       setTasks(tasks);
+      const [ar, en] = rpcErrorText(error);
+      toast({ variant: "destructive", title: bi("لم يتم الحفظ", "Not saved"), description: bi(ar, en) });
     }
+    });
   };
 
   /**
@@ -533,73 +469,36 @@ const NassChallenge = () => {
     const attendanceTask = tasks.find((t) => t.id === ATTENDANCE_TASK_ID);
     if (!attendanceTask || attendanceTask.completed) return;
 
-    if (status === "already") {
-      setTasks((prev) =>
-        prev.map((t) => (t.id === ATTENDANCE_TASK_ID ? { ...t, completed: true } : t)),
-      );
-      return;
-    }
-
+    // 'already' included: complete_task is idempotent on the server, so it
+    // only awards if today's attendance task was not recorded yet.
+    void status;
     await toggleTask(ATTENDANCE_TASK_ID);
   };
 
   const toggleCustomTask = async (taskId: string) => {
     const task = customTasks.find(t => t.id === taskId);
-    const wasCompleted = task?.completed;
-    
-    const updatedCustomTasks = customTasks.map(task =>
-      task.id === taskId ? { ...task, completed: !task.completed } : task
+    // Completions are final — the server never un-awards a task.
+    if (task?.completed) return;
+
+    const updatedCustomTasks = customTasks.map(t =>
+      t.id === taskId ? { ...t, completed: true } : t
     );
     setCustomTasks(updatedCustomTasks);
 
     try {
-      const { data, error: fetchError } = await supabase
-        .from("challenge_progress")
-        .select("tasks_state, weekly_points, total_points")
-        .eq("user_id", session?.user?.id)
-        .single();
-
-      if (fetchError) throw fetchError;
-
-      const tasksState = (data?.tasks_state || {}) as Record<string, Record<string, boolean>>;
-      const todayKey = `day_${currentDay}`;
-      
-      if (!tasksState[todayKey]) {
-        tasksState[todayKey] = {};
+      const result = await challengeRpc.completeCustomTask(taskId, "nass");
+      setTotalPoints(result.total_points);
+      if (result.awarded) {
+        applyServerXP(result.xp, isArabic, handleLevelUp);
       }
-      
-      const customTaskKey = `custom_${taskId}`;
-      tasksState[todayKey][customTaskKey] = !wasCompleted;
-
-      const basePoints = POINTS_PER_TASK;
-      const pointChange = wasCompleted ? -basePoints : basePoints;
-      const newWeeklyPoints = Math.max(0, (data?.weekly_points || 0) + pointChange);
-      const newTotalPoints = Math.max(0, (data?.total_points || 0) + pointChange);
-      
-      setTotalPoints(newTotalPoints);
-
-      const { error: updateError } = await supabase
-        .from("challenge_progress")
-        .update({ 
-          tasks_state: tasksState,
-          weekly_points: newWeeklyPoints,
-          total_points: newTotalPoints
-        })
-        .eq("user_id", session?.user?.id);
-
-      if (updateError) throw updateError;
-
-      if (!wasCompleted) {
-        await supabase.from("task_completions").insert({
-          user_id: session?.user?.id,
-          task_key: task?.title || `custom_${taskId}`,
-          points_earned: basePoints,
-        });
-
-        addXP(10, isArabic, handleLevelUp);
+      if (result.loot_box_awarded) {
+        announceLootBox(isArabic);
+        refetchCosmetics();
       }
+      invalidateProgress();
     } catch (error) {
       console.error("Error saving custom task state:", error);
+      setCustomTasks(customTasks);
     }
   };
 
@@ -707,37 +606,25 @@ const NassChallenge = () => {
   const completeDay = async () => {
     if (!allTasksCompleted || isDayCompleted) return;
 
+    // Interstitial on "I finished my tasks". Fire-and-forget and capped in
+    // lib/ads.ts, so it never delays or blocks completing the day.
+    void showInterstitial();
+
     try {
-      const newCompletedDays = [...Array.from(completedDays), currentDay];
-      const newStreak = currentStreak + 1;
-      
-      const { data: currentData, error: fetchError } = await supabase
-        .from("challenge_progress")
-        .select("best_streak")
-        .eq("user_id", session?.user?.id)
-        .single();
+      // The server verifies all tasks and computes streak / best streak / XP.
+      const result = await challengeRpc.completeDay("nass");
+      invalidateProgress();
 
-      if (fetchError) throw fetchError;
+      setCompletedDays(new Set<number>(result.completed_days || []));
+      setCurrentStreak(result.current_streak);
+      if (result.already_completed) return;
 
-      const bestStreak = Math.max(currentData?.best_streak || 0, newStreak);
+      applyServerXP(result.xp, isArabic);
+      if (result.loot_box_awarded) {
+        announceLootBox(isArabic);
+        refetchCosmetics();
+      }
 
-      const { error } = await supabase
-        .from("challenge_progress")
-        .update({
-          completed_days: newCompletedDays,
-          current_streak: newStreak,
-          best_streak: bestStreak,
-        })
-        .eq("user_id", session?.user?.id);
-
-      if (error) throw error;
-
-      setCompletedDays(new Set(newCompletedDays));
-      setCurrentStreak(newStreak);
-      
-      // Add bonus XP for completing day
-      addXP(50, isArabic);
-      
       confetti({
         particleCount: 100,
         spread: 70,
@@ -757,6 +644,8 @@ const NassChallenge = () => {
       }
     } catch (error) {
       console.error("Error completing day:", error);
+      const [ar, en] = rpcErrorText(error);
+      toast({ variant: "destructive", title: bi(ar, en) });
     }
   };
 
@@ -797,10 +686,10 @@ const NassChallenge = () => {
   const loadDayTasks = async (dayNumber: number) => {
     try {
       const { data, error } = await supabase
-        .from("challenge_progress")
+        .from("nass_progress")
         .select("tasks_state")
         .eq("user_id", session?.user?.id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
 
@@ -859,7 +748,9 @@ const NassChallenge = () => {
     <div className="duo-page min-h-screen bg-background pb-24" dir={bi("rtl", "ltr")}>
       {/* Home Header with filter, avatar, level */}
       <HomeHeader
-        avatarUrl={userProfile?.avatar_url}
+        avatarId={userProfile?.avatar_id}
+        gender={userProfile?.gender}
+        userId={session?.user?.id}
         username={userProfile?.username}
         selectedFilter={taskFilter}
         totalPoints={totalPoints}
@@ -961,7 +852,7 @@ const NassChallenge = () => {
           tasksCompleted={completedTasksCount}
           totalTasks={totalTasksCount}
           onRewardClaimed={(amount) => {
-            console.log(`Vault released: ${amount} lemons`);
+            console.log(`Vault released: ${amount} gems`);
           }}
         />
       )}
@@ -980,11 +871,13 @@ const NassChallenge = () => {
               <p className="text-sm font-semibold mt-0.5" style={{ color: "hsl(var(--duo-muted))" }}>
                 {bi("المهام الجديدة في:", "New tasks in:")}
               </p>
-            </div>
-            <div className="px-3 py-2 rounded-xl flex-shrink-0" style={{ background: "#FFC8001e" }}>
-              <span className="text-xl font-extrabold tabular-nums" style={{ color: "#FFC800" }} dir="ltr">
-                {countdownToMidnight}
-              </span>
+              {/* Under the text, not beside it: beside it the timer squeezed
+                  the text to one word per line on a 360px screen. */}
+              <div className="mt-2 inline-block px-3 py-1.5 rounded-xl" style={{ background: "#FFC8001e" }}>
+                <span className="text-xl font-extrabold tabular-nums" style={{ color: "#FFC800" }} dir="ltr">
+                  {countdownToMidnight}
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -1069,7 +962,7 @@ const NassChallenge = () => {
                     "w-full h-14 text-lg font-bold rounded-2xl uppercase tracking-widest",
                     "text-white border-b-4 active:border-b-0 active:translate-y-1 transition-all duration-150",
                     allTasksCompleted
-                      ? "bg-[#58cc02] hover:bg-[#46a302] border-[#58a700]"
+                      ? "bg-[hsl(var(--duo-accent))] hover:bg-[hsl(var(--duo-accent-edge))] border-[hsl(var(--duo-accent-edge))]"
                       : "bg-[#e5e5e5] hover:bg-[#e5e5e5] border-[#d8d8d8] text-[#afafaf]"
                   )}
                   size="lg"
@@ -1094,11 +987,17 @@ const NassChallenge = () => {
 
       {/* Attendance — camera-only scanner (ML Kit on device, zxing on web).
           It owns the camera, the record_attendance RPC and the result UI. */}
-      <AttendanceScannerDialog
-        open={scannerOpen}
-        onOpenChange={setScannerOpen}
-        onAttendanceRecorded={handleAttendanceRecorded}
-      />
+      {scannerOpen && (
+        <AttendanceErrorBoundary resetKey={scannerOpen} onClose={() => setScannerOpen(false)}>
+        <Suspense fallback={null}>
+          <AttendanceScannerDialog
+            open={scannerOpen}
+            onOpenChange={setScannerOpen}
+            onAttendanceRecorded={handleAttendanceRecorded}
+          />
+        </Suspense>
+        </AttendanceErrorBoundary>
+      )}
 
 
       {/* Reminder Dialog */}

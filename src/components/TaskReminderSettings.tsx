@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { clerkAuth } from "@/lib/clerk-auth";
 import { useTranslation } from "react-i18next";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent } from "@/components/ui/card";
@@ -50,7 +49,7 @@ export const TaskReminderSettings = () => {
 
   const fetchReminders = async () => {
     try {
-      const { data: { user } } = await clerkAuth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
       const { data, error } = await supabase
@@ -103,7 +102,7 @@ export const TaskReminderSettings = () => {
 
   const handleToggle = async (taskId: number) => {
     try {
-      const { data: { user } } = await clerkAuth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
       const reminder = reminders.find(r => r.task_id === taskId);
@@ -166,7 +165,7 @@ export const TaskReminderSettings = () => {
 
   const handleTimeChange = async (taskId: number, newTime: string) => {
     try {
-      const { data: { user } } = await clerkAuth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
       const reminder = reminders.find(r => r.task_id === taskId);

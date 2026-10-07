@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { readCache, readLastKnown, writeCache, dropCache, homeKeys } from "@/lib/home-cache";
 import { CosmeticItem, CosmeticType } from "@/components/cosmetics/types";
 
 interface UserCosmeticsData {
@@ -12,14 +13,45 @@ interface UserCosmeticsData {
 }
 
 export const useUserCosmetics = (userId: string | null): UserCosmeticsData => {
-  const [equippedFrame, setEquippedFrame] = useState<CosmeticItem | null>(null);
-  const [equippedBadge, setEquippedBadge] = useState<CosmeticItem | null>(null);
-  const [equippedTheme, setEquippedTheme] = useState<CosmeticItem | null>(null);
-  const [lootBoxes, setLootBoxes] = useState(0);
+  // Last known equipment for the first frame (no frame popping onto the avatar
+  // a second after launch).
+  const [initial] = useState(() =>
+    userId
+      ? readLastKnown<{ lootBoxes: number; frame: CosmeticItem | null; badge: CosmeticItem | null; theme: CosmeticItem | null }>(
+          homeKeys.cosmetics(userId),
+          true,
+        )
+      : undefined,
+  );
+  const [equippedFrame, setEquippedFrame] = useState<CosmeticItem | null>(initial?.frame ?? null);
+  const [equippedBadge, setEquippedBadge] = useState<CosmeticItem | null>(initial?.badge ?? null);
+  const [equippedTheme, setEquippedTheme] = useState<CosmeticItem | null>(initial?.theme ?? null);
+  const [lootBoxes, setLootBoxes] = useState(initial?.lootBoxes ?? 0);
   const [loading, setLoading] = useState(true);
+
+  /** Shape held in the session cache. */
+  interface CosmeticsSnapshotShape {
+    lootBoxes: number;
+    frame: CosmeticItem | null;
+    badge: CosmeticItem | null;
+    theme: CosmeticItem | null;
+  }
 
   const fetchCosmetics = useCallback(async () => {
     if (!userId) {
+      setLoading(false);
+      return;
+    }
+
+    // Equipped cosmetics change only when the user equips something, and the
+    // inventory modal calls `refetch` when they do — which drops this entry
+    // first, so equipping is still reflected immediately.
+    const cached = readCache<CosmeticsSnapshotShape>(homeKeys.cosmetics(userId));
+    if (cached) {
+      setLootBoxes(cached.lootBoxes);
+      setEquippedFrame(cached.frame);
+      setEquippedBadge(cached.badge);
+      setEquippedTheme(cached.theme);
       setLoading(false);
       return;
     }
@@ -54,14 +86,24 @@ export const useUserCosmetics = (userId: string | null): UserCosmeticsData => {
             rarity: item.rarity as any,
           }));
 
-          setEquippedFrame(itemsTyped.find(i => i.id === profile.equipped_frame_id) || null);
-          setEquippedBadge(itemsTyped.find(i => i.id === profile.equipped_badge_id) || null);
-          setEquippedTheme(itemsTyped.find(i => i.id === profile.equipped_theme_id) || null);
+          const frame = itemsTyped.find(i => i.id === profile.equipped_frame_id) || null;
+          const badge = itemsTyped.find(i => i.id === profile.equipped_badge_id) || null;
+          const theme = itemsTyped.find(i => i.id === profile.equipped_theme_id) || null;
+
+          setEquippedFrame(frame);
+          setEquippedBadge(badge);
+          setEquippedTheme(theme);
+          writeCache<CosmeticsSnapshotShape>(homeKeys.cosmetics(userId), {
+            lootBoxes: profile.loot_boxes || 0, frame, badge, theme,
+          });
         }
       } else {
         setEquippedFrame(null);
         setEquippedBadge(null);
         setEquippedTheme(null);
+        writeCache<CosmeticsSnapshotShape>(homeKeys.cosmetics(userId), {
+          lootBoxes: profile.loot_boxes || 0, frame: null, badge: null, theme: null,
+        });
       }
     } catch (error) {
       console.error("Error fetching user cosmetics:", error);
@@ -74,12 +116,18 @@ export const useUserCosmetics = (userId: string | null): UserCosmeticsData => {
     fetchCosmetics();
   }, [fetchCosmetics]);
 
+  /** Forces a real read — used after the user equips or opens something. */
+  const refetch = useCallback(async () => {
+    if (userId) dropCache(homeKeys.cosmetics(userId));
+    await fetchCosmetics();
+  }, [userId, fetchCosmetics]);
+
   return {
+    refetch,
     equippedFrame,
     equippedBadge,
     equippedTheme,
     lootBoxes,
     loading,
-    refetch: fetchCosmetics,
   };
 };
